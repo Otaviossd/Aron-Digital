@@ -133,5 +133,43 @@ check("admin vê todas as assinaturas", r.length === 6, String(r.length));
 await como("admin@x.com", () => db.exec(`insert into public.modules (title, position) values ('Novo do admin', 9)`));
 check("admin cria módulo", (await q("select 1 from public.modules where title='Novo do admin'")).length === 1);
 
+// 9) Leads e e-mail marketing
+await db.exec(`insert into public.leads (email, plan) values ('lead1@x.com', 'monthly'), ('lead2@x.com', 'annual'), ('lead3@x.com', 'monthly')`);
+const l1 = (await q("select id from public.leads where email='lead1@x.com'"))[0].id;
+const l2 = (await q("select id from public.leads where email='lead2@x.com'"))[0].id;
+await db.exec(`insert into public.email_sends (lead_id, step, sent_at) values ('${l1}', 1, now() - interval '5 hours'), ('${l2}', 1, now() - interval '5 hours')`);
+await db.exec(`update public.leads set converted_at = now() where id = '${l1}'`); // comprou depois do e-mail 1
+await db.exec(`update public.leads set unsubscribed_at = now() where id = '${l2}'`);
+
+let dup = false;
+try { await db.exec(`insert into public.email_sends (lead_id, step) values ('${l1}', 1)`); } catch { dup = true; }
+check("mesma etapa não pode ser enviada duas vezes ao mesmo lead", dup);
+
+let mai = false;
+try { await db.exec(`insert into public.leads (email) values ('MAIUSCULA@x.com')`); } catch { mai = true; }
+check("e-mail do lead precisa estar em minúsculas", mai);
+
+let dupMail = false;
+try { await db.exec(`insert into public.leads (email) values ('lead1@x.com')`); } catch { dupMail = true; }
+check("e-mail de lead é único", dupMail);
+
+r = await como("novo@x.com", () => q("select * from public.leads"));
+check("aluno não enxerga leads", r.length === 0);
+r = await como("novo@x.com", () => q("select * from public.email_sends"));
+check("aluno não enxerga envios", r.length === 0);
+let escritaLead = 0;
+try { escritaLead = (await como("novo@x.com", () => db.query(`update public.leads set converted_at = null`))).affectedRows ?? 0; } catch { escritaLead = 0; }
+check("aluno não consegue alterar leads", escritaLead === 0);
+
+r = await como("novo@x.com", () => q("select public.email_stats() as s"));
+check("email_stats retorna null para quem não é admin", r[0].s === null);
+r = await como("admin@x.com", () => q("select public.email_stats() as s"));
+const s = r[0].s;
+check("email_stats (admin): 3 leads", s.leads === 3, JSON.stringify(s));
+check("email_stats (admin): 1 pendente (lead3)", s.pendientes === 1, JSON.stringify(s));
+check("email_stats (admin): 1 recuperado (lead1 comprou depois do e-mail)", s.recuperados === 1, JSON.stringify(s));
+check("email_stats (admin): 1 descadastro", s.bajas === 1, JSON.stringify(s));
+check("email_stats (admin): 2 envios da etapa 1", s.enviados["1"] === 2, JSON.stringify(s));
+
 console.log(falhas === 0 ? "\nTODOS OS TESTES PASSARAM" : `\n${falhas} FALHA(S)`);
 process.exit(falhas === 0 ? 0 : 1);

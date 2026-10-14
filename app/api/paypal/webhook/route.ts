@@ -78,6 +78,14 @@ async function handleEvent(admin: ReturnType<typeof createAdminClient>, event: P
         .single();
       if (error) throw error;
 
+      // A pessoa comprou: para a sequência de carrinho abandonado (e-mail de acesso ou do PayPal)
+      const emailsLead = [accessEmail, payerEmail].filter((e): e is string => !!e);
+      await admin
+        .from("leads")
+        .update({ converted_at: new Date().toISOString() })
+        .in("email", emailsLead)
+        .is("converted_at", null);
+
       if (!row.welcome_sent_at) {
         await sendWelcomeEmail({ to: accessEmail, plan });
         await admin

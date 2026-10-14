@@ -1,14 +1,34 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { supabaseAnonKey, supabaseUrl } from "@/lib/env";
 
-// Renova a sessão do Supabase e protege a área de aulas.
+const ZONAS_PROTEGIDAS = ["/aulas", "/admin"];
+
+function aviso(mensaje: string) {
+  return new NextResponse(mensaje, {
+    status: 503,
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
+}
+
+// Renova a sessão do Supabase e protege a área de aulas e o admin.
+// Nunca derruba as páginas públicas: se algo falhar na configuração, a página de venda continua abrindo.
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const url = supabaseUrl();
+  const key = supabaseAnonKey();
+  const protegida = ZONAS_PROTEGIDAS.some((p) => request.nextUrl.pathname.startsWith(p));
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  if (!url || !key) {
+    if (!protegida) return NextResponse.next();
+    return aviso(
+      "Configuración incompleta: faltan NEXT_PUBLIC_SUPABASE_URL y/o NEXT_PUBLIC_SUPABASE_ANON_KEY. Abrí /api/salud para ver qué falta.",
+    );
+  }
+
+  try {
+    let response = NextResponse.next({ request });
+
+    const supabase = createServerClient(url, key, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -16,25 +36,28 @@ export async function proxy(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
-    },
-  );
+    });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user && request.nextUrl.pathname.startsWith("/aulas")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/entrar";
-    return NextResponse.redirect(url);
+    if (!user && protegida) {
+      const redirect = request.nextUrl.clone();
+      redirect.pathname = "/entrar";
+      return NextResponse.redirect(redirect);
+    }
+
+    return response;
+  } catch (err) {
+    console.error("proxy error", err);
+    if (!protegida) return NextResponse.next();
+    const detalle = err instanceof Error ? err.message : "error desconocido";
+    return aviso(`No se pudo conectar con Supabase (${detalle}). Abrí /api/salud para diagnosticar.`);
   }
-
-  return response;
 }
 
 export const config = {

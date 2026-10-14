@@ -48,11 +48,19 @@ export default function AdminPage() {
 
 async function Painel() {
   const supabase = await createClient();
-  const [{ data: m }, { data: a }, { data: s }] = await Promise.all([
+  const [{ data: m }, { data: a }, { data: s }, { data: es }] = await Promise.all([
     supabase.from("modules").select("*").order("position"),
     supabase.from("lessons").select("*").order("position"),
     supabase.from("subscriptions").select("email, plan, status, purchased_at, access_until, refunded_at").order("purchased_at", { ascending: false }),
+    supabase.rpc("email_stats"),
   ]);
+  const stats = (es ?? null) as {
+    leads: number;
+    pendientes: number;
+    bajas: number;
+    enviados: Record<string, number>;
+    recuperados: number;
+  } | null;
   const modulos = (m ?? []) as Modulo[];
   const aulas = (a ?? []) as Aula[];
   const subs = (s ?? []) as Sub[];
@@ -73,6 +81,31 @@ async function Painel() {
           </div>
         ))}
       </section>
+
+      {/* E-mails de carrinho abandonado */}
+      {stats && (
+        <section>
+          <h2 className="mb-4 text-xl font-black uppercase tracking-tight">E-mails de carrinho abandonado</h2>
+          <div className="grid grid-cols-2 gap-px bg-white/10 text-center sm:grid-cols-4">
+            {[
+              ["Leads (e-mails no checkout)", stats.leads],
+              ["Pendentes", stats.pendientes],
+              ["Recuperados", stats.recuperados],
+              ["Descadastros", stats.bajas],
+            ].map(([t, v]) => (
+              <div key={t as string} className="bg-black p-5">
+                <p className="text-3xl font-black text-acid">{v}</p>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-white/50">{t}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-white/50">
+            Enviados: e-mail 1 (1 h) = {stats.enviados["1"] ?? 0} · e-mail 2 (24 h) = {stats.enviados["2"] ?? 0} · e-mail 3 (48 h) ={" "}
+            {stats.enviados["3"] ?? 0}. “Recuperado” = comprou depois de receber ao menos um e-mail; pode incluir quem
+            compraria de qualquer forma.
+          </p>
+        </section>
+      )}
 
       {/* Módulos */}
       <section>

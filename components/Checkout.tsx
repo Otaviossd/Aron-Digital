@@ -32,6 +32,29 @@ export default function Checkout() {
 
   const emailValido = /^\S+@\S+\.\S+$/.test(email.trim());
 
+  // E-mail pré-preenchido pelo link dos e-mails de carrinho abandonado (?email=...)
+  useEffect(() => {
+    const e = new URLSearchParams(window.location.search).get("email");
+    if (e) setEmail(e);
+  }, []);
+
+  // Guarda o e-mail como lead quando a pessoa termina de digitar (uma vez por e-mail)
+  const ultimoLead = useRef("");
+  useEffect(() => {
+    if (!emailValido) return;
+    const limpio = email.trim().toLowerCase();
+    if (limpio === ultimoLead.current) return;
+    const t = setTimeout(() => {
+      ultimoLead.current = limpio;
+      fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: limpio, plan }),
+      }).catch(() => {});
+    }, 900);
+    return () => clearTimeout(t);
+  }, [email, emailValido, plan]);
+
   useEffect(() => {
     if (!sdkListo || !window.paypal || !contenedor.current || !emailValido) return;
     const el = contenedor.current;
@@ -91,8 +114,12 @@ export default function Checkout() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="tu@email.com"
-        className="mb-5 w-full border-2 border-white/30 bg-transparent px-4 py-4 text-base outline-none focus:border-acid"
+        className="mb-2 w-full border-2 border-white/30 bg-transparent px-4 py-4 text-base outline-none focus:border-acid"
       />
+      <p className="mb-5 text-[11px] leading-relaxed text-white/40">
+        Al continuar aceptás que usemos tu email para enviarte el acceso y novedades del curso.
+        Podés darte de baja cuando quieras.
+      </p>
 
       {emailValido ? (
         <div ref={contenedor} />

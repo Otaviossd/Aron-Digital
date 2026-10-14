@@ -224,6 +224,42 @@ create policy "progress_delete_own" on public.lesson_progress
   using (lower(user_email) = lower(coalesce(auth.jwt() ->> 'email', '')));
 
 -- ============================================================
+-- E-mail marketing: leads (quem digitou o e-mail no checkout) e envios
+-- ============================================================
+
+create table if not exists public.leads (
+  id uuid primary key default gen_random_uuid(),
+  -- sempre em minúsculas (a API normaliza); evita duplicar o mesmo e-mail
+  email text not null unique check (email = lower(email) and char_length(email) <= 254),
+  plan text,
+  source text,
+  -- momento em que a pessoa viu o aviso de uso do e-mail e continuou
+  consent_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  -- preenchido quando a compra é confirmada (para a sequência parar)
+  converted_at timestamptz,
+  unsubscribed_at timestamptz,
+  unsubscribe_token uuid not null default gen_random_uuid()
+);
+create index if not exists leads_pending_idx on public.leads (created_at)
+  where converted_at is null and unsubscribed_at is null;
+
+create table if not exists public.email_sends (
+  id uuid primary key default gen_random_uuid(),
+  lead_id uuid not null references public.leads(id) on delete cascade,
+  sequence text not null default 'abandono',
+  step int not null,
+  sent_at timestamptz not null default now(),
+  provider_id text,
+  -- a mesma etapa nunca é enviada duas vezes para o mesmo lead
+  unique (lead_id, sequence, step)
+);
+
+alter table public.leads enable row level security;
+alter table public.email_sends enable row level security;
+-- Sem policies para alunos: só o service role (servidor) escreve. Admin lê abaixo.
+
+-- ============================================================
 -- Administração
 -- ============================================================
 
@@ -241,6 +277,40 @@ create policy "lessons_admin_all" on public.lessons
 drop policy if exists "subscriptions_admin_select" on public.subscriptions;
 create policy "subscriptions_admin_select" on public.subscriptions
   for select to authenticated using (public.is_admin());
+
+drop policy if exists "leads_admin_select" on public.leads;
+create policy "leads_admin_select" on public.leads
+  for select to authenticated using (public.is_admin());
+
+drop policy if exists "email_sends_admin_select" on public.email_sends;
+create policy "email_sends_admin_select" on public.email_sends
+  for select to authenticated using (public.is_admin());
+
+-- Números do e-mail marketing para o painel (só admin; para os demais retorna null).
+create or replace function public.email_stats()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select jsonb_build_object(
+    'leads', (select count(*) from public.leads),
+    'pendientes', (select count(*) from public.leads where converted_at is null and unsubscribed_at is null),
+    'bajas', (select count(*) from public.leads where unsubscribed_at is not null),
+    'enviados', (
+      select coalesce(jsonb_object_agg(step::text, n), '{}'::jsonb)
+      from (select step, count(*) as n from public.email_sends group by step) s
+    ),
+    -- recuperados: compraram depois de receber pelo menos um e-mail da sequência
+    'recuperados', (
+      select count(*) from public.leads l
+      where l.converted_at is not null
+        and exists (select 1 from public.email_sends e where e.lead_id = l.id and e.sent_at < l.converted_at)
+    )
+  )
+  where public.is_admin()
+$$;
 
 -- ============================================================
 -- Storage das capas (bucket público para leitura; só admin envia)
