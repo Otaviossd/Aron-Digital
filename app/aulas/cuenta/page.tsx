@@ -31,41 +31,41 @@ async function Cuenta() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="mb-8 text-4xl font-black uppercase tracking-tight">Mi cuenta</h1>
+      <h1 className="mb-8 text-3xl font-semibold tracking-tight">Mi cuenta</h1>
 
-      <dl className="mb-8 divide-y divide-white/10 border border-white/10 bg-[#141414] text-sm">
-        <div className="flex justify-between px-5 py-4">
-          <dt className="text-white/50">Email de acceso</dt>
-          <dd className="font-semibold">{email}</dd>
+      <dl className="mb-8 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface text-sm">
+        <div className="flex justify-between gap-4 px-5 py-4">
+          <dt className="text-muted">Email de acceso</dt>
+          <dd className="font-medium">{email}</dd>
         </div>
         {sub && (
           <>
-            <div className="flex justify-between px-5 py-4">
-              <dt className="text-white/50">Plan</dt>
-              <dd className="font-semibold">{sub.plan === "annual" ? "Anual" : "Mensual"}</dd>
+            <div className="flex justify-between gap-4 px-5 py-4">
+              <dt className="text-muted">Plan</dt>
+              <dd className="font-medium">{sub.plan === "annual" ? "Anual" : "Mensual"}</dd>
             </div>
-            <div className="flex justify-between px-5 py-4">
-              <dt className="text-white/50">Estado</dt>
-              <dd className="font-semibold">{sub.status === "active" ? "Activa" : sub.status === "cancelled" ? "Cancelada" : sub.status}</dd>
+            <div className="flex justify-between gap-4 px-5 py-4">
+              <dt className="text-muted">Estado</dt>
+              <dd className="font-medium">{sub.status === "active" ? "Activa" : sub.status === "cancelled" ? "Cancelada" : sub.status}</dd>
             </div>
             {compra && (
-              <div className="flex justify-between px-5 py-4">
-                <dt className="text-white/50">Fecha de compra</dt>
-                <dd className="font-semibold">{fmt(compra)}</dd>
-              </div>
+            <div className="flex justify-between gap-4 px-5 py-4">
+              <dt className="text-muted">Fecha de compra</dt>
+              <dd className="font-medium">{fmt(compra)}</dd>
+            </div>
             )}
             {sub.access_until && (
-              <div className="flex justify-between px-5 py-4">
-                <dt className="text-white/50">{sub.status === "active" ? "Próxima cobranza" : "Acceso hasta"}</dt>
-                <dd className="font-semibold">{fmt(sub.access_until)}</dd>
-              </div>
+            <div className="flex justify-between gap-4 px-5 py-4">
+              <dt className="text-muted">{sub.status === "active" ? "Próxima cobranza" : "Acceso hasta"}</dt>
+              <dd className="font-medium">{fmt(sub.access_until)}</dd>
+            </div>
             )}
           </>
         )}
       </dl>
 
       {sub && (
-        <div className="text-sm text-white/60">
+        <div className="text-sm leading-relaxed text-muted">
           <p className="mb-4">
             {enVentana && finReembolso
               ? `Podés pedir reembolso hasta el ${fmt(finReembolso)} escribiéndonos por soporte. Después de esa fecha solo podés cancelar las próximas cobranzas.`

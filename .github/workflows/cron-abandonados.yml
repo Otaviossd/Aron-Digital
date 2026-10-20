@@ -1,0 +1,23 @@
+# Dispara a sequência de carrinho abandonado a cada hora.
+# O cron da Vercel no plano gratuito (Hobby) roda só 1x por dia, por isso usamos o GitHub Actions.
+# Configure em GitHub > Settings > Secrets and variables > Actions:
+#   SITE_URL     = https://seudominio.com
+#   CRON_SECRET  = o mesmo valor da variável CRON_SECRET da Vercel
+name: cron-abandonados
+
+on:
+  schedule:
+    - cron: "7 * * * *" # minuto 7 de cada hora (UTC); horários redondos costumam atrasar
+  workflow_dispatch: {}
+
+jobs:
+  disparar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chamar a rota de abandonados
+        run: |
+          status=$(curl -s -o resposta.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/abandonados")
+          cat resposta.json
+          test "$status" = "200"

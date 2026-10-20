@@ -3,6 +3,8 @@ import Link from "next/link";
 import CoverCard from "@/components/members/CoverCard";
 import Row from "@/components/members/Row";
 import { aulasDelModulo, getMemberData, siguienteAula } from "@/lib/members";
+import { FOTOS, fondoFoto } from "@/lib/fotos";
+import { ui } from "@/lib/ui";
 
 export default function AulasPage() {
   return (
@@ -19,16 +21,14 @@ async function Inicio() {
   if (modulos.length === 0) {
     return (
       <div className="mx-auto max-w-md py-16">
-        <h1 className="mb-4 text-4xl font-black uppercase leading-none">
-          No encontramos <span className="text-acid">tu acceso</span>
-        </h1>
-        <p className="mb-6 text-white/70">
-          Entraste con <strong>{email}</strong>, pero no hay una compra activa con ese email. Si
+        <h1 className="mb-4 text-3xl font-semibold tracking-tight">No encontramos tu acceso</h1>
+        <p className="mb-7 leading-relaxed text-muted">
+          Entraste con <span className="text-ink">{email}</span>, pero no hay una compra activa con ese email. Si
           compraste con otro email, cerrá sesión y entrá con ese.
         </p>
-        <a href="/#comprar" className="inline-block border-2 border-acid bg-acid px-5 py-3 text-xs font-black uppercase tracking-widest text-black">
+        <Link href="/ventas#comprar" className={ui.boton}>
           Comprar acceso
-        </a>
+        </Link>
       </div>
     );
   }
@@ -50,37 +50,37 @@ async function Inicio() {
   return (
     <>
       {/* Siguiente clase */}
-      <section className="relative mb-10 overflow-hidden border border-white/10 bg-gradient-to-br from-[#1a1a1a] to-black p-6 sm:p-10">
-        <div className="absolute -right-10 -top-10 h-56 w-56 rounded-full bg-acid/10 blur-3xl" />
+      <section
+        className="relative mb-14 overflow-hidden rounded-3xl border border-line p-8 sm:p-12"
+        style={fondoFoto(FOTOS.aulas, "linear-gradient(90deg, rgba(10,10,10,.95) 0%, rgba(10,10,10,.7) 60%, rgba(10,10,10,.35) 100%)")}
+      >
+        <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
         {siguiente ? (
-          <>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-acid">
+          <div className="relative">
+            <p className="mb-4 text-sm font-medium text-accent">
               {completadas.size === 0 ? "Empezá acá" : "Seguí donde quedaste"}
             </p>
-            <h1 className="max-w-2xl text-3xl font-black uppercase leading-[1.0] tracking-tight sm:text-5xl">
+            <h1 className="max-w-2xl text-3xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
               {siguiente.aula.title}
             </h1>
-            <p className="mt-3 text-sm text-white/50">{siguiente.modulo.title}</p>
-            <Link
-              href={`/aulas/${siguiente.aula.id}`}
-              className="mt-7 inline-block border-2 border-acid bg-acid px-7 py-4 text-xs font-black uppercase tracking-widest text-black transition hover:bg-transparent hover:text-acid"
-            >
+            <p className="mt-3 text-sm text-muted">{siguiente.modulo.title}</p>
+            <Link href={`/aulas/${siguiente.aula.id}`} className={`${ui.boton} mt-8`}>
               {completadas.size === 0 ? "Ver primera clase" : "Continuar"}
             </Link>
-          </>
+          </div>
         ) : (
-          <>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-acid">Al día</p>
-            <h1 className="max-w-2xl text-3xl font-black uppercase leading-[1.0] tracking-tight sm:text-5xl">
+          <div className="relative">
+            <p className="mb-4 text-sm font-medium text-accent">Al día</p>
+            <h1 className="max-w-2xl text-3xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
               Completaste todo lo disponible
             </h1>
-            <p className="mt-3 text-sm text-white/50">Volvé pronto: se publican clases nuevas cada semana.</p>
-          </>
+            <p className="mt-3 text-sm text-muted">Volvé pronto: se publican clases nuevas cada semana.</p>
+          </div>
         )}
       </section>
 
       {enProgreso.length > 0 && (
-        <Row titulo="Mis módulos en progreso" subtitulo="Seguí por donde ibas">
+        <Row titulo="Seguí con estos módulos" subtitulo="Los que ya empezaste">
           {enProgreso.map((d) => (
             <CoverCard key={d.m.id} modulo={d.m} numero={d.numero} progreso={d.progreso} totalAulas={d.total} />
           ))}

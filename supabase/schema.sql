@@ -241,8 +241,15 @@ create table if not exists public.leads (
   unsubscribed_at timestamptz,
   unsubscribe_token uuid not null default gen_random_uuid()
 );
-create index if not exists leads_pending_idx on public.leads (created_at)
-  where converted_at is null and unsubscribed_at is null;
+-- Momento em que a pessoa digitou o e-mail no checkout (a sequência de carrinho abandonado conta a
+-- partir daqui). Quem só se cadastrou na página de captura fica com checkout_at nulo e NÃO recebe
+-- e-mail de carrinho abandonado.
+alter table public.leads add column if not exists checkout_at timestamptz;
+-- Leads antigos vieram todos do checkout.
+update public.leads set checkout_at = created_at where checkout_at is null and coalesce(source, 'checkout') = 'checkout';
+drop index if exists public.leads_pending_idx;
+create index if not exists leads_checkout_idx on public.leads (checkout_at)
+  where checkout_at is not null and converted_at is null and unsubscribed_at is null;
 
 create table if not exists public.email_sends (
   id uuid primary key default gen_random_uuid(),
@@ -296,7 +303,8 @@ set search_path = public
 as $$
   select jsonb_build_object(
     'leads', (select count(*) from public.leads),
-    'pendientes', (select count(*) from public.leads where converted_at is null and unsubscribed_at is null),
+    'captura', (select count(*) from public.leads where source = 'captura'),
+    'pendientes', (select count(*) from public.leads where checkout_at is not null and converted_at is null and unsubscribed_at is null),
     'bajas', (select count(*) from public.leads where unsubscribed_at is not null),
     'enviados', (
       select coalesce(jsonb_object_agg(step::text, n), '{}'::jsonb)
@@ -307,6 +315,233 @@ as $$
       select count(*) from public.leads l
       where l.converted_at is not null
         and exists (select 1 from public.email_sends e where e.lead_id = l.id and e.sent_at < l.converted_at)
+    )
+  )
+  where public.is_admin()
+$$;
+
+-- ============================================================
+-- Atividade dos alunos (quem está assistindo) e histórico de e-mails
+-- ============================================================
+
+-- Cada vez que o aluno abre uma aula, registramos a visita. Serve para o painel mostrar
+-- "quantos alunos estão assistindo" (aberturas de aula), que é diferente de "aula concluída".
+create table if not exists public.lesson_views (
+  user_email text not null,
+  lesson_id uuid not null references public.lessons(id) on delete cascade,
+  first_viewed_at timestamptz not null default now(),
+  last_viewed_at timestamptz not null default now(),
+  views int not null default 1,
+  primary key (user_email, lesson_id)
+);
+alter table public.lesson_views enable row level security;
+
+drop policy if exists "views_select_own" on public.lesson_views;
+create policy "views_select_own" on public.lesson_views
+  for select to authenticated
+  using (lower(user_email) = lower(coalesce(auth.jwt() ->> 'email', '')));
+
+-- Só registra visita de aulas que o aluno realmente enxerga (a RLS de lessons vale dentro do exists).
+drop policy if exists "views_insert_own" on public.lesson_views;
+create policy "views_insert_own" on public.lesson_views
+  for insert to authenticated
+  with check (
+    lower(user_email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    and exists (select 1 from public.lessons l where l.id = lesson_id)
+  );
+
+drop policy if exists "views_update_own" on public.lesson_views;
+create policy "views_update_own" on public.lesson_views
+  for update to authenticated
+  using (lower(user_email) = lower(coalesce(auth.jwt() ->> 'email', '')))
+  with check (lower(user_email) = lower(coalesce(auth.jwt() ->> 'email', '')));
+
+drop policy if exists "views_admin_select" on public.lesson_views;
+create policy "views_admin_select" on public.lesson_views
+  for select to authenticated using (public.is_admin());
+
+-- security invoker: roda com os direitos do aluno, então as policies acima se aplicam.
+create or replace function public.registrar_vista(p_lesson_id uuid)
+returns void
+language sql
+security invoker
+set search_path = public
+as $$
+  insert into public.lesson_views (user_email, lesson_id)
+  values (lower(coalesce(auth.jwt() ->> 'email', '')), p_lesson_id)
+  on conflict (user_email, lesson_id) do update
+    set last_viewed_at = now(), views = public.lesson_views.views + 1
+$$;
+
+-- Admin enxerga o progresso de todos os alunos (tabela de alunos do painel).
+drop policy if exists "progress_admin_select" on public.lesson_progress;
+create policy "progress_admin_select" on public.lesson_progress
+  for select to authenticated using (public.is_admin());
+
+-- Histórico dos e-mails transacionais (confirmação de compra, etc.). A sequência de carrinho
+-- abandonado continua em email_sends. Só o servidor escreve; admin lê.
+create table if not exists public.email_log (
+  id uuid primary key default gen_random_uuid(),
+  to_email text not null,
+  kind text not null,
+  subject text,
+  status text not null default 'sent' check (status in ('sent', 'failed')),
+  error text,
+  provider_id text,
+  created_at timestamptz not null default now()
+);
+create index if not exists email_log_created_idx on public.email_log (created_at desc);
+alter table public.email_log enable row level security;
+
+drop policy if exists "email_log_admin_select" on public.email_log;
+create policy "email_log_admin_select" on public.email_log
+  for select to authenticated using (public.is_admin());
+
+-- Equipe: quem já é admin pode ver, adicionar e remover admins pelo painel.
+-- (O primeiro admin é cadastrado pelo SQL Editor: veja supabase/admins.sql.)
+drop policy if exists "admins_admin_select" on public.admins;
+create policy "admins_admin_select" on public.admins
+  for select to authenticated using (public.is_admin());
+
+drop policy if exists "admins_admin_insert" on public.admins;
+create policy "admins_admin_insert" on public.admins
+  for insert to authenticated with check (public.is_admin());
+
+drop policy if exists "admins_admin_delete" on public.admins;
+create policy "admins_admin_delete" on public.admins
+  for delete to authenticated using (public.is_admin());
+
+-- Números do painel (só admin; para os demais retornam null / vazio). Feitos em SQL para não
+-- esbarrar no limite de linhas da API quando houver muitos alunos.
+create or replace function public.admin_resumen()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with con_acceso as (
+    select distinct on (lower(s.email)) lower(s.email) as email, s.plan
+    from public.subscriptions s
+    where s.refunded_at is null
+      and (s.status = 'active' or (s.status = 'cancelled' and s.access_until is not null and s.access_until > now()))
+    order by lower(s.email), s.purchased_at desc
+  )
+  select jsonb_build_object(
+    'activos', (select count(*) from con_acceso),
+    'activos_mensual', (select count(*) from con_acceso where plan = 'monthly'),
+    'activos_anual', (select count(*) from con_acceso where plan = 'annual'),
+    'compras', (select count(*) from public.subscriptions),
+    'compras_7d', (select count(*) from public.subscriptions where purchased_at > now() - interval '7 days'),
+    'reembolsos', (select count(*) from public.subscriptions where refunded_at is not null),
+    'viendo_24h', (select count(distinct lower(user_email)) from public.lesson_views where last_viewed_at > now() - interval '24 hours'),
+    'viendo_7d', (select count(distinct lower(user_email)) from public.lesson_views where last_viewed_at > now() - interval '7 days'),
+    'viendo_30d', (select count(distinct lower(user_email)) from public.lesson_views where last_viewed_at > now() - interval '30 days'),
+    'vistas', (select coalesce(sum(views), 0) from public.lesson_views),
+    'completadas', (select count(*) from public.lesson_progress),
+    'aulas', (select count(*) from public.lessons where published_at <= now()),
+    'modulos', (select count(*) from public.modules),
+    'top_clases', (
+      select coalesce(jsonb_agg(t order by t.vistas desc), '[]'::jsonb) from (
+        select l.title, sum(v.views)::int as vistas, count(*)::int as alumnos
+        from public.lesson_views v join public.lessons l on l.id = v.lesson_id
+        group by l.id, l.title order by sum(v.views) desc limit 5
+      ) t
+    ),
+    'actividad', (
+      select coalesce(jsonb_agg(t order by t.cuando desc), '[]'::jsonb) from (
+        select v.user_email as email, l.title as clase, v.last_viewed_at as cuando
+        from public.lesson_views v join public.lessons l on l.id = v.lesson_id
+        order by v.last_viewed_at desc limit 8
+      ) t
+    )
+  )
+  where public.is_admin()
+$$;
+
+-- Uma linha por assinatura, com o progresso e a última atividade do aluno.
+create or replace function public.admin_alumnos()
+returns table (
+  email text, plan text, status text, purchased_at timestamptz, access_until timestamptz,
+  refunded_at timestamptz, con_acceso boolean, completadas int, vistas int, ultima_vista timestamptz
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    s.email, s.plan, s.status, s.purchased_at, s.access_until, s.refunded_at,
+    (s.refunded_at is null and (s.status = 'active' or (s.status = 'cancelled' and s.access_until is not null and s.access_until > now()))),
+    (select count(*)::int from public.lesson_progress p where lower(p.user_email) = lower(s.email)),
+    (select coalesce(sum(v.views), 0)::int from public.lesson_views v where lower(v.user_email) = lower(s.email)),
+    (select max(v.last_viewed_at) from public.lesson_views v where lower(v.user_email) = lower(s.email))
+  from public.subscriptions s
+  where public.is_admin()
+  order by s.purchased_at desc
+  limit 1000
+$$;
+
+-- ============================================================
+-- Funil: visitas às páginas (rastreio próprio, sem cookies de terceiros)
+-- ============================================================
+
+-- Uma linha por evento. Só o servidor grava (service role); admin lê.
+create table if not exists public.page_events (
+  id bigint generated always as identity primary key,
+  visitor_id text not null check (char_length(visitor_id) <= 64),
+  path text not null check (path ~ '^/[a-z0-9/_-]{0,60}$'),
+  kind text not null check (kind in ('view', 'lead', 'checkout')),
+  -- origem da visita: utm_source ou domínio de quem indicou (vazio = direto)
+  source text check (char_length(source) <= 80),
+  created_at timestamptz not null default now()
+);
+create index if not exists page_events_created_idx on public.page_events (created_at desc);
+create index if not exists page_events_path_kind_idx on public.page_events (path, kind, created_at desc);
+alter table public.page_events enable row level security;
+
+drop policy if exists "page_events_admin_select" on public.page_events;
+create policy "page_events_admin_select" on public.page_events
+  for select to authenticated using (public.is_admin());
+
+-- Funil dos últimos p_days dias: por página, por origem e totais (só admin).
+create or replace function public.admin_embudo(p_days int default 30)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with ev as (
+    select * from public.page_events
+    where created_at > now() - make_interval(days => least(greatest(p_days, 1), 365))
+  )
+  select jsonb_build_object(
+    'paginas', (
+      select coalesce(jsonb_agg(t order by t.path), '[]'::jsonb) from (
+        select path,
+          (count(distinct visitor_id) filter (where kind = 'view'))::int as visitantes,
+          (count(distinct visitor_id) filter (where kind = 'lead'))::int as registros,
+          (count(distinct visitor_id) filter (where kind = 'checkout'))::int as checkout
+        from ev group by path
+      ) t
+    ),
+    'origenes', (
+      select coalesce(jsonb_agg(t order by t.visitantes desc), '[]'::jsonb) from (
+        select coalesce(nullif(source, ''), 'directo') as origen,
+          (count(distinct visitor_id) filter (where kind = 'view'))::int as visitantes,
+          (count(distinct visitor_id) filter (where kind = 'lead'))::int as registros,
+          (count(distinct visitor_id) filter (where kind = 'checkout'))::int as checkout
+        from ev group by 1 order by 2 desc limit 10
+      ) t
+    ),
+    'registros_lista', (
+      select count(*) from public.leads
+      where source = 'captura' and created_at > now() - make_interval(days => least(greatest(p_days, 1), 365))
+    ),
+    'compras', (
+      select count(*) from public.subscriptions
+      where purchased_at > now() - make_interval(days => least(greatest(p_days, 1), 365))
     )
   )
   where public.is_admin()

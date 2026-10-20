@@ -2,7 +2,8 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME ?? "Barbería Aaron";
+import { BRAND } from "@/lib/config";
+export { BRAND };
 
 export type ModuloEstado = {
   id: string;

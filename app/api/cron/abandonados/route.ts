@@ -26,11 +26,13 @@ export async function GET(request: NextRequest) {
 
   const { data: leads, error } = await admin
     .from("leads")
-    .select("id, email, created_at, converted_at, unsubscribed_at, unsubscribe_token")
+    .select("id, email, checkout_at, converted_at, unsubscribed_at, unsubscribe_token")
     .is("converted_at", null)
     .is("unsubscribed_at", null)
-    .gte("created_at", desde)
-    .order("created_at")
+    // só quem chegou ao checkout; quem apenas se cadastrou na página de captura não entra aqui
+    .not("checkout_at", "is", null)
+    .gte("checkout_at", desde)
+    .order("checkout_at")
     .limit(LOTE);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!leads || leads.length === 0) return NextResponse.json({ enviados: 0, revisados: 0 });
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
     }
 
     const step = pasoDebido({
-      createdAt: new Date(lead.created_at),
+      createdAt: new Date(lead.checkout_at as string),
       now: ahora,
       enviados: porLead.get(lead.id) ?? [],
       convertedAt: null,

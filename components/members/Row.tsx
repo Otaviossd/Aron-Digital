@@ -8,11 +8,11 @@ export default function Row({ titulo, subtitulo, children }: { titulo: string; s
   const mover = (dir: 1 | -1) => ref.current?.scrollBy({ left: dir * 480, behavior: "smooth" });
 
   return (
-    <section className="mb-10 border border-white/10 bg-[#141414] p-5 sm:p-6">
-      <div className="mb-5 flex items-start justify-between gap-4">
+    <section className="mb-12">
+      <div className="mb-5 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-black uppercase tracking-tight">{titulo}</h2>
-          {subtitulo && <p className="text-xs text-white/40">{subtitulo}</p>}
+          <h2 className="text-lg font-semibold tracking-tight">{titulo}</h2>
+          {subtitulo && <p className="mt-0.5 text-sm text-faint">{subtitulo}</p>}
         </div>
         <div className="hidden gap-2 sm:flex">
           {([-1, 1] as const).map((d) => (
@@ -20,7 +20,7 @@ export default function Row({ titulo, subtitulo, children }: { titulo: string; s
               key={d}
               onClick={() => mover(d)}
               aria-label={d === 1 ? "Siguiente" : "Anterior"}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-sm hover:bg-acid hover:text-black"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-line-strong text-sm text-muted transition hover:bg-white/5 hover:text-ink"
             >
               {d === 1 ? "›" : "‹"}
             </button>

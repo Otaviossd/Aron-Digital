@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { PRECOS } from "@/lib/config";
+import { enviarEvento } from "@/components/Rastreo";
 
 type Plan = "monthly" | "annual";
 
@@ -45,11 +46,13 @@ export default function Checkout() {
     const limpio = email.trim().toLowerCase();
     if (limpio === ultimoLead.current) return;
     const t = setTimeout(() => {
+      // Passo do funil: chegou ao checkout (uma vez por abertura da página)
+      if (!ultimoLead.current) enviarEvento("/ventas", "checkout");
       ultimoLead.current = limpio;
       fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: limpio, plan }),
+        body: JSON.stringify({ email: limpio, plan, source: "checkout" }),
       }).catch(() => {});
     }, 900);
     return () => clearTimeout(t);
@@ -60,7 +63,7 @@ export default function Checkout() {
     const el = contenedor.current;
     el.innerHTML = "";
     const botones = window.paypal.Buttons({
-      style: { layout: "vertical", color: "gold", shape: "rect", label: "subscribe" },
+      style: { layout: "vertical", color: "gold", shape: "pill", label: "subscribe" },
       createSubscription: (_data: unknown, actions: any) =>
         actions.subscription.create({
           plan_id: PLAN_IDS[plan],
@@ -80,7 +83,7 @@ export default function Checkout() {
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
   return (
-    <div id="comprar" className="border-2 border-acid p-6 sm:p-8">
+    <div id="comprar" className="scroll-mt-8 rounded-3xl border border-line bg-surface p-6 sm:p-8">
       {clientId && (
         <Script
           src={`https://www.paypal.com/sdk/js?client-id=${clientId}&vault=true&intent=subscription`}
@@ -93,51 +96,48 @@ export default function Checkout() {
           <button
             key={p}
             onClick={() => setPlan(p)}
-            className={`border-2 p-4 text-left transition ${
-              plan === p ? "border-acid bg-acid text-black" : "border-white/30 hover:border-white"
+            className={`rounded-2xl border p-4 text-left transition ${
+              plan === p ? "border-ink bg-ink text-bg" : "border-line hover:border-line-strong"
             }`}
           >
-            <span className="block text-xs font-bold uppercase tracking-widest">
-              {PRECOS[p].rotulo}
-            </span>
-            <span className="block text-4xl font-black">US${PRECOS[p].valor}</span>
-            <span className="block text-xs opacity-70">{PRECOS[p].detalle}</span>
+            <span className={`block text-xs font-medium ${plan === p ? "text-bg/60" : "text-muted"}`}>{PRECOS[p].rotulo}</span>
+            <span className="mt-1 block text-3xl font-semibold tracking-tight">US${PRECOS[p].valor}</span>
+            <span className={`mt-1 block text-xs leading-snug ${plan === p ? "text-bg/60" : "text-faint"}`}>{PRECOS[p].detalle}</span>
           </button>
         ))}
       </div>
 
-      <label className="mb-2 block text-xs font-bold uppercase tracking-widest text-white/60">
+      <label htmlFor="email-checkout" className="mb-1.5 block text-xs font-medium text-muted">
         Tu email de acceso
       </label>
       <input
+        id="email-checkout"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="tu@email.com"
-        className="mb-2 w-full border-2 border-white/30 bg-transparent px-4 py-4 text-base outline-none focus:border-acid"
+        className="mb-2 w-full rounded-xl border border-line bg-white/[0.03] px-4 py-3.5 text-base outline-none transition placeholder:text-faint focus:border-white/35"
       />
-      <p className="mb-5 text-[11px] leading-relaxed text-white/40">
-        Al continuar aceptás que usemos tu email para enviarte el acceso y novedades del curso.
-        Podés darte de baja cuando quieras.
+      <p className="mb-5 text-[11px] leading-relaxed text-faint">
+        Al continuar aceptás que usemos tu email para enviarte el acceso y novedades del curso. Podés darte de baja
+        cuando quieras.
       </p>
 
       {emailValido ? (
         <div ref={contenedor} />
       ) : (
-        <p className="border border-dashed border-white/30 p-4 text-center text-sm text-white/50">
+        <p className="rounded-xl border border-dashed border-line-strong p-4 text-center text-sm text-faint">
           Escribí tu email para habilitar el pago
         </p>
       )}
 
       {!clientId && (
-        <p className="mt-4 text-xs text-red-400">
-          Falta configurar NEXT_PUBLIC_PAYPAL_CLIENT_ID (ver .env.example).
-        </p>
+        <p className="mt-4 text-xs text-red-300">Falta configurar NEXT_PUBLIC_PAYPAL_CLIENT_ID (ver .env.example).</p>
       )}
 
-      <p className="mt-5 text-xs leading-relaxed text-white/40">
-        Recibís el acceso por email al instante. Podés cancelar cuando quieras desde tu cuenta.
-        Reembolso disponible solo durante los primeros 7 días.
+      <p className="mt-5 text-xs leading-relaxed text-faint">
+        Recibís el acceso por email al instante. Podés cancelar cuando quieras desde tu cuenta. Reembolso disponible
+        solo durante los primeros 7 días.
       </p>
     </div>
   );

@@ -134,7 +134,7 @@ await como("admin@x.com", () => db.exec(`insert into public.modules (title, posi
 check("admin cria módulo", (await q("select 1 from public.modules where title='Novo do admin'")).length === 1);
 
 // 9) Leads e e-mail marketing
-await db.exec(`insert into public.leads (email, plan) values ('lead1@x.com', 'monthly'), ('lead2@x.com', 'annual'), ('lead3@x.com', 'monthly')`);
+await db.exec(`insert into public.leads (email, plan, source, checkout_at) values ('lead1@x.com', 'monthly', 'checkout', now()), ('lead2@x.com', 'annual', 'checkout', now()), ('lead3@x.com', 'monthly', 'checkout', now())`);
 const l1 = (await q("select id from public.leads where email='lead1@x.com'"))[0].id;
 const l2 = (await q("select id from public.leads where email='lead2@x.com'"))[0].id;
 await db.exec(`insert into public.email_sends (lead_id, step, sent_at) values ('${l1}', 1, now() - interval '5 hours'), ('${l2}', 1, now() - interval '5 hours')`);
@@ -170,6 +170,100 @@ check("email_stats (admin): 1 pendente (lead3)", s.pendientes === 1, JSON.string
 check("email_stats (admin): 1 recuperado (lead1 comprou depois do e-mail)", s.recuperados === 1, JSON.stringify(s));
 check("email_stats (admin): 1 descadastro", s.bajas === 1, JSON.stringify(s));
 check("email_stats (admin): 2 envios da etapa 1", s.enviados["1"] === 2, JSON.stringify(s));
+
+// 10) Atividade dos alunos, histórico de e-mails e equipe
+const aulaVisivel = (await q("select id from public.lessons where title='Aula 1.1'"))[0].id;
+const aulaFutura = (await q("select id from public.lessons where title='Aula 1.2 agendada'"))[0].id;
+await como("novo@x.com", () => q(`select public.registrar_vista('${aulaVisivel}')`));
+await como("novo@x.com", () => q(`select public.registrar_vista('${aulaVisivel}')`));
+r = await q("select views from public.lesson_views where user_email='novo@x.com'");
+check("registrar_vista: 2 aberturas da mesma aula = 1 linha com views=2", r.length === 1 && r[0].views === 2, JSON.stringify(r));
+let vistaBloqueada = false;
+try { await como("novo@x.com", () => q(`select public.registrar_vista('${aulaFutura}')`)); } catch { vistaBloqueada = true; }
+check("registrar_vista: não registra aula que o aluno não enxerga (agendada)", vistaBloqueada);
+r = await como("antigo@x.com", () => q("select * from public.lesson_views"));
+check("aluno não enxerga visitas de outro aluno", r.length === 0);
+r = await como("admin@x.com", () => q("select * from public.lesson_views"));
+check("admin enxerga as visitas", r.length === 1);
+r = await como("admin@x.com", () => q("select * from public.lesson_progress"));
+check("admin enxerga o progresso de todos", r.length >= 1, String(r.length));
+r = await como("novo@x.com", () => q("select * from public.lesson_progress where lower(user_email) <> 'novo@x.com'"));
+check("aluno continua sem ver progresso alheio", r.length === 0);
+
+await db.exec(`insert into public.email_log (to_email, kind, subject) values ('novo@x.com', 'compra', 'Compra confirmada')`);
+r = await como("novo@x.com", () => q("select * from public.email_log"));
+check("aluno não enxerga o histórico de e-mails", r.length === 0);
+r = await como("admin@x.com", () => q("select * from public.email_log"));
+check("admin enxerga o histórico de e-mails", r.length === 1);
+let logEscrita = 0;
+try { logEscrita = (await como("admin@x.com", () => db.query(`delete from public.email_log`))).affectedRows ?? 0; } catch { logEscrita = 0; }
+check("nem o admin apaga o histórico pelo painel", logEscrita === 0);
+
+r = await como("novo@x.com", () => q("select * from public.admins"));
+check("aluno não enxerga a lista de admins", r.length === 0);
+let autoAdmin = false;
+try { await como("novo@x.com", () => db.exec(`insert into public.admins (email) values ('novo@x.com')`)); } catch { autoAdmin = true; }
+check("aluno não consegue se tornar admin", autoAdmin);
+await como("admin@x.com", () => db.exec(`insert into public.admins (email) values ('aaron@x.com')`));
+r = await como("aaron@x.com", () => q("select public.is_admin() as ok"));
+check("admin adiciona o Aaron e ele passa a ser admin", r[0].ok === true);
+await como("admin@x.com", () => db.exec(`delete from public.admins where email='aaron@x.com'`));
+r = await como("aaron@x.com", () => q("select public.is_admin() as ok"));
+check("admin remove o Aaron e ele deixa de ser admin", r[0].ok === false);
+
+// 11) Funções do painel
+r = await como("novo@x.com", () => q("select public.admin_resumen() as s"));
+check("admin_resumen retorna null para quem não é admin", r[0].s === null);
+r = await como("novo@x.com", () => q("select * from public.admin_alumnos()"));
+check("admin_alumnos vazio para quem não é admin", r.length === 0);
+r = await como("admin@x.com", () => q("select public.admin_resumen() as s"));
+const rs = r[0].s;
+check("admin_resumen: compras = 6", rs.compras === 6, JSON.stringify(rs));
+check("admin_resumen: 1 aluno viu aula nas últimas 24 h", rs.viendo_24h === 1 && rs.viendo_7d === 1, JSON.stringify(rs));
+check("admin_resumen: top_clases lidera com Aula 1.1 (2 aberturas)", rs.top_clases[0]?.title === "Aula 1.1" && rs.top_clases[0]?.vistas === 2, JSON.stringify(rs.top_clases));
+check("admin_resumen: atividade recente traz o aluno e a aula", rs.actividad[0]?.email === "novo@x.com" && rs.actividad[0]?.clase === "Aula 1.1", JSON.stringify(rs.actividad));
+const ativosEsperados = (await q(`select count(distinct lower(email))::int as n from public.subscriptions
+  where refunded_at is null and (status='active' or (status='cancelled' and access_until is not null and access_until > now()))`))[0].n;
+check("admin_resumen: ativos bate com a regra de acesso", rs.activos === ativosEsperados, `${rs.activos} vs ${ativosEsperados}`);
+r = await como("admin@x.com", () => q("select * from public.admin_alumnos()"));
+check("admin_alumnos: uma linha por assinatura (6)", r.length === 6, String(r.length));
+const novoLinha = r.find((x) => x.email === "novo@x.com");
+check("admin_alumnos: traz vistas e última vista do aluno", novoLinha?.vistas === 2 && novoLinha?.ultima_vista !== null, JSON.stringify(novoLinha));
+check("admin_alumnos: reembolsado nunca tem acesso", r.filter((x) => x.refunded_at).every((x) => x.con_acceso === false));
+
+// 12) Captura x checkout e funil
+await db.exec(`insert into public.leads (email, source) values ('lista1@x.com', 'captura'), ('lista2@x.com', 'captura')`);
+r = await como("admin@x.com", () => q("select public.email_stats() as s"));
+check("email_stats: 2 cadastros da captura", r[0].s.captura === 2, JSON.stringify(r[0].s));
+check("email_stats: quem só se cadastrou na captura não conta como pendente de carrinho", r[0].s.pendientes === s.pendientes, `${r[0].s.pendientes} vs ${s.pendientes}`);
+await db.exec(`update public.leads set checkout_at = now() where email = 'lista1@x.com'`);
+r = await como("admin@x.com", () => q("select public.email_stats() as s"));
+check("email_stats: lead da captura que chega ao checkout passa a ser pendente de carrinho", r[0].s.pendientes === s.pendientes + 1, JSON.stringify(r[0].s));
+
+await db.exec(`insert into public.page_events (visitor_id, path, kind, source) values
+  ('v1', '/captura', 'view', 'instagram'), ('v1', '/captura', 'view', 'instagram'), ('v1', '/captura', 'lead', 'instagram'),
+  ('v2', '/captura', 'view', null), ('v3', '/ventas', 'view', 'instagram'), ('v3', '/ventas', 'checkout', 'instagram')`);
+let evInvalido = false;
+try { await db.exec(`insert into public.page_events (visitor_id, path, kind) values ('v9', '../etc', 'view')`); } catch { evInvalido = true; }
+check("page_events recusa caminho inválido", evInvalido);
+r = await como("novo@x.com", () => q("select * from public.page_events"));
+check("aluno não enxerga eventos de página", r.length === 0);
+let escrita = false;
+try { await como("novo@x.com", () => db.exec(`insert into public.page_events (visitor_id, path, kind) values ('x', '/captura', 'view')`)); } catch { escrita = true; }
+check("aluno não consegue gravar eventos (só o servidor)", escrita);
+r = await como("novo@x.com", () => q("select public.admin_embudo(30) as e"));
+check("admin_embudo retorna null para quem não é admin", r[0].e === null);
+r = await como("admin@x.com", () => q("select public.admin_embudo(30) as e"));
+const emb = r[0].e;
+const cap = emb.paginas.find((x) => x.path === "/captura");
+const ven = emb.paginas.find((x) => x.path === "/ventas");
+check("funil: /captura tem 2 visitantes únicos (v1 repetido conta uma vez) e 1 registro", cap.visitantes === 2 && cap.registros === 1, JSON.stringify(cap));
+check("funil: /ventas tem 1 visitante e 1 checkout", ven.visitantes === 1 && ven.checkout === 1, JSON.stringify(ven));
+const insta = emb.origenes.find((x) => x.origen === "instagram");
+const directo = emb.origenes.find((x) => x.origen === "directo");
+check("funil: origem instagram = 2 visitantes, 1 registro, 1 checkout", insta.visitantes === 2 && insta.registros === 1 && insta.checkout === 1, JSON.stringify(insta));
+check("funil: visita sem origem aparece como 'directo'", directo?.visitantes === 1, JSON.stringify(emb.origenes));
+check("funil: registros da lista = 2", emb.registros_lista === 2, JSON.stringify(emb));
 
 console.log(falhas === 0 ? "\nTODOS OS TESTES PASSARAM" : `\n${falhas} FALHA(S)`);
 process.exit(falhas === 0 ? 0 : 1);

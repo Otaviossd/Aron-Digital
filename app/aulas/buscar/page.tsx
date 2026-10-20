@@ -26,22 +26,22 @@ async function Resultados({ searchParams }: { searchParams: Promise<{ q?: string
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="mb-6 text-3xl font-black uppercase tracking-tight">
-        {q ? <>Resultados para “<span className="text-acid">{q}</span>”</> : "Buscar"}
+      <h1 className="mb-8 text-3xl font-semibold tracking-tight">
+        {q ? <>Resultados para “{q}”</> : "Buscar"}
       </h1>
 
-      {!q && <p className="text-white/50">Escribí algo en el buscador de arriba.</p>}
+      {!q && <p className="text-muted">Escribí algo en el buscador de arriba.</p>}
       {q && modulosOk.length === 0 && aulasOk.length === 0 && (
-        <p className="text-white/50">No encontramos nada. Probá con otra palabra.</p>
+        <p className="text-muted">No encontramos nada. Probá con otra palabra.</p>
       )}
 
       {modulosOk.length > 0 && (
-        <section className="mb-8">
-          <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-white/50">Módulos</h2>
-          <ul className="divide-y divide-white/10 border border-white/10 bg-[#141414]">
+        <section className="mb-10">
+          <h2 className="mb-3 text-sm font-medium text-muted">Módulos</h2>
+          <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
             {modulosOk.map((m) => (
               <li key={m.id}>
-                <Link href={`/aulas/modulo/${m.id}`} className="block px-5 py-4 font-semibold hover:bg-white/5 hover:text-acid">
+                <Link href={`/aulas/modulo/${m.id}`} className="block px-5 py-4 text-[15px] font-medium transition hover:bg-white/[0.03]">
                   {m.title}
                 </Link>
               </li>
@@ -52,13 +52,13 @@ async function Resultados({ searchParams }: { searchParams: Promise<{ q?: string
 
       {aulasOk.length > 0 && (
         <section>
-          <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-white/50">Clases</h2>
-          <ul className="divide-y divide-white/10 border border-white/10 bg-[#141414]">
+          <h2 className="mb-3 text-sm font-medium text-muted">Clases</h2>
+          <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
             {aulasOk.map((a) => (
               <li key={a.id}>
-                <Link href={`/aulas/${a.id}`} className="block px-5 py-4 hover:bg-white/5 hover:text-acid">
-                  <span className="font-semibold">{a.title}</span>
-                  <span className="block text-xs text-white/40">{modulos.find((m) => m.id === a.module_id)?.title}</span>
+                <Link href={`/aulas/${a.id}`} className="block px-5 py-4 transition hover:bg-white/[0.03]">
+                  <span className="text-[15px] font-medium">{a.title}</span>
+                  <span className="block text-xs text-faint">{modulos.find((m) => m.id === a.module_id)?.title}</span>
                 </Link>
               </li>
             ))}

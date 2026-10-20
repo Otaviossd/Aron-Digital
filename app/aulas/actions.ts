@@ -20,3 +20,14 @@ export async function toggleCompletada(lessonId: string, yaCompletada: boolean) 
   }
   revalidatePath("/aulas", "layout");
 }
+
+// Registra que o aluno abriu a aula (alimenta "alunos assistindo" no painel). Falhar aqui nunca
+// deve atrapalhar quem está assistindo, por isso os erros são ignorados.
+export async function registrarVista(lessonId: string) {
+  try {
+    const supabase = await createClient();
+    await supabase.rpc("registrar_vista", { p_lesson_id: lessonId });
+  } catch {
+    /* sem efeito para o aluno */
+  }
+}
