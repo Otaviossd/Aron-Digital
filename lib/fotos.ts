@@ -12,10 +12,14 @@ export const FOTOS = {
 } as const;
 
 // Foto de fundo com um véu escuro por cima para o texto ficar legível.
-export function fondoFoto(src: string, veu = "linear-gradient(90deg, rgba(10,10,10,.92) 0%, rgba(10,10,10,.6) 55%, rgba(10,10,10,.25) 100%)"): CSSProperties {
+export function fondoFoto(
+  src: string,
+  veu = "linear-gradient(90deg, rgba(10,10,10,.92) 0%, rgba(10,10,10,.6) 55%, rgba(10,10,10,.25) 100%)",
+  posicion = "center",
+): CSSProperties {
   return {
     backgroundImage: `${veu}, url(${src})`,
     backgroundSize: "cover",
-    backgroundPosition: "center",
+    backgroundPosition: posicion,
   };
 }

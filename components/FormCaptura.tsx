@@ -5,9 +5,18 @@ import { enviarEvento } from "@/components/Rastreo";
 import { WHATSAPP_GRUPO_URL } from "@/lib/config";
 import { ui } from "@/lib/ui";
 
-export default function FormCaptura() {
+type Props = {
+  // "oscuro": sobre el fondo negro de la página. "claro": dentro de la tarjeta clara del final.
+  tono?: "oscuro" | "claro";
+  // Hace único el id del campo cuando hay dos formularios en la misma página.
+  id?: string;
+  textoBoton?: string;
+};
+
+export default function FormCaptura({ tono = "oscuro", id = "captura", textoBoton = "Quiero entrar a la lista" }: Props) {
   const [email, setEmail] = useState("");
   const [estado, setEstado] = useState<"idle" | "enviando" | "listo" | "error">("idle");
+  const claro = tono === "claro";
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -28,13 +37,19 @@ export default function FormCaptura() {
 
   if (estado === "listo") {
     return (
-      <div className="max-w-md rounded-2xl border border-line-strong bg-white/[0.04] p-6 backdrop-blur">
+      <div className={`rounded-2xl border p-6 ${claro ? "border-black/10 bg-white text-bg" : "border-line-strong bg-white/[0.04] backdrop-blur"}`}>
         <p className="text-lg font-semibold tracking-tight">¡Listo, estás en la lista!</p>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          Te avisamos por email apenas abramos las inscripciones. Sumate también al grupo de WhatsApp para enterarte
-          de todo primero.
+        <p className={`mt-2 text-sm leading-relaxed ${claro ? "text-black/60" : "text-muted"}`}>
+          Para quedarte con el descuento exclusivo, entrá ahora al grupo de WhatsApp. Ahí avisamos todo primero.
         </p>
-        <a href={WHATSAPP_GRUPO_URL} target="_blank" rel="noreferrer" className={`${ui.boton} mt-5 w-full`}>
+        <a
+          href={WHATSAPP_GRUPO_URL}
+          target="_blank"
+          rel="noreferrer"
+          className={`mt-5 flex w-full items-center justify-center rounded-full px-6 py-3.5 text-sm font-medium transition ${
+            claro ? "bg-bg text-ink hover:bg-black/80" : "bg-ink text-bg hover:bg-white/85"
+          }`}
+        >
           Entrar al grupo de WhatsApp
         </a>
       </div>
@@ -42,28 +57,35 @@ export default function FormCaptura() {
   }
 
   return (
-    <form onSubmit={enviar} className="max-w-md">
-      <label htmlFor="email-captura" className="sr-only">
-        Tu email
+    <form onSubmit={enviar}>
+      <label htmlFor={`email-${id}`} className={`mb-2 block text-xs font-medium ${claro ? "text-black/60" : "text-muted"}`}>
+        Tu mejor email
       </label>
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <input
-          id="email-captura"
-          type="email"
-          required
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="tu@email.com"
-          className="w-full flex-1 rounded-full border border-line-strong bg-black/40 px-5 py-3.5 text-base outline-none backdrop-blur transition placeholder:text-faint focus:border-white/50"
-        />
-        <button disabled={estado === "enviando"} className={`${ui.boton} shrink-0 py-3.5`}>
-          {estado === "enviando" ? "Enviando..." : "Quiero que me avisen"}
-        </button>
-      </div>
-      {estado === "error" && <p className="mt-3 text-sm text-red-300">No pudimos guardar tu email. Intentá de nuevo.</p>}
-      <p className="mt-4 text-xs leading-relaxed text-faint">
-        Usamos tu email solo para avisarte del curso. Podés darte de baja cuando quieras.
+      <input
+        id={`email-${id}`}
+        type="email"
+        required
+        autoComplete="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="tu@email.com"
+        className={`w-full rounded-xl border px-4 py-3.5 text-base outline-none transition ${
+          claro
+            ? "border-black/10 bg-white text-bg placeholder:text-black/35 focus:border-black/40"
+            : "border-line-strong bg-black/40 backdrop-blur placeholder:text-faint focus:border-white/50"
+        }`}
+      />
+      <button
+        disabled={estado === "enviando"}
+        className={`mt-3 flex w-full items-center justify-center rounded-full px-6 py-3.5 text-sm font-medium transition disabled:opacity-50 ${
+          claro ? "bg-bg text-ink hover:bg-black/80" : "bg-ink text-bg hover:bg-white/85"
+        }`}
+      >
+        {estado === "enviando" ? "Enviando..." : textoBoton}
+      </button>
+      {estado === "error" && <p className="mt-3 text-sm text-red-400">No pudimos guardar tu email. Intentá de nuevo.</p>}
+      <p className={`mt-4 text-xs leading-relaxed ${claro ? "text-black/45" : "text-faint"}`}>
+        Usamos tu email solo para avisarte del lanzamiento. Podés darte de baja cuando quieras.
       </p>
     </form>
   );
