@@ -37,7 +37,7 @@ export default function FormCaptura({ tono = "oscuro", id = "captura", textoBoto
 
   if (estado === "listo") {
     return (
-      <div className={`rounded-2xl border p-6 ${claro ? "border-black/10 bg-white text-bg" : "border-line-strong bg-white/[0.04] backdrop-blur"}`}>
+      <div className={`rounded-2xl border p-6 ${claro ? "border-black/10 bg-white text-bg" : "border-accent/30 bg-accent/[0.06]"}`}>
         <p className="text-lg font-semibold tracking-tight">¡Listo, estás en la lista!</p>
         <p className={`mt-2 text-sm leading-relaxed ${claro ? "text-black/60" : "text-muted"}`}>
           Para quedarte con el descuento exclusivo, entrá ahora al grupo de WhatsApp. Ahí avisamos todo primero.
@@ -46,9 +46,7 @@ export default function FormCaptura({ tono = "oscuro", id = "captura", textoBoto
           href={WHATSAPP_GRUPO_URL}
           target="_blank"
           rel="noreferrer"
-          className={`mt-5 flex w-full items-center justify-center rounded-full px-6 py-3.5 text-sm font-medium transition ${
-            claro ? "bg-bg text-ink hover:bg-black/80" : "bg-ink text-bg hover:bg-white/85"
-          }`}
+          className="neon mt-5 flex w-full items-center justify-center rounded-full px-6 py-3.5 text-sm font-semibold transition"
         >
           Entrar al grupo de WhatsApp
         </a>
@@ -72,14 +70,12 @@ export default function FormCaptura({ tono = "oscuro", id = "captura", textoBoto
         className={`w-full rounded-xl border px-4 py-3.5 text-base outline-none transition ${
           claro
             ? "border-black/10 bg-white text-bg placeholder:text-black/35 focus:border-black/40"
-            : "border-line-strong bg-black/40 backdrop-blur placeholder:text-faint focus:border-white/50"
+            : "border-white/15 bg-black/50 placeholder:text-faint focus:border-accent/70 focus:shadow-[0_0_0_4px_rgba(57,255,126,.12)]"
         }`}
       />
       <button
         disabled={estado === "enviando"}
-        className={`mt-3 flex w-full items-center justify-center rounded-full px-6 py-3.5 text-sm font-medium transition disabled:opacity-50 ${
-          claro ? "bg-bg text-ink hover:bg-black/80" : "bg-ink text-bg hover:bg-white/85"
-        }`}
+        className="neon mt-3 flex w-full items-center justify-center rounded-full px-6 py-3.5 text-sm font-semibold transition disabled:opacity-50"
       >
         {estado === "enviando" ? "Enviando..." : textoBoton}
       </button>

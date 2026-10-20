@@ -20,8 +20,9 @@ async function Shell({ children }: { children: React.ReactNode }) {
     <div className="relative min-h-screen overflow-x-clip bg-bg">
       {/* Luces suaves de fondo */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-accent/[0.09] blur-[120px]" />
-        <div className="absolute left-1/3 top-[38rem] h-[26rem] w-[26rem] rounded-full bg-white/[0.035] blur-[110px]" />
+        <div className="absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-accent/[0.22] blur-[130px] respirar" />
+        <div className="absolute left-1/3 top-[34rem] h-[28rem] w-[28rem] rounded-full bg-cyan-400/[0.10] blur-[120px] respirar [animation-delay:-3s]" />
+        <div className="absolute -left-20 top-[70rem] h-[26rem] w-[26rem] rounded-full bg-accent/[0.10] blur-[120px]" />
       </div>
       <Sidebar
         brand={BRAND}

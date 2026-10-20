@@ -4,11 +4,11 @@
 
 export const ui = {
   boton:
-    "inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-bg transition hover:bg-white/85 disabled:cursor-not-allowed disabled:opacity-50",
+    "neon inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50",
   botonSuave:
     "inline-flex items-center justify-center gap-2 rounded-full border border-line-strong px-6 py-3 text-sm font-medium text-ink transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50",
   botonChico:
-    "inline-flex items-center justify-center rounded-full bg-ink px-4 py-2 text-xs font-medium text-bg transition hover:bg-white/85",
+    "neon inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold transition",
   botonPeligro:
     "inline-flex items-center justify-center rounded-full border border-red-400/30 px-4 py-2 text-xs font-medium text-red-300 transition hover:bg-red-400/10",
   campo:

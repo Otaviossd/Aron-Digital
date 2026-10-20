@@ -65,7 +65,7 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, 
             <span className="font-medium text-accent">{porcentaje}%</span>
           </div>
           <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/10">
-            <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${porcentaje}%` }} />
+            <div className="h-full rounded-full bg-gradient-to-r from-accent to-[#b6ff5c] shadow-[0_0_12px_rgba(57,255,126,.7)] transition-all" style={{ width: `${porcentaje}%` }} />
           </div>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3">
         {items.map((it) => {
           const clase = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-            activo(it.href) && !it.externo ? "bg-white/[0.07] font-medium text-ink" : "text-muted hover:bg-white/[0.04] hover:text-ink"
+            activo(it.href) && !it.externo ? "bg-accent/10 font-medium text-ink shadow-[inset_2px_0_0_#39ff7e]" : "text-muted hover:bg-white/[0.04] hover:text-ink"
           }`;
           return it.externo ? (
             <a key={it.label} href={it.href} target="_blank" rel="noreferrer" className={clase}>

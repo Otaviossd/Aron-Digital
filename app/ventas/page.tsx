@@ -25,7 +25,7 @@ export default function Home() {
       <Rastreo path="/ventas" />
       {/* Hero */}
       <section className="relative isolate overflow-hidden" style={fondoFoto(FOTOS.hero, undefined, "center 30%")}>
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_60%_at_80%_0%,rgba(205,180,138,.14),transparent)]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_60%_at_80%_0%,rgba(57,255,126,.14),transparent)]" />
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <span className="text-sm font-semibold tracking-tight">{BRAND}</span>
           <Suspense fallback={linkAcceso}>

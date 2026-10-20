@@ -27,7 +27,7 @@ export default async function PuertaAcceso({ modo, searchParams }: Props) {
   return (
     <main className="grid min-h-screen lg:grid-cols-2">
       <div className="relative hidden lg:block" style={fondoFoto(FOTOS.entrar, "linear-gradient(180deg, rgba(10,10,10,.35) 0%, rgba(10,10,10,.85) 100%)")}>
-        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_20%_0%,rgba(205,180,138,.12),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_20%_0%,rgba(57,255,126,.12),transparent)]" />
         <div className="absolute inset-x-0 bottom-0 p-12">
           <p className="max-w-sm text-2xl font-medium leading-snug tracking-tight text-ink/90">
             Barbería de verdad, paso a paso, con clases nuevas cada semana.

@@ -2,7 +2,7 @@
 @import "@fontsource-variable/inter";
 
 :root {
-  --bg: #0a0a0a;
+  --bg: #07090a;
   --surface: #111112;
   --surface-2: #18181a;
   --ink: #f4f4f2;
@@ -10,7 +10,7 @@
   --faint: rgba(244, 244, 242, 0.36);
   --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.18);
-  --accent: #cdb48a;
+  --accent: #39ff7e;
 }
 
 @theme inline {
@@ -40,11 +40,81 @@ body {
 }
 
 ::selection {
-  background: rgba(205, 180, 138, 0.35);
+  background: rgba(57, 255, 126, 0.35);
 }
 
 /* Foco visível e discreto em tudo que é clicável */
 :focus-visible {
-  outline: 2px solid rgba(205, 180, 138, 0.7);
+  outline: 2px solid rgba(57, 255, 126, 0.7);
   outline-offset: 2px;
+}
+
+/* ---------- Efectos de luz y movimiento ---------- */
+@keyframes flotar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes respirar {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.08); }
+}
+@keyframes cinta {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes brillo {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.flotar { animation: flotar 6s ease-in-out infinite; }
+.flotar-lento { animation: flotar 8s ease-in-out infinite reverse; }
+.respirar { animation: respirar 7s ease-in-out infinite; }
+.cinta { animation: cinta 38s linear infinite; }
+
+/* Cristal: tarjeta translúcida con borde de luz */
+.cristal {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Foto que se funde con el fondo (cara completa, borde inferior suave) */
+.foto-fundida {
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+}
+
+/* Botón principal con luz */
+.neon {
+  background: linear-gradient(135deg, #39ff7e 0%, #b6ff5c 100%);
+  color: #04120a;
+  box-shadow: 0 10px 40px -10px rgba(57, 255, 126, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.neon:hover {
+  box-shadow: 0 14px 52px -8px rgba(57, 255, 126, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  filter: brightness(1.06);
+}
+
+.texto-luz {
+  background: linear-gradient(100deg, #39ff7e 0%, #b6ff5c 45%, #39ff7e 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: brillo 7s linear infinite;
+}
+
+.rejilla {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 30%, #000, transparent);
+  mask-image: radial-gradient(70% 60% at 50% 30%, #000, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flotar, .flotar-lento, .respirar, .cinta, .texto-luz { animation: none; }
 }

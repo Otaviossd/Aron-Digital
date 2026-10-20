@@ -5,7 +5,7 @@ import FormCaptura from "@/components/FormCaptura";
 import NavAcceso from "@/components/NavAcceso";
 import Rastreo from "@/components/Rastreo";
 import { BRAND } from "@/lib/config";
-import { FOTOS, fondoFoto } from "@/lib/fotos";
+import { FOTOS } from "@/lib/fotos";
 
 export const metadata: Metadata = {
   title: "La nueva plataforma de Aaron para barberos | Lista de espera",
@@ -14,6 +14,8 @@ export const metadata: Metadata = {
 };
 
 // Contenido editable de la página (cambiá los textos acá, sin tocar el diseño).
+const CINTA = ["Acceso antes que nadie", "Descuento exclusivo", "Bonos de lanzamiento", "Todo el conocimiento de Aaron", "Algo nunca hecho antes"];
+
 const PROBLEMAS = [
   "Contenido suelto en redes, sin un orden para aprender.",
   "Cursos que enseñan una técnica y te dejan sin el resto del camino.",
@@ -42,7 +44,7 @@ const PARA_QUIEN = [
 ];
 
 const acceder = (
-  <Link href="/entrar" className="rounded-full border border-line-strong px-4 py-2 text-sm font-medium text-ink transition hover:bg-white/5">
+  <Link href="/entrar" className="cristal rounded-full px-4 py-2 text-sm font-medium text-ink transition hover:border-accent/40">
     Acceder
   </Link>
 );
@@ -54,17 +56,29 @@ const Check = () => (
   </svg>
 );
 
+function Chip({ className, children }: { className: string; children: React.ReactNode }) {
+  return (
+    <div className={`cristal absolute z-20 rounded-2xl px-4 py-3 text-sm ${className}`}>
+      {children}
+    </div>
+  );
+}
+
 export default function CapturaPage() {
   return (
-    <main>
+    <main className="overflow-x-clip">
       <Rastreo path="/captura" />
 
-      {/* Hero con foto y formulario */}
-      <section
-        className="relative isolate overflow-hidden"
-        style={fondoFoto(FOTOS.captura, "linear-gradient(90deg, rgba(10,10,10,.97) 0%, rgba(10,10,10,.85) 38%, rgba(10,10,10,.25) 70%, rgba(10,10,10,.1) 100%)", "right center")}
-      >
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_85%_20%,rgba(205,180,138,.16),transparent)]" />
+      {/* Hero */}
+      <section className="relative isolate overflow-hidden">
+        {/* Luces */}
+        <div aria-hidden="true" className="absolute inset-0 -z-10">
+          <div className="rejilla absolute inset-0" />
+          <div className="respirar absolute -right-24 top-0 h-[38rem] w-[38rem] rounded-full bg-accent/30 blur-[140px]" />
+          <div className="respirar absolute -left-40 top-[28rem] h-[30rem] w-[30rem] rounded-full bg-cyan-400/15 blur-[130px] [animation-delay:-3s]" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-bg to-transparent" />
+        </div>
+
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <span className="text-sm font-semibold tracking-tight">{BRAND}</span>
           <Suspense fallback={acceder}>
@@ -72,65 +86,114 @@ export default function CapturaPage() {
           </Suspense>
         </nav>
 
-        <div className="mx-auto max-w-6xl px-6 pb-24 pt-12 sm:pb-32 sm:pt-20">
-          <div className="max-w-xl">
-            <p className="mb-5 text-sm font-medium text-accent">Lista de espera · Muy pronto</p>
-            <h1 className="text-[clamp(2.1rem,5.2vw,3.75rem)] font-semibold leading-[1.05] tracking-[-0.03em]">
-              Todo lo que Aaron aprendió en años de barbería, <span className="text-ink/55">en una sola plataforma.</span>
-            </h1>
-            <p className="mb-8 mt-6 text-base leading-relaxed text-muted sm:text-lg">
-              Una nueva plataforma digital para barberos que quieren profundizar su conocimiento. Anotate en la lista de
-              espera: entrás primero y te llevás un descuento exclusivo.
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.05fr_.95fr] lg:pb-24 lg:pt-10">
+          {/* Tarjeta */}
+          <div className="cristal relative overflow-hidden rounded-3xl p-7 sm:p-10">
+            <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1.5 text-xs font-medium text-accent">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+              </span>
+              Lista de espera abierta · Muy pronto
             </p>
-            <div className="max-w-sm rounded-2xl border border-line bg-black/50 p-5 backdrop-blur">
+            <h1 className="text-[clamp(2rem,4.6vw,3.4rem)] font-semibold leading-[1.05] tracking-[-0.03em]">
+              Todo lo que Aaron aprendió en años de barbería, <span className="texto-luz">en una sola plataforma.</span>
+            </h1>
+            <p className="mb-8 mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
+              Algo que nunca se hizo antes para barberos. Anotate en la lista de espera: entrás primero que todos y te llevás un descuento exclusivo.
+            </p>
+            <div className="max-w-md">
               <FormCaptura id="hero" />
             </div>
+          </div>
+
+          {/* Foto de Aaron */}
+          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+            <div aria-hidden="true" className="respirar absolute left-1/2 top-[38%] h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/40 blur-[90px]" />
+            <div aria-hidden="true" className="absolute left-1/2 top-[40%] h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/30" />
+            <div aria-hidden="true" className="absolute left-1/2 top-[40%] h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={FOTOS.retratoRecorte}
+              alt="Aaron Dalla Rosa"
+              width={900}
+              height={1500}
+              fetchPriority="high"
+              className="relative z-10 mx-auto h-auto max-h-[42rem] w-auto max-w-full object-contain drop-shadow-[0_0_28px_rgba(57,255,126,.35)]"
+            />
+            <Chip className="left-0 top-[14%] flotar sm:-left-4">
+              <p className="text-lg font-semibold tracking-tight text-accent">+2.500</p>
+              <p className="text-xs text-muted">barberos formados</p>
+            </Chip>
+            <Chip className="right-0 top-[40%] flotar-lento sm:-right-4">
+              <p className="text-lg font-semibold tracking-tight text-accent">6 países</p>
+              <p className="text-xs text-muted">con cursos presenciales</p>
+            </Chip>
+            <Chip className="bottom-[12%] left-2 flotar sm:left-0">
+              <p className="text-sm font-medium">Acceso primero + descuento</p>
+              <p className="text-xs text-muted">para la lista de espera</p>
+            </Chip>
           </div>
         </div>
       </section>
 
+      {/* Cinta */}
+      <div className="overflow-hidden border-y border-white/10 bg-white/[0.02] py-4" aria-hidden="true">
+        <div className="cinta flex w-max gap-10 whitespace-nowrap">
+          {[...CINTA, ...CINTA, ...CINTA, ...CINTA].map((t, i) => (
+            <span key={i} className="flex items-center gap-10 text-sm font-medium text-ink/80">
+              {t}
+              <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_12px_rgba(57,255,126,.9)]" />
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Problema */}
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <div className="grid gap-12 md:grid-cols-2 md:items-center">
+      <section className="relative mx-auto max-w-6xl px-6 py-24">
+        <div aria-hidden="true" className="absolute -left-32 top-10 h-80 w-80 rounded-full bg-accent/10 blur-[110px]" />
+        <div className="relative grid gap-12 md:grid-cols-2 md:items-center">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight">
-              El problema que <span className="text-accent">vamos a resolver</span>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              El problema que <span className="texto-luz">vamos a resolver</span>
             </h2>
             <p className="mt-5 max-w-md leading-relaxed text-muted">
-              Aprender barbería hoy es un camino desordenado. Mucha gente sabe cortar, pero le falta una guía clara para
-              seguir creciendo.
+              Aprender barbería hoy es un camino desordenado. Mucha gente sabe cortar, pero le falta una guía clara para seguir creciendo.
             </p>
             <p className="mt-6 text-sm font-medium">Lo que más se repite:</p>
             <ul className="mt-3 space-y-3">
               {PROBLEMAS.map((p) => (
                 <li key={p} className="flex items-start gap-3 text-sm text-muted">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400 shadow-[0_0_10px_rgba(248,113,113,.8)]" />
                   {p}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl border border-line bg-surface p-8">
-            <p className="text-sm font-medium text-accent">La respuesta</p>
-            <p className="mt-3 text-xl font-medium leading-snug tracking-tight">
-              Aaron está juntando todo su conocimiento en una plataforma pensada para que aprendas en orden, a tu ritmo y
-              con alguien que lo hace todos los días.
+          <div className="cristal relative overflow-hidden rounded-3xl p-8">
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/25 blur-3xl" />
+            <p className="relative text-sm font-medium text-accent">La respuesta</p>
+            <p className="relative mt-3 text-xl font-medium leading-snug tracking-tight sm:text-2xl">
+              Aaron está juntando todo su conocimiento en una plataforma pensada para que aprendas en orden, a tu ritmo y con alguien que lo hace todos los días.
             </p>
           </div>
         </div>
       </section>
 
       {/* Qué vas a encontrar */}
-      <section className="border-y border-line bg-surface">
-        <div className="mx-auto max-w-6xl px-6 py-24">
-          <h2 className="text-3xl font-semibold tracking-tight">
-            Qué vas a <span className="text-accent">encontrar</span>
+      <section className="relative border-y border-white/10 bg-white/[0.015]">
+        <div aria-hidden="true" className="absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-cyan-400/10 blur-[120px]" />
+        <div className="relative mx-auto max-w-6xl px-6 py-24">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            Qué vas a <span className="texto-luz">encontrar</span>
           </h2>
           <p className="mt-3 max-w-lg text-muted">Una plataforma hecha para barberos, con todo el contenido en un solo lugar.</p>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {INCLUYE.map((i) => (
-              <div key={i.t} className="rounded-2xl border border-line bg-bg p-6">
-                <h3 className="font-medium tracking-tight text-accent">{i.t}</h3>
+            {INCLUYE.map((i, n) => (
+              <div key={i.t} className="cristal group relative overflow-hidden rounded-2xl p-6 transition duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-[0_20px_60px_-20px_rgba(57,255,126,.35)]">
+                <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl border border-accent/30 bg-accent/10 text-sm font-semibold text-accent">{n + 1}</span>
+                <h3 className="font-medium tracking-tight">{i.t}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{i.d}</p>
               </div>
             ))}
@@ -140,11 +203,11 @@ export default function CapturaPage() {
 
       {/* Por qué anotarte ahora */}
       <section className="mx-auto max-w-6xl px-6 py-24">
-        <h2 className="max-w-xl text-3xl font-semibold tracking-tight">Por qué anotarte hoy en la lista de espera</h2>
-        <div className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-3">
+        <h2 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">Por qué anotarte hoy en la lista de espera</h2>
+        <div className="mt-12 grid gap-6 sm:grid-cols-3">
           {VENTAJAS.map((v, i) => (
-            <div key={v.t} className="border-t border-line pt-6">
-              <p className="mb-4 text-xs font-medium text-accent">0{i + 1}</p>
+            <div key={v.t} className="relative rounded-2xl border border-accent/20 bg-gradient-to-b from-accent/[0.08] to-transparent p-6">
+              <p className="mb-6 text-4xl font-semibold tracking-tight text-accent/90">0{i + 1}</p>
               <h3 className="text-lg font-medium tracking-tight">{v.t}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{v.d}</p>
             </div>
@@ -153,18 +216,26 @@ export default function CapturaPage() {
       </section>
 
       {/* Quién es Aaron / para quién */}
-      <section className="border-t border-line">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 md:grid-cols-2">
-          <div
-            className="aspect-[4/5] w-full max-w-md rounded-2xl border border-line bg-surface-2"
-            style={fondoFoto(FOTOS.sobre, "linear-gradient(180deg, rgba(10,10,10,0) 55%, rgba(10,10,10,.55) 100%)")}
-          />
+      <section className="relative border-t border-white/10">
+        <div aria-hidden="true" className="absolute left-0 top-1/3 h-96 w-96 rounded-full bg-accent/15 blur-[130px]" />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 md:grid-cols-2">
+          <div className="relative mx-auto w-full max-w-md">
+            <div aria-hidden="true" className="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-accent/50 via-transparent to-cyan-400/30 blur-xl" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={FOTOS.clase}
+              alt="Aaron dando una clase"
+              width={912}
+              height={1368}
+              loading="lazy"
+              className="relative aspect-[4/5] w-full rounded-3xl border border-white/15 object-cover object-[center_20%]"
+            />
+          </div>
           <div>
             <p className="mb-3 text-sm font-medium text-accent">Quién es Aaron</p>
-            <h2 className="text-3xl font-semibold tracking-tight">Un barbero que enseña lo que hace todos los días.</h2>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Un barbero que enseña lo que hace todos los días.</h2>
             <p className="mt-5 max-w-md leading-relaxed text-muted">
-              Aaron Dalla Rosa es barbero y educador internacional. Más de 2.500 barberos pasaron por sus clases y ahora
-              reúne todo ese conocimiento en una plataforma digital.
+              Aaron Dalla Rosa es barbero y educador internacional. Más de 2.500 barberos pasaron por sus clases y ahora reúne todo ese conocimiento en una plataforma digital.
             </p>
             <h3 className="mb-4 mt-10 text-lg font-medium tracking-tight">Es para vos si...</h3>
             <ul className="space-y-3">
@@ -175,7 +246,7 @@ export default function CapturaPage() {
                 </li>
               ))}
             </ul>
-            <p className="mt-6 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-faint">
+            <p className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-faint">
               No es para quien busca fórmulas mágicas o resultados sin esfuerzo.
             </p>
           </div>
@@ -183,18 +254,28 @@ export default function CapturaPage() {
       </section>
 
       {/* Formulario final */}
-      <section className="mx-auto max-w-6xl px-6 pb-24">
-        <div className="mx-auto max-w-md rounded-3xl bg-ink p-8 text-bg shadow-2xl shadow-black/50 sm:p-10">
-          <p className="text-center text-sm font-medium text-black/50">{BRAND}</p>
-          <h2 className="mt-2 text-center text-3xl font-semibold tracking-tight">Próximos pasos</h2>
-          <p className="mb-7 mt-3 text-center text-sm leading-relaxed text-black/60">
-            Dejá tu email y entrá al grupo de WhatsApp para asegurar tu descuento exclusivo y ser de los primeros en entrar.
-          </p>
-          <FormCaptura tono="claro" id="final" textoBoton="Quiero asegurar mi lugar" />
+      <section className="relative isolate overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 -z-10">
+          <div
+            className="absolute inset-0 bg-cover bg-top opacity-30"
+            style={{ backgroundImage: `linear-gradient(0deg, #07090a 5%, transparent 60%, #07090a 100%), url(${FOTOS.auditorio})` }}
+          />
+          <div className="respirar absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/25 blur-[130px]" />
+        </div>
+        <div className="mx-auto max-w-6xl px-6 py-28">
+          <div className="cristal relative mx-auto max-w-md overflow-hidden rounded-3xl p-8 sm:p-10">
+            <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
+            <p className="text-center text-sm font-medium text-accent">{BRAND}</p>
+            <h2 className="mt-2 text-center text-3xl font-semibold tracking-tight">Asegurá tu lugar</h2>
+            <p className="mb-7 mt-3 text-center text-sm leading-relaxed text-muted">
+              Dejá tu email y entrá al grupo de WhatsApp para asegurar tu descuento exclusivo y ser de los primeros en entrar.
+            </p>
+            <FormCaptura id="final" textoBoton="Quiero asegurar mi lugar" />
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-line">
+      <footer className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-xs text-faint">
           <span>© {BRAND}. Todos los derechos reservados.</span>
           <Link href="/equipo" className="transition hover:text-muted">

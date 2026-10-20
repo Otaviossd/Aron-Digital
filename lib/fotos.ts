@@ -7,6 +7,7 @@ export const FOTOS = {
   espalda: "/aaron/espalda.jpg",
   auditorio: "/aaron/auditorio.jpg",
   clase: "/aaron/clase.jpg",
+  retratoRecorte: "/aaron/retrato-recorte.webp", // retrato sin fondo (PNG/WebP transparente), para ponerlo sobre luces
   // Uso por página:
   hero: "/aaron/auditorio.jpg", // página de venta, topo
   captura: "/aaron/retrato.jpg", // página de captura (lista de espera)

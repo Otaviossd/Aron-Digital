@@ -42,7 +42,7 @@ export async function guardarModulo(formData: FormData) {
     cover_url = supabase.storage.from("covers").getPublicUrl(caminho).data.publicUrl;
   }
 
-  const accent = /^#[0-9a-fA-F]{6}$/.test(texto(formData, "accent")) ? texto(formData, "accent") : "#cdb48a";
+  const accent = /^#[0-9a-fA-F]{6}$/.test(texto(formData, "accent")) ? texto(formData, "accent") : "#39ff7e";
 
   const fila = {
     title: texto(formData, "title"),

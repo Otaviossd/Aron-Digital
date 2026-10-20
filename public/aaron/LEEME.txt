@@ -6,6 +6,7 @@ Archivos guardados (JPG optimizados, ~100 KB cada uno):
   espalda.jpg    de espaldas frente al público, camiseta Hellion Crew (vertical)
   auditorio.jpg  de espaldas frente al auditorio lleno (vertical)
   clase.jpg      dando clase con micrófono (vertical)
+  retrato-recorte.webp  el retrato sin fondo (transparente), para ponerlo sobre luces de color
 
 Para cambiar qué foto va en cada página, edita lib/fotos.ts.
 Para agregar fotos nuevas, súbelas a esta carpeta (JPG, hasta ~1800 px, menos de 400 KB).

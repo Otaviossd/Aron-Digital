@@ -89,7 +89,7 @@ async function Contenido() {
                   </div>
                   <div>
                     <label className={ui.rotulo}>Color del módulo</label>
-                    <input name="accent" defaultValue={mod.accent} placeholder="#cdb48a" className={ui.campo} />
+                    <input name="accent" defaultValue={mod.accent} placeholder="#39ff7e" className={ui.campo} />
                   </div>
                   <div>
                     <label className={ui.rotulo}>Portada (URL)</label>
@@ -101,7 +101,7 @@ async function Contenido() {
                   </div>
                   <div className="sm:col-span-2">
                     <label className="flex items-center gap-2 text-sm text-muted">
-                      <input name="is_bonus" type="checkbox" defaultChecked={mod.is_bonus} className="h-4 w-4 accent-[#cdb48a]" />
+                      <input name="is_bonus" type="checkbox" defaultChecked={mod.is_bonus} className="h-4 w-4 accent-[#39ff7e]" />
                       Es un bono (aparece en la fila “Bonos”; ponele día 7 para bloquearlo 7 días)
                     </label>
                   </div>
@@ -161,7 +161,7 @@ async function Contenido() {
           </div>
           <div>
             <label className={ui.rotulo}>Color del módulo</label>
-            <input name="accent" defaultValue="#cdb48a" className={ui.campo} />
+            <input name="accent" defaultValue="#39ff7e" className={ui.campo} />
           </div>
           <div>
             <label className={ui.rotulo}>Portada (URL)</label>
@@ -173,7 +173,7 @@ async function Contenido() {
           </div>
           <div className="sm:col-span-2">
             <label className="flex items-center gap-2 text-sm text-muted">
-              <input name="is_bonus" type="checkbox" className="h-4 w-4 accent-[#cdb48a]" />
+              <input name="is_bonus" type="checkbox" className="h-4 w-4 accent-[#39ff7e]" />
               Es un bono (aparece en la fila “Bonos”; ponele día 7 para bloquearlo 7 días)
             </label>
           </div>

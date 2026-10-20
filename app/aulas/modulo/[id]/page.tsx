@@ -27,7 +27,7 @@ async function ModuloContenido({ params }: { params: Promise<{ id: string }> }) 
   const progreso = abiertas.length === 0 ? 0 : Math.round((hechas / abiertas.length) * 100);
   const numero = modulos.filter((m, i) => !m.is_bonus && i <= indice).length;
   const foto = FOTOS_PORTADA[(Math.max(numero, 1) - 1) % FOTOS_PORTADA.length];
-  const accent = /^#[0-9a-fA-F]{6}$/.test(modulo.accent) ? modulo.accent : "#cdb48a";
+  const accent = /^#[0-9a-fA-F]{6}$/.test(modulo.accent) ? modulo.accent : "#39ff7e";
 
   return (
     <div className="mx-auto max-w-3xl">

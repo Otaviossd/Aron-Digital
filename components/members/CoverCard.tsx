@@ -14,13 +14,13 @@ type Props = {
 // teñida con el color del módulo.
 export default function CoverCard({ modulo, numero, progreso, totalAulas }: Props) {
   const bloqueado = !modulo.is_unlocked;
-  const accent = /^#[0-9a-fA-F]{6}$/.test(modulo.accent) ? modulo.accent : "#cdb48a";
+  const accent = /^#[0-9a-fA-F]{6}$/.test(modulo.accent) ? modulo.accent : "#39ff7e";
   const foto = FOTOS_PORTADA[(numero - 1) % FOTOS_PORTADA.length];
 
   const tarjeta = (
     <div
       className={`group relative aspect-[3/4] w-[176px] shrink-0 snap-start overflow-hidden rounded-xl border border-line bg-surface transition duration-300 sm:w-[212px] ${
-        bloqueado ? "" : "hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_18px_50px_-12px_rgba(205,180,138,.28)]"
+        bloqueado ? "" : "hover:-translate-y-1.5 hover:border-accent/50 hover:shadow-[0_20px_60px_-12px_rgba(57,255,126,.5)]"
       }`}
     >
       {modulo.cover_url ? (
@@ -69,7 +69,7 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
               {progreso > 0 && ` · ${progreso}%`}
             </p>
             <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-white/15">
-              <div className="h-full rounded-full bg-accent" style={{ width: `${progreso}%` }} />
+              <div className="h-full rounded-full bg-gradient-to-r from-accent to-[#b6ff5c] shadow-[0_0_10px_rgba(57,255,126,.7)]" style={{ width: `${progreso}%` }} />
             </div>
           </>
         )}

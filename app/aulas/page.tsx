@@ -53,27 +53,35 @@ async function Inicio() {
   return (
     <>
       {/* Portada */}
-      <section
-        className="relative mb-14 min-h-[22rem] overflow-hidden rounded-3xl border border-line sm:min-h-[26rem]"
-        style={{
-          backgroundImage: `linear-gradient(90deg, rgba(10,10,10,.96) 0%, rgba(10,10,10,.78) 45%, rgba(10,10,10,.15) 100%), linear-gradient(0deg, rgba(10,10,10,.85) 0%, transparent 45%), url(${FOTOS.aulas})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center 35%",
-        }}
-      >
-        <div className="absolute -left-20 -top-24 h-72 w-72 rounded-full bg-accent/20 blur-[100px]" />
-        <div className="relative flex h-full min-h-[22rem] flex-col justify-end p-8 sm:min-h-[26rem] sm:p-12">
+      <section className="relative mb-14 min-h-[24rem] overflow-hidden rounded-3xl border border-white/10 bg-surface sm:min-h-[27rem]">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 opacity-60"
+          style={{ backgroundImage: `linear-gradient(90deg, #07090a 0%, rgba(7,9,10,.75) 50%, rgba(7,9,10,.35) 100%), url(${FOTOS.aulas})`, backgroundSize: "cover", backgroundPosition: "center 35%" }}
+        />
+        <div aria-hidden="true" className="respirar absolute -right-10 top-0 h-[26rem] w-[26rem] rounded-full bg-accent/40 blur-[100px]" />
+        <div aria-hidden="true" className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-[100px]" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={FOTOS.retratoRecorte}
+          alt=""
+          className="absolute -bottom-2 right-2 hidden h-[112%] w-auto object-contain object-bottom drop-shadow-[0_0_30px_rgba(57,255,126,.35)] sm:right-6 md:block"
+        />
+        <div className="relative flex min-h-[24rem] max-w-xl flex-col justify-end p-8 sm:min-h-[27rem] sm:p-12">
           {siguiente ? (
             <>
-              <p className="mb-4 text-sm font-medium text-accent">{completadas.size === 0 ? "Empezá acá" : "Seguí donde quedaste"}</p>
-              <h1 className="max-w-2xl text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">{siguiente.aula.title}</h1>
+              <p className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1.5 text-xs font-medium text-accent">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_rgba(57,255,126,.9)]" />
+                {completadas.size === 0 ? "Empezá acá" : "Seguí donde quedaste"}
+              </p>
+              <h1 className="text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">{siguiente.aula.title}</h1>
               <p className="mt-3 text-sm text-muted">{siguiente.modulo.title}</p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Link href={`/aulas/${siguiente.aula.id}`} className={ui.boton}>
                   {completadas.size === 0 ? "Ver primera clase" : "Continuar"}
                 </Link>
                 {proximoBono?.m.unlock_at && (
-                  <span className="rounded-full border border-line-strong bg-black/30 px-4 py-2.5 text-xs text-muted backdrop-blur">
+                  <span className="cristal rounded-full px-4 py-2.5 text-xs text-muted">
                     {proximoBono.m.title} se libera {diasRestantes(proximoBono.m.unlock_at)}
                   </span>
                 )}
@@ -82,7 +90,7 @@ async function Inicio() {
           ) : (
             <>
               <p className="mb-4 text-sm font-medium text-accent">Al día</p>
-              <h1 className="max-w-2xl text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">Completaste todo lo disponible</h1>
+              <h1 className="text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">Completaste todo lo disponible</h1>
               <p className="mt-3 text-sm text-muted">Volvé pronto: se publican clases nuevas cada semana.</p>
             </>
           )}
