@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: { bodySizeLimit: "8mb" },
   },
+  // Atalho: quem digitar /vendas cai em /ventas (as páginas ficam em espanhol, o público é hispano).
+  async redirects() {
+    return [{ source: "/vendas", destination: "/ventas", permanent: false }];
+  },
   turbopack: {
     rules: {
       "*.css": {

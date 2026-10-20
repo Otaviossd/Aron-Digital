@@ -4,11 +4,46 @@ Next.js 16 + Supabase (banco, login e armazenamento das capas) + PayPal (assinat
 
 ## O que existe
 
+**Visual:** fonte Inter em tudo, texto em caixa normal, tema escuro minimalista com uma cor de destaque champanhe. As cores e classes comuns ficam em `app/globals.css` e `lib/ui.ts`.
+
+**Fotos do Aaron:** coloque os arquivos em `public/aaron/` (`hero.jpg`, `sobre.jpg`, `entrar.jpg`, `aulas.jpg`; veja `public/aaron/LEEME.txt`). Sem os arquivos o site funciona com fundo escuro.
+
+**Páginas do domínio (tudo no mesmo site):**
+- `/captura`: lista de espera. A pessoa deixa o e-mail, recebe a boas-vindas e vê o botão do grupo de WhatsApp.
+- `/ventas`: página de venda com o checkout. (`/vendas` redireciona para `/ventas`.)
+- `/`: leva para a etapa atual. Antes do lançamento vai para `/captura`; no dia da abertura troque `PAGINA_INICIAL=ventas` na Vercel e faça um Redeploy.
+- `/entrar` (alunos) e `/equipo` (time), descritas abaixo.
+
+**Funil no painel (`/admin/embudo`):** visitantes, cadastros, chegada ao checkout e compras de cada página, por período (7, 30 ou 90 dias) e por origem. O site guarda um identificador anônimo no navegador (sem dados pessoais) e registra os eventos em `page_events`. Para saber de onde veio cada pessoa, use links com `?utm_source=...` (a aba mostra exemplos prontos). Para suas visitas não contarem, abra uma vez `/captura?rastreo=off` em cada navegador do time.
+
+**Quem recebe e-mail de carrinho abandonado:** só quem digitou o e-mail no checkout (`/ventas`). Quem apenas se cadastrou na captura não recebe essa sequência.
+
+**Duas portas de entrada:**
+- `/entrar` é para alunos. Depois do login cai direto em `/aulas`.
+- `/equipo` é para o time (você e o Aaron). Depois do login cai direto em `/admin`.
+- Quem já está logado e abre qualquer uma das duas vai direto para o seu lugar, sem ver o formulário. O botão do topo da página de venda também muda ("Ir al panel" / "Ir a mis clases").
+- Quem decide se a pessoa é do time é a tabela `public.admins`.
+
 **Venda:** `/` página de venda com checkout PayPal na própria tela (mensal/anual), `/gracias` pós-compra.
 
-**Área do aluno (`/aulas`):** menu lateral com progresso, busca, "continue de onde parou", fileiras de módulos com capas verticais (bloqueados mostram cadeado e quantos dias faltam), página do módulo, player com "marcar como concluída" e próxima aula, "Mi cuenta" (plano, datas, cancelar).
+**Área do aluno (`/aulas`):** menu lateral com progresso, busca, "continue de onde parou", fileiras de módulos com capas verticais (bloqueados mostram cadeado e quantos dias faltam), página do módulo, player com "marcar como concluída" e próxima aula, "Mi cuenta" (plano, datas, cancelar). Cada vez que o aluno abre uma aula isso é registrado (alimenta "viendo" no painel).
 
-**Admin (`/admin`):** criar/editar/apagar módulos e aulas, enviar capa (arquivo ou URL), definir o dia de liberação do módulo, agendar aulas (vídeo de toda segunda), ver alunos e status.
+**Painel do time (`/admin`, em espanhol):**
+- *Resumen:* alunos com acesso, viendo hoje/semana/mês, compras, receita mensal estimada, clases mais vistas, atividade recente, últimas compras.
+- *Alumnos:* cada compra com plano, estado, progresso (clases concluídas) e última atividade.
+- *Contenido:* criar/editar/apagar módulos e aulas, enviar capa, dia de liberação, agendar aulas (vídeo de toda segunda).
+- *Email marketing:* estado do envio (o que falta configurar), automações (compra, carrinho abandonado, e os espaços de referidos e campanhas), histórico de envios, últimos leads e prévia de cada e-mail.
+- *Equipo:* quem tem acesso ao painel; adicionar e remover pessoas.
+
+## Domínio próprio
+
+1. Compre o domínio (por exemplo `lanuevaera.com`) em qualquer registrador.
+2. Na Vercel: Settings > Domains > Add. Siga as instruções de DNS que ela mostrar (registro A ou CNAME no registrador).
+3. Na Vercel, em Environment Variables, mude `NEXT_PUBLIC_SITE_URL` para `https://seudominio.com` (sem barra no final) e, se o nome do curso for outro, `NEXT_PUBLIC_BRAND_NAME`. Faça um Redeploy.
+4. No Supabase: Authentication > URL Configuration. Troque o Site URL e inclua em Redirect URLs `https://seudominio.com/auth/callback` e `https://seudominio.com/**`.
+5. No Google Cloud (login com Google): nada muda, o retorno passa pelo Supabase.
+6. Resend: verifique o mesmo domínio (SPF e DKIM) para os e-mails saírem de `@seudominio.com`.
+7. PayPal/Hotmart: atualize a URL do webhook para o novo domínio.
 
 ## Fluxo de compra
 
@@ -20,8 +55,8 @@ Next.js 16 + Supabase (banco, login e armazenamento das capas) + PayPal (assinat
 
 ## Configuração (ordem)
 
-1. **Supabase**: crie o projeto e rode `supabase/schema.sql` no SQL Editor (cria tabelas, regras de acesso e o bucket `covers`). Em Authentication > Providers ative Google. Em Authentication > URL Configuration adicione a URL do site e `URL/auth/callback`.
-2. **Admins**: no SQL Editor, `insert into public.admins (email) values ('seu@email.com'), ('email-do-aaron@email.com');`
+1. **Supabase**: crie o projeto e rode `supabase/schema.sql` no SQL Editor (cria tabelas, regras de acesso e o bucket `covers`). Em Authentication > Providers ative Google. Em Authentication > URL Configuration troque o **Site URL** (que vem como `http://localhost:3000`) pela URL real do site e adicione em Redirect URLs `URL/auth/callback` e `URL/**`.
+2. **Admins**: rode `supabase/admins.sql` no SQL Editor (já traz o seu e-mail; para o Aaron, tire o `--` da linha dele e troque pelo e-mail dele). Depois, quem já é admin adiciona outras pessoas em `/admin/equipo`.
 3. **PayPal**: crie o app (sandbox primeiro) e dois planos de assinatura (mensal e anual) com os valores de `lib/config.ts`. Crie um webhook para `URL/api/paypal/webhook` com os eventos `BILLING.SUBSCRIPTION.ACTIVATED`, `.CANCELLED`, `.EXPIRED`, `.SUSPENDED`, `PAYMENT.SALE.COMPLETED` e `PAYMENT.SALE.REFUNDED`.
 4. **Resend**: verifique o domínio de envio e gere a API key.
 5. Copie `.env.example` para `.env.local` e preencha tudo.
@@ -37,7 +72,7 @@ Formato vertical 3:4 (sugestão: 900x1200 px). Envie pelo `/admin` ou cole uma U
 - A cada hora, o GitHub Actions (`.github/workflows/cron-abandonados.yml`) chama `/api/cron/abandonados`. Cada lead recebe, no máximo, 3 e-mails: 1 h, 24 h e 48 h depois. Quem compra ou se descadastra para de receber na hora; passados 7 dias, o lead é considerado frio.
 - Configure no GitHub os segredos `SITE_URL` e `CRON_SECRET` (o mesmo valor da Vercel). O cron da Vercel no plano gratuito roda só 1x por dia, por isso o agendador é externo.
 - Textos em `lib/emails/abandono.ts`. Não há desconto nem urgência inventada; o prazo só aparece se `OFERTA_FIN` estiver preenchido.
-- O `/admin` mostra leads, pendentes, e-mails enviados por etapa, recuperados e descadastros. "Recuperado" é quem comprou depois de receber um e-mail, e pode incluir quem compraria de qualquer forma.
+- O painel (Email marketing) mostra leads, pendentes, e-mails enviados por etapa, recuperados e descadastros. "Recuperado" é quem comprou depois de receber um e-mail, e pode incluir quem compraria de qualquer forma.
 - Cuidado: como o e-mail vem de um campo aberto, alguém pode digitar o e-mail de outra pessoa. Por isso há descadastro de um clique e no máximo 3 e-mails por pessoa.
 - Antes de disparar: verifique o domínio no Resend (SPF e DKIM) e use um subdomínio para marketing.
 

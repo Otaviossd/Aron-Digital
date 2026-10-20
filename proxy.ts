@@ -14,6 +14,15 @@ function aviso(mensaje: string) {
 // Renova a sessão do Supabase e protege a área de aulas e o admin.
 // Nunca derruba as páginas públicas: se algo falhar na configuração, a página de venda continua abrindo.
 export async function proxy(request: NextRequest) {
+  // A raiz do domínio leva à etapa atual: antes do lançamento "captura", depois "ventas".
+  // Troque a variável PAGINA_INICIAL na Vercel (e faça um Redeploy) no dia em que abrir as vendas.
+  if (request.nextUrl.pathname === "/") {
+    const etapa = process.env.PAGINA_INICIAL === "ventas" ? "/ventas" : "/captura";
+    const destino = request.nextUrl.clone();
+    destino.pathname = etapa;
+    return NextResponse.redirect(destino);
+  }
+
   const url = supabaseUrl();
   const key = supabaseAnonKey();
   const protegida = ZONAS_PROTEGIDAS.some((p) => request.nextUrl.pathname.startsWith(p));
@@ -47,7 +56,8 @@ export async function proxy(request: NextRequest) {
 
     if (!user && protegida) {
       const redirect = request.nextUrl.clone();
-      redirect.pathname = "/entrar";
+      // O painel tem a sua própria porta de entrada; o aluno entra por /entrar.
+      redirect.pathname = request.nextUrl.pathname.startsWith("/admin") ? "/equipo" : "/entrar";
       return NextResponse.redirect(redirect);
     }
 
