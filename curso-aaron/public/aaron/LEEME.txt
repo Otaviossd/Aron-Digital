@@ -1,0 +1,13 @@
+Fotos do Aaron
+==============
+Coloque aqui as fotos, com estes nomes exatos:
+
+  hero.jpg    topo da página de venda          (horizontal, ~2400 px de largura)
+  captura.jpg página de captura (lista de espera)   (horizontal, ~2400 px)
+  sobre.jpg   seção "Quién es Aaron"            (retrato 4:5, ~1200 x 1500 px)
+  entrar.jpg  tela de acesso                    (horizontal ou vertical, ~1600 px)
+  aulas.jpg   boas-vindas da área do aluno      (horizontal, ~2000 px)
+
+Sem os arquivos o site funciona normalmente, só com fundo escuro.
+Para trocar os nomes ou caminhos, edite lib/fotos.ts.
+Dica: comprima as fotos (TinyPNG, Squoosh) para ficarem abaixo de 400 KB cada.
