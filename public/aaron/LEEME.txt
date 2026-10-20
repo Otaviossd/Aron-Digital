@@ -1,13 +1,11 @@
-Fotos do Aaron
-==============
-Coloque aqui as fotos, com estes nomes exatos:
+Fotos del Aaron
+===============
+Archivos guardados (JPG optimizados, ~100 KB cada uno):
 
-  hero.jpg    topo da página de venda          (horizontal, ~2400 px de largura)
-  captura.jpg página de captura (lista de espera)   (horizontal, ~2400 px)
-  sobre.jpg   seção "Quién es Aaron"            (retrato 4:5, ~1200 x 1500 px)
-  entrar.jpg  tela de acesso                    (horizontal ou vertical, ~1600 px)
-  aulas.jpg   boas-vindas da área do aluno      (horizontal, ~2000 px)
+  retrato.jpg    retrato de frente, brazos cruzados (vertical)
+  espalda.jpg    de espaldas frente al público, camiseta Hellion Crew (vertical)
+  auditorio.jpg  de espaldas frente al auditorio lleno (vertical)
+  clase.jpg      dando clase con micrófono (vertical)
 
-Sem os arquivos o site funciona normalmente, só com fundo escuro.
-Para trocar os nomes ou caminhos, edite lib/fotos.ts.
-Dica: comprima as fotos (TinyPNG, Squoosh) para ficarem abaixo de 400 KB cada.
+Para cambiar qué foto va en cada página, edita lib/fotos.ts.
+Para agregar fotos nuevas, súbelas a esta carpeta (JPG, hasta ~1800 px, menos de 400 KB).

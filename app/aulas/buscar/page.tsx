@@ -22,7 +22,7 @@ async function Resultados({ searchParams }: { searchParams: Promise<{ q?: string
   const modulosOk = nq
     ? modulos.filter((m) => m.is_unlocked && norm(`${m.title} ${m.description ?? ""}`).includes(nq))
     : [];
-  const aulasOk = nq ? aulas.filter((a) => norm(`${a.title} ${a.description ?? ""}`).includes(nq)) : [];
+  const aulasOk = nq ? aulas.filter((a) => a.is_unlocked !== false && norm(`${a.title} ${a.description ?? ""}`).includes(nq)) : [];
 
   return (
     <div className="mx-auto max-w-3xl">

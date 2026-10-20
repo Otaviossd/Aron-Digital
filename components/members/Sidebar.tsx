@@ -3,20 +3,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Avatar from "./Avatar";
 
 type Props = {
   brand: string;
   email: string;
   porcentaje: number;
   esAdmin: boolean;
+  avatarUrl?: string | null;
   instagramUrl?: string;
-  soporteEmail?: string;
 };
 
 const iconos: Record<string, string> = {
   inicio: "M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V11z",
   cuenta: "M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm-8 10a8 8 0 0 1 16 0",
   soporte: "M4 4h16v12H7l-3 3V4z",
+  ayuda: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01",
   instagram: "M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm5 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8z",
   admin: "M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z",
   salir: "M10 3H5a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h5M16 17l5-5-5-5M21 12H9",
@@ -30,14 +32,15 @@ function Icono({ d }: { d: string }) {
   );
 }
 
-export default function Sidebar({ brand, email, porcentaje, esAdmin, instagramUrl, soporteEmail }: Props) {
+export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, instagramUrl }: Props) {
   const pathname = usePathname();
   const [abierto, setAbierto] = useState(false);
 
   const items: { href: string; label: string; icono: string; externo?: boolean }[] = [
     { href: "/aulas", label: "Inicio", icono: "inicio" },
     { href: "/aulas/cuenta", label: "Mi cuenta", icono: "cuenta" },
-    ...(soporteEmail ? [{ href: `mailto:${soporteEmail}`, label: "Soporte", icono: "soporte", externo: true }] : []),
+    { href: "/aulas/ayuda", label: "Preguntas frecuentes", icono: "ayuda" },
+    { href: "/aulas/soporte", label: "Soporte", icono: "soporte" },
     ...(instagramUrl ? [{ href: instagramUrl, label: "Instagram", icono: "instagram", externo: true }] : []),
     ...(esAdmin ? [{ href: "/admin", label: "Panel del equipo", icono: "admin" }] : []),
   ];
@@ -50,8 +53,14 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, instagramUr
         <p className="text-sm font-semibold tracking-tight">{brand}</p>
 
         <div className="mt-8">
-          <p className="truncate text-xs text-faint">{email}</p>
-          <div className="mt-4 flex items-baseline justify-between text-xs">
+          <Link href="/aulas/cuenta" onClick={() => setAbierto(false)} className="flex items-center gap-3 rounded-xl border border-line bg-white/[0.03] p-3 transition hover:border-line-strong">
+            <Avatar url={avatarUrl} email={email} size={36} />
+            <span className="min-w-0">
+              <span className="block text-[11px] text-faint">Tu cuenta</span>
+              <span className="block truncate text-xs text-ink/90">{email}</span>
+            </span>
+          </Link>
+          <div className="mt-5 flex items-baseline justify-between text-xs">
             <span className="text-muted">Tu progreso</span>
             <span className="font-medium text-accent">{porcentaje}%</span>
           </div>
@@ -100,7 +109,7 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, instagramUr
       </button>
 
       {/* Escritorio */}
-      <aside className="fixed inset-y-0 left-0 hidden w-60 border-r border-line bg-bg lg:block">{contenido}</aside>
+      <aside className="fixed inset-y-0 left-0 z-10 hidden w-60 border-r border-line bg-bg/80 backdrop-blur-xl lg:block">{contenido}</aside>
 
       {/* Móvil (drawer) */}
       {abierto && (

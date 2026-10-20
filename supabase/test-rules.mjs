@@ -21,7 +21,8 @@ await db.exec(`
 const sql = readFileSync(new URL("./schema.sql", import.meta.url), "utf8");
 await db.exec(sql);
 await db.exec(`grant select, insert, update, delete on all tables in schema public to authenticated;
-               grant execute on all functions in schema public to authenticated;`);
+               grant execute on all functions in schema public to authenticated;
+               grant select, insert, update, delete on storage.objects to authenticated;`);
 
 let falhas = 0;
 const check = (nome, ok, extra = "") => {
@@ -42,12 +43,16 @@ const q = async (text) => (await db.query(text)).rows;
 
 // Conteúdo: módulo 1 e 2 (dia 0), módulo 3 (dia 7) já vêm do seed do schema
 const mods = await q("select id, title, unlock_after_days from public.modules order by position");
-check("seed criou 3 módulos", mods.length === 3);
-const [m1, m2, m3] = mods;
+check("seed criou 3 módulos + bono Color", mods.length === 4);
+const [m1, m2, m3, mBono] = mods;
+check("bono Color: is_bonus e abre ao dia 7", !!(await q("select 1 from public.modules where is_bonus and title='Bono: Color' and unlock_after_days=7")).length);
 await db.exec(`
   insert into public.lessons (module_id, title, position) values
     ('${m1.id}', 'Aula 1.1', 1),
-    ('${m3.id}', 'Aula 3.1', 1);
+    ('${m3.id}', 'Aula 3.1', 1),
+    ('${mBono.id}', 'Aula bono 1', 1);
+  insert into public.lessons (module_id, title, position, unlock_after_days) values
+    ('${m1.id}', 'Aula 1.3 dia 7', 3, 7);
   insert into public.lessons (module_id, title, position, published_at) values
     ('${m1.id}', 'Aula 1.2 agendada', 2, now() + interval '3 days');
 `);
@@ -64,18 +69,22 @@ check("sem assinatura: nenhum módulo visível", r.length === 0);
 await db.exec(`insert into public.subscriptions (email, paypal_subscription_id, status, purchased_at, access_until)
                values ('novo@x.com', 'I-NOVO', 'active', now(), now() + interval '30 days')`);
 r = await como("Novo@X.com", () => q("select title, is_unlocked from public.my_modules() order by position"));
-check("comprou agora: 3 módulos listados (case-insensitive no e-mail)", r.length === 3);
-check("comprou agora: módulos 1 e 2 abertos, 3 fechado", r[0]?.is_unlocked && r[1]?.is_unlocked && !r[2]?.is_unlocked, JSON.stringify(r.map((x) => x.is_unlocked)));
+check("comprou agora: 4 módulos listados (case-insensitive no e-mail)", r.length === 4);
+check("comprou agora: módulos 1 e 2 abertos, 3 fechado", r[0]?.is_unlocked && r[1]?.is_unlocked && !r[2]?.is_unlocked && !r[3]?.is_unlocked, JSON.stringify(r.map((x) => x.is_unlocked)));
 r = await como("novo@x.com", () => q("select title from public.lessons order by title"));
-check("comprou agora: vê Aula 1.1, NÃO vê a do módulo 3 nem a agendada", r.length === 1 && r[0].title === "Aula 1.1", JSON.stringify(r));
+check("comprou agora: vê Aula 1.1, NÃO vê a do módulo 3, a do bono, a agendada nem a do dia 7", r.length === 1 && r[0].title === "Aula 1.1", JSON.stringify(r));
+r = await como("novo@x.com", () => q("select title, is_unlocked from public.my_lessons() order by title"));
+check("comprou agora: my_lessons mostra aula do dia 7 bloqueada e esconde módulos fechados", r.map((x) => `${x.title}:${x.is_unlocked}`).join() === "Aula 1.1:true,Aula 1.3 dia 7:false", JSON.stringify(r));
+r = await como("novo@x.com", () => q("select is_bonus from public.my_modules() where title='Bono: Color'"));
+check("comprou agora: bono Color listado como bono e bloqueado", r.length === 1 && r[0].is_bonus === true);
 
 // 3) Comprou há 8 dias
 await db.exec(`insert into public.subscriptions (email, paypal_subscription_id, status, purchased_at, access_until)
                values ('antigo@x.com', 'I-ANTIGO', 'active', now() - interval '8 days', now() + interval '22 days')`);
 r = await como("antigo@x.com", () => q("select is_unlocked from public.my_modules()"));
-check("há 8 dias: todos os módulos abertos", r.length === 3 && r.every((x) => x.is_unlocked));
+check("há 8 dias: todos os módulos abertos", r.length === 4 && r.every((x) => x.is_unlocked));
 r = await como("antigo@x.com", () => q("select title from public.lessons order by title"));
-check("há 8 dias: vê aula do módulo 3 (mas ainda não a agendada)", r.map((x) => x.title).join() === "Aula 1.1,Aula 3.1", JSON.stringify(r));
+check("há 8 dias: vê aulas do módulo 3, bono e do dia 7 (mas ainda não a agendada)", r.map((x) => x.title).join() === "Aula 1.1,Aula 1.3 dia 7,Aula 3.1,Aula bono 1", JSON.stringify(r));
 
 // 4) Cancelada: acesso até fim do período pago
 await db.exec(`insert into public.subscriptions (email, paypal_subscription_id, status, purchased_at, access_until)
@@ -83,7 +92,7 @@ await db.exec(`insert into public.subscriptions (email, paypal_subscription_id, 
                       ('venceu@x.com', 'I-VENC', 'cancelled', now() - interval '40 days', now() - interval '1 day'),
                       ('suspensa@x.com', 'I-SUSP', 'suspended', now() - interval '10 days', now() + interval '5 days')`);
 r = await como("cancelou@x.com", () => q("select * from public.my_modules()"));
-check("cancelada com período pago futuro: mantém acesso", r.length === 3);
+check("cancelada com período pago futuro: mantém acesso", r.length === 4);
 r = await como("venceu@x.com", () => q("select * from public.my_modules()"));
 check("cancelada com período vencido: sem acesso", r.length === 0);
 r = await como("suspensa@x.com", () => q("select * from public.my_modules()"));
@@ -125,9 +134,9 @@ for (const [nome, cmd] of [
 // 8) Admin
 await db.exec(`insert into public.admins (email) values ('admin@x.com')`);
 r = await como("admin@x.com", () => q("select is_unlocked from public.my_modules()"));
-check("admin sem compra: vê os 3 módulos abertos", r.length === 3 && r.every((x) => x.is_unlocked));
+check("admin sem compra: vê os 4 módulos abertos", r.length === 4 && r.every((x) => x.is_unlocked));
 r = await como("admin@x.com", () => q("select title from public.lessons"));
-check("admin vê todas as aulas (inclusive agendada)", r.length === 3, JSON.stringify(r));
+check("admin vê todas as aulas (inclusive agendada e do dia 7)", r.length === 5, JSON.stringify(r));
 r = await como("admin@x.com", () => q("select email from public.subscriptions"));
 check("admin vê todas as assinaturas", r.length === 6, String(r.length));
 await como("admin@x.com", () => db.exec(`insert into public.modules (title, position) values ('Novo do admin', 9)`));
@@ -264,6 +273,16 @@ const directo = emb.origenes.find((x) => x.origen === "directo");
 check("funil: origem instagram = 2 visitantes, 1 registro, 1 checkout", insta.visitantes === 2 && insta.registros === 1 && insta.checkout === 1, JSON.stringify(insta));
 check("funil: visita sem origem aparece como 'directo'", directo?.visitantes === 1, JSON.stringify(emb.origenes));
 check("funil: registros da lista = 2", emb.registros_lista === 2, JSON.stringify(emb));
+
+// 13) Foto de perfil: cada aluno só escreve na própria pasta do bucket avatars
+await db.exec(`select set_config('request.jwt.claims', '${JSON.stringify({ email: "novo@x.com", sub: "uid-novo" })}', false)`);
+await db.exec("set role authenticated");
+let okAvatar = true, bloqueado = false;
+try { await db.exec("insert into storage.objects (bucket_id, name) values ('avatars', 'uid-novo/foto.jpg')"); } catch { okAvatar = false; }
+try { await db.exec("insert into storage.objects (bucket_id, name) values ('avatars', 'uid-outro/foto.jpg')"); } catch { bloqueado = true; }
+await db.exec("reset role");
+check("avatar: aluno grava na própria pasta", okAvatar);
+check("avatar: aluno NÃO grava na pasta de outro", bloqueado);
 
 console.log(falhas === 0 ? "\nTODOS OS TESTES PASSARAM" : `\n${falhas} FALHA(S)`);
 process.exit(falhas === 0 ? 0 : 1);

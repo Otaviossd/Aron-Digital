@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { aulasDelModulo, getMemberData } from "@/lib/members";
+import { aulasDelModulo, diasRestantes, getMemberData } from "@/lib/members";
 import { toggleCompletada } from "../actions";
 import RegistrarVista from "@/components/members/RegistrarVista";
 import { ui } from "@/lib/ui";
@@ -20,7 +20,7 @@ async function AulaContenido({ params }: { params: Promise<{ id: string }> }) {
 
   // RLS: si el módulo todavía no se liberó (o la clase no se publicó), no aparece en `aulas`.
   const aula = aulas.find((a) => a.id === id);
-  if (!aula) notFound();
+  if (!aula || aula.is_unlocked === false) notFound();
   const modulo = modulos.find((m) => m.id === aula.module_id);
   if (!modulo) notFound();
 
@@ -29,9 +29,10 @@ async function AulaContenido({ params }: { params: Promise<{ id: string }> }) {
   const esArchivo = url ? /\.(mp4|webm|mov)(\?|$)/i.test(url) : false;
 
   const lista = aulasDelModulo(aulas, modulo.id);
-  const idx = lista.findIndex((a) => a.id === id);
-  const anterior = idx > 0 ? lista[idx - 1] : null;
-  const siguiente = idx < lista.length - 1 ? lista[idx + 1] : null;
+  const abiertas = lista.filter((a) => a.is_unlocked !== false);
+  const idx = abiertas.findIndex((a) => a.id === id);
+  const anterior = idx > 0 ? abiertas[idx - 1] : null;
+  const siguiente = idx < abiertas.length - 1 ? abiertas[idx + 1] : null;
   const hecha = completadas.has(id);
 
   return (
@@ -79,26 +80,34 @@ async function AulaContenido({ params }: { params: Promise<{ id: string }> }) {
       <aside className="h-fit overflow-hidden rounded-2xl border border-line bg-surface">
         <h2 className="border-b border-line px-5 py-4 text-sm font-semibold tracking-tight">{modulo.title}</h2>
         <ul>
-          {lista.map((a) => (
-            <li key={a.id}>
-              <Link
-                href={`/aulas/${a.id}`}
-                className={`flex items-center gap-3 px-5 py-3 text-sm transition hover:bg-white/[0.03] ${
-                  a.id === id ? "bg-white/[0.05] font-medium text-ink" : "text-muted"
-                }`}
-              >
-                <span
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] ${
-                    completadas.has(a.id) ? "border-accent bg-accent font-semibold text-bg" : "border-line-strong"
+          {lista.map((a) =>
+            a.is_unlocked === false ? (
+              <li key={a.id} className="flex items-center gap-3 px-5 py-3 text-sm text-faint">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-line text-[10px]">🔒</span>
+                <span className="flex-1">{a.title}</span>
+                {a.unlock_at && <span className="text-xs">{diasRestantes(a.unlock_at)}</span>}
+              </li>
+            ) : (
+              <li key={a.id}>
+                <Link
+                  href={`/aulas/${a.id}`}
+                  className={`flex items-center gap-3 px-5 py-3 text-sm transition hover:bg-white/[0.03] ${
+                    a.id === id ? "bg-white/[0.05] font-medium text-ink" : "text-muted"
                   }`}
                 >
-                  {completadas.has(a.id) ? "✓" : ""}
-                </span>
-                <span className="flex-1">{a.title}</span>
-                {a.duration_minutes && <span className="text-xs text-faint">{a.duration_minutes}′</span>}
-              </Link>
-            </li>
-          ))}
+                  <span
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] ${
+                      completadas.has(a.id) ? "border-accent bg-accent font-semibold text-bg" : "border-line-strong"
+                    }`}
+                  >
+                    {completadas.has(a.id) ? "✓" : ""}
+                  </span>
+                  <span className="flex-1">{a.title}</span>
+                  {a.duration_minutes && <span className="text-xs text-faint">{a.duration_minutes}′</span>}
+                </Link>
+              </li>
+            ),
+          )}
         </ul>
       </aside>
     </div>

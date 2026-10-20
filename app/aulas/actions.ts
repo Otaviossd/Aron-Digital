@@ -31,3 +31,38 @@ export async function registrarVista(lessonId: string) {
     /* sem efeito para o aluno */
   }
 }
+
+const TIPOS_IMAGEN = ["image/jpeg", "image/png", "image/webp"];
+
+// Foto de perfil: se guarda en el bucket "avatars" (carpeta = id del usuario) y la URL queda en su perfil.
+export async function guardarAvatar(_prev: { error?: string; ok?: boolean }, formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Tenés que iniciar sesión." };
+
+  const archivo = formData.get("foto");
+  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elegí una foto." };
+  if (!TIPOS_IMAGEN.includes(archivo.type)) return { error: "Usá una imagen JPG, PNG o WebP." };
+  if (archivo.size > 4 * 1024 * 1024) return { error: "La foto pesa más de 4 MB. Probá con una más liviana." };
+
+  const ext = archivo.type === "image/png" ? "png" : archivo.type === "image/webp" ? "webp" : "jpg";
+  // Nombre nuevo cada vez: evita que el navegador muestre la foto anterior en caché.
+  const ruta = `${user.id}/${Date.now()}.${ext}`;
+  const { error } = await supabase.storage.from("avatars").upload(ruta, archivo, { contentType: archivo.type });
+  if (error) return { error: "No pudimos subir la foto. Intentá de nuevo." };
+
+  const url = supabase.storage.from("avatars").getPublicUrl(ruta).data.publicUrl;
+  const { error: errPerfil } = await supabase.auth.updateUser({ data: { avatar_url: url } });
+  if (errPerfil) return { error: "No pudimos guardar la foto en tu perfil." };
+
+  revalidatePath("/aulas", "layout");
+  return { ok: true };
+}
+
+export async function quitarAvatar() {
+  const supabase = await createClient();
+  await supabase.auth.updateUser({ data: { avatar_url: null } });
+  revalidatePath("/aulas", "layout");
+}

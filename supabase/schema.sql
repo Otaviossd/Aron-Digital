@@ -22,6 +22,8 @@ create table if not exists public.modules (
 -- Bases que já rodaram a versão anterior deste arquivo:
 alter table public.modules add column if not exists cover_url text;
 alter table public.modules add column if not exists accent text not null default '#d4ff00';
+-- bonos: aparecen en su propia fila en el área del alumno
+alter table public.modules add column if not exists is_bonus boolean not null default false;
 
 create table if not exists public.lessons (
   id uuid primary key default gen_random_uuid(),
@@ -36,6 +38,9 @@ create table if not exists public.lessons (
   published_at timestamptz not null default now(),
   created_at timestamptz not null default now()
 );
+
+-- dias após a compra para a aula abrir (dentro de um módulo já liberado). 0 = abre com o módulo.
+alter table public.lessons add column if not exists unlock_after_days int not null default 0 check (unlock_after_days >= 0);
 
 create table if not exists public.subscriptions (
   id uuid primary key default gen_random_uuid(),
@@ -141,7 +146,8 @@ returns table (
   cover_url text,
   accent text,
   unlock_at timestamptz,
-  is_unlocked boolean
+  is_unlocked boolean,
+  is_bonus boolean
 )
 language sql
 stable
@@ -157,10 +163,68 @@ as $$
     m.cover_url,
     m.accent,
     public.module_unlock_at(m.id) as unlock_at,
-    coalesce(public.module_unlock_at(m.id) <= now(), false) as is_unlocked
+    coalesce(public.module_unlock_at(m.id) <= now(), false) as is_unlocked,
+    m.is_bonus
   from public.modules m
   where (public.current_subscription()).id is not null or public.is_admin()
   order by m.position
+$$;
+
+-- Quando uma aula abre: o que for mais tarde entre o módulo e a própria aula (dias desde a compra).
+create or replace function public.lesson_unlock_at(p_lesson_id uuid)
+returns timestamptz
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    case when public.is_admin() then now() - interval '1 second' end,
+    (
+      select sub.purchased_at + (greatest(m.unlock_after_days, l.unlock_after_days) * interval '1 day')
+      from public.current_subscription() sub
+      where sub.id is not null
+    )
+  )
+  from public.lessons l
+  join public.modules m on m.id = l.module_id
+  where l.id = p_lesson_id
+$$;
+
+-- Aulas dos módulos já liberados, com estado de bloqueio, sem expor o vídeo das bloqueadas.
+drop function if exists public.my_lessons();
+create or replace function public.my_lessons()
+returns table (
+  id uuid,
+  module_id uuid,
+  title text,
+  description text,
+  "position" int,
+  duration_minutes int,
+  published_at timestamptz,
+  unlock_at timestamptz,
+  is_unlocked boolean
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    l.id,
+    l.module_id,
+    l.title,
+    l.description,
+    l.position,
+    l.duration_minutes,
+    l.published_at,
+    public.lesson_unlock_at(l.id) as unlock_at,
+    coalesce(public.lesson_unlock_at(l.id) <= now(), false) as is_unlocked
+  from public.lessons l
+  where ((public.current_subscription()).id is not null or public.is_admin())
+    and l.published_at <= now()
+    and coalesce(public.module_unlock_at(l.module_id) <= now(), false)
+  order by l.position
 $$;
 
 -- ============================================================
@@ -184,7 +248,7 @@ create policy "lessons_select_unlocked" on public.lessons
   for select to authenticated
   using (
     published_at <= now()
-    and coalesce(public.module_unlock_at(module_id) <= now(), false)
+    and coalesce(public.lesson_unlock_at(id) <= now(), false)
   );
 
 -- Assinaturas: o aluno só enxerga a própria. Escrita só pelo servidor (service role ignora RLS).
@@ -572,3 +636,25 @@ select * from (values
   ('Módulo 3: Avançado', 'Acabamentos e atendimento premium', 3, 7)
 ) as v(title, description, position, unlock_after_days)
 where not exists (select 1 from public.modules);
+
+-- ============================================================
+-- Foto de perfil do aluno (bucket público; cada aluno só escreve na própria pasta)
+-- ============================================================
+
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+drop policy if exists "avatars_own_write" on storage.objects;
+create policy "avatars_own_write" on storage.objects
+  for all to authenticated
+  using (bucket_id = 'avatars' and split_part(name, '/', 1) = coalesce(auth.jwt() ->> 'sub', ''))
+  with check (bucket_id = 'avatars' and split_part(name, '/', 1) = coalesce(auth.jwt() ->> 'sub', ''));
+
+-- ============================================================
+-- Bono de lanzamiento: módulo de Color (se abre al día 7). Edita o agrega más desde /admin/contenido.
+-- ============================================================
+
+insert into public.modules (title, description, position, unlock_after_days, is_bonus)
+select 'Bono: Color', 'Técnicas de color para barberos. Se libera a los 7 días de tu acceso.', 100, 7, true
+where not exists (select 1 from public.modules where is_bonus and title = 'Bono: Color');

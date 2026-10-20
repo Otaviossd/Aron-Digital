@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { ModuloEstado } from "@/lib/members";
+import { diasRestantes } from "@/lib/members";
+import { FOTOS_PORTADA } from "@/lib/fotos";
 
 type Props = {
   modulo: ModuloEstado;
@@ -8,25 +10,19 @@ type Props = {
   totalAulas: number;
 };
 
-function diasHasta(fecha: string) {
-  const ms = new Date(fecha).getTime() - Date.now();
-  return Math.max(1, Math.ceil(ms / 86400000));
-}
-
-// Capa vertical de módulo. Usa a imagem do módulo; sem imagem, gera uma capa tipográfica discreta
-// com a cor do módulo em tom suave.
+// Capa vertical de módulo (estilo catálogo). Usa la imagen del módulo; sin imagen, una foto del Aaron
+// teñida con el color del módulo.
 export default function CoverCard({ modulo, numero, progreso, totalAulas }: Props) {
   const bloqueado = !modulo.is_unlocked;
   const accent = /^#[0-9a-fA-F]{6}$/.test(modulo.accent) ? modulo.accent : "#cdb48a";
-  const dias = modulo.unlock_at ? diasHasta(modulo.unlock_at) : null;
+  const foto = FOTOS_PORTADA[(numero - 1) % FOTOS_PORTADA.length];
 
   const tarjeta = (
     <div
       className={`group relative aspect-[3/4] w-[176px] shrink-0 snap-start overflow-hidden rounded-xl border border-line bg-surface transition duration-300 sm:w-[212px] ${
-        bloqueado ? "" : "hover:-translate-y-1 hover:border-line-strong"
+        bloqueado ? "" : "hover:-translate-y-1.5 hover:border-white/25 hover:shadow-[0_18px_50px_-12px_rgba(205,180,138,.28)]"
       }`}
     >
-      {/* Fondo */}
       {modulo.cover_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -38,45 +34,32 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
         />
       ) : (
         <div
-          className={`absolute inset-0 ${bloqueado ? "grayscale" : ""}`}
-          style={{
-            background: `radial-gradient(110% 70% at 50% 0%, ${accent}38 0%, transparent 62%), linear-gradient(180deg, #151517 0%, #0a0a0a 100%)`,
-          }}
-        >
-          <span
-            className="absolute -right-2 top-4 select-none text-[10rem] font-extralight leading-none tracking-tighter"
-            style={{ color: "transparent", WebkitTextStroke: `1px ${accent}66` }}
-          >
-            {numero}
-          </span>
-        </div>
+          className={`absolute inset-0 bg-cover bg-center transition duration-500 ${bloqueado ? "grayscale" : "group-hover:scale-[1.05]"}`}
+          style={{ backgroundImage: `url(${foto})` }}
+        />
       )}
 
-      {/* Degradado para legibilidad */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+      {/* Tinte del color del módulo + degradado para legibilidad */}
+      {!modulo.cover_url && <div className="absolute inset-0 mix-blend-soft-light" style={{ background: `linear-gradient(160deg, ${accent}aa, transparent 70%)` }} />}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10" />
       {bloqueado && <div className="absolute inset-0 bg-black/55" />}
 
-      {/* Etiqueta */}
-      <span className="absolute left-3 top-3 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-medium text-ink/90 backdrop-blur">
-        Módulo {numero}
+      <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-ink/90 backdrop-blur">
+        {modulo.is_bonus ? "Bono" : `Módulo ${numero}`}
       </span>
 
-      {/* Candado */}
       {bloqueado && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
-          <svg viewBox="0 0 24 24" className="h-7 w-7 text-ink/80" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="5" y="11" width="14" height="10" rx="2" />
-            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-          </svg>
-          {dias !== null && (
-            <span className="px-3 text-xs font-medium text-ink/80">
-              Se libera en {dias} {dias === 1 ? "día" : "días"}
-            </span>
-          )}
+          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/40 backdrop-blur">
+            <svg viewBox="0 0 24 24" className="h-5 w-5 text-ink/90" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </svg>
+          </span>
+          {modulo.unlock_at && <span className="px-3 text-xs font-medium text-ink/85">Se libera {diasRestantes(modulo.unlock_at)}</span>}
         </div>
       )}
 
-      {/* Título */}
       <div className="absolute inset-x-0 bottom-0 p-4">
         <h3 className="text-lg font-semibold leading-tight tracking-tight">{modulo.title}</h3>
         {!bloqueado && (

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getMemberData } from "@/lib/members";
 import { DIAS_REEMBOLSO } from "@/lib/config";
 import CancelButton from "../CancelButton";
+import AvatarForm from "@/components/members/AvatarForm";
 
 export default function CuentaPage() {
   return (
@@ -12,7 +13,7 @@ export default function CuentaPage() {
 }
 
 async function Cuenta() {
-  const { supabase, email } = await getMemberData();
+  const { supabase, email, avatarUrl } = await getMemberData();
 
   const { data: sub } = await supabase
     .from("subscriptions")
@@ -32,6 +33,8 @@ async function Cuenta() {
   return (
     <div className="mx-auto max-w-xl">
       <h1 className="mb-8 text-3xl font-semibold tracking-tight">Mi cuenta</h1>
+
+      <AvatarForm url={avatarUrl} email={email} />
 
       <dl className="mb-8 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface text-sm">
         <div className="flex justify-between gap-4 px-5 py-4">
@@ -68,7 +71,7 @@ async function Cuenta() {
         <div className="text-sm leading-relaxed text-muted">
           <p className="mb-4">
             {enVentana && finReembolso
-              ? `Podés pedir reembolso hasta el ${fmt(finReembolso)} escribiéndonos por soporte. Después de esa fecha solo podés cancelar las próximas cobranzas.`
+              ? `Podés pedir reembolso hasta el ${fmt(finReembolso)} escribiéndonos a soporte (menú Soporte). Después de esa fecha solo podés cancelar las próximas cobranzas.`
               : "El período de reembolso ya terminó. Podés cancelar las próximas cobranzas cuando quieras."}
           </p>
           {sub.status === "active" ? (

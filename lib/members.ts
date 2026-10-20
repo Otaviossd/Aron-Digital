@@ -15,6 +15,7 @@ export type ModuloEstado = {
   accent: string;
   unlock_at: string | null;
   is_unlocked: boolean;
+  is_bonus: boolean;
 };
 
 export type Aula = {
@@ -25,6 +26,8 @@ export type Aula = {
   position: number;
   duration_minutes: number | null;
   published_at?: string;
+  unlock_at?: string | null;
+  is_unlocked?: boolean;
 };
 
 // Usuário logado + dados comuns da área de membros (módulos, aulas visíveis, concluídas).
@@ -39,10 +42,7 @@ export const getMemberData = cache(async function getMemberData() {
   const [{ data: modulosRaw }, { data: aulasRaw }, { data: progresoRaw }, { data: admin }] =
     await Promise.all([
       supabase.rpc("my_modules"),
-      supabase
-        .from("lessons")
-        .select("id, module_id, title, description, position, duration_minutes, published_at")
-        .order("position"),
+      supabase.rpc("my_lessons"),
       supabase.from("lesson_progress").select("lesson_id"),
       supabase.rpc("is_admin"),
     ]);
@@ -51,13 +51,18 @@ export const getMemberData = cache(async function getMemberData() {
   const aulas = (aulasRaw ?? []) as Aula[];
   const completadas = new Set(((progresoRaw ?? []) as { lesson_id: string }[]).map((p) => p.lesson_id));
 
-  const porcentaje = aulas.length === 0 ? 0 : Math.round((completadas.size / aulas.length) * 100);
+  // El progreso se calcula sobre las clases ya liberadas, para no penalizar lo que todavía está bloqueado.
+  const liberadas = aulas.filter((a) => a.is_unlocked !== false);
+  const hechas = liberadas.filter((a) => completadas.has(a.id)).length;
+  const porcentaje = liberadas.length === 0 ? 0 : Math.round((hechas / liberadas.length) * 100);
+  const avatarUrl = typeof user.user_metadata?.avatar_url === "string" ? (user.user_metadata.avatar_url as string) : null;
 
   return {
     supabase,
     user,
     email: user.email,
     esAdmin: admin === true,
+    avatarUrl,
     modulos,
     aulas,
     completadas,
@@ -74,8 +79,14 @@ export function aulasDelModulo(aulas: Aula[], moduloId: string) {
 export function siguienteAula(modulos: ModuloEstado[], aulas: Aula[], completadas: Set<string>) {
   for (const m of modulos) {
     if (!m.is_unlocked) continue;
-    const pendiente = aulasDelModulo(aulas, m.id).find((a) => !completadas.has(a.id));
+    const pendiente = aulasDelModulo(aulas, m.id).find((a) => a.is_unlocked !== false && !completadas.has(a.id));
     if (pendiente) return { aula: pendiente, modulo: m };
   }
   return null;
+}
+
+// "en 3 días" para mostrar cuándo se libera algo bloqueado.
+export function diasRestantes(fecha: string) {
+  const dias = Math.max(1, Math.ceil((new Date(fecha).getTime() - Date.now()) / 86400000));
+  return `en ${dias} ${dias === 1 ? "día" : "días"}`;
 }

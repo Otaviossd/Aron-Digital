@@ -12,6 +12,7 @@ type Modulo = {
   unlock_after_days: number;
   cover_url: string | null;
   accent: string;
+  is_bonus: boolean;
 };
 type Aula = {
   id: string;
@@ -22,6 +23,7 @@ type Aula = {
   video_url: string | null;
   duration_minutes: number | null;
   published_at: string;
+  unlock_after_days: number;
 };
 
 // datetime-local en horario de Asunción (UTC-03:00)
@@ -62,7 +64,7 @@ async function Contenido() {
                   {mod.title}
                 </span>
                 <span className="text-xs text-faint">
-                  {lista.length} clases · se abre el día {mod.unlock_after_days}
+                  {mod.is_bonus && "bono · "}{lista.length} clases · se abre el día {mod.unlock_after_days}
                 </span>
               </summary>
 
@@ -96,6 +98,12 @@ async function Contenido() {
                   <div className="sm:col-span-2">
                     <label className={ui.rotulo}>O subir una portada nueva (vertical, 3:4, sin texto en la imagen)</label>
                     <input name="cover_file" type="file" accept="image/*" className="text-xs text-muted" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="flex items-center gap-2 text-sm text-muted">
+                      <input name="is_bonus" type="checkbox" defaultChecked={mod.is_bonus} className="h-4 w-4 accent-[#cdb48a]" />
+                      Es un bono (aparece en la fila “Bonos”; ponele día 7 para bloquearlo 7 días)
+                    </label>
                   </div>
                   <div className="sm:col-span-2">
                     <button className={ui.botonChico}>Guardar módulo</button>
@@ -164,6 +172,12 @@ async function Contenido() {
             <input name="cover_file" type="file" accept="image/*" className="text-xs text-muted" />
           </div>
           <div className="sm:col-span-2">
+            <label className="flex items-center gap-2 text-sm text-muted">
+              <input name="is_bonus" type="checkbox" className="h-4 w-4 accent-[#cdb48a]" />
+              Es un bono (aparece en la fila “Bonos”; ponele día 7 para bloquearlo 7 días)
+            </label>
+          </div>
+          <div className="sm:col-span-2">
             <button className={ui.botonChico}>Crear módulo</button>
           </div>
         </form>
@@ -193,6 +207,10 @@ function FormAula({ moduloId, aula }: { moduloId: string; aula?: Aula }) {
         <div>
           <label className={ui.rotulo}>Orden</label>
           <input name="position" type="number" defaultValue={aula?.position ?? 0} className={ui.campo} />
+        </div>
+        <div>
+          <label className={ui.rotulo}>Se libera el día (0 = con el módulo)</label>
+          <input name="unlock_after_days" type="number" min={0} defaultValue={aula?.unlock_after_days ?? 0} className={ui.campo} />
         </div>
         <div>
           <label className={ui.rotulo}>Duración (min)</label>
