@@ -29,10 +29,10 @@ export default function FormAcceso({ modo, error }: Props) {
   }
 
   return (
-    <div className="w-full max-w-sm">
+    <div className="w-full">
       <button
         onClick={entrarConGoogle}
-        className="flex w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-3.5 text-sm font-medium text-bg transition hover:bg-white/85"
+        className="flex w-full items-center justify-center gap-3 rounded-full bg-ink px-6 py-3.5 text-sm font-medium text-bg shadow-[0_10px_40px_-14px_rgba(255,255,255,.5)] transition hover:bg-white/85"
       >
         <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
           <path fill="#4285F4" d="M23 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.4z" />
@@ -44,11 +44,11 @@ export default function FormAcceso({ modo, error }: Props) {
       </button>
 
       <div className="my-6 flex items-center gap-3 text-xs text-faint">
-        <span className="h-px flex-1 bg-line" /> o con tu email <span className="h-px flex-1 bg-line" />
+        <span className="h-px flex-1 bg-white/10" /> o con tu email <span className="h-px flex-1 bg-white/10" />
       </div>
 
       {estado === "enviado" ? (
-        <p className="rounded-xl border border-line bg-white/[0.03] p-4 text-sm leading-relaxed text-muted">
+        <p className="rounded-xl border border-accent/30 bg-accent/10 p-4 text-sm leading-relaxed text-muted">
           Listo. Te enviamos un enlace a <span className="text-ink">{email}</span>. Revisá tu bandeja de entrada (y
           spam) y tocá el enlace para entrar.
         </p>
@@ -67,7 +67,7 @@ export default function FormAcceso({ modo, error }: Props) {
             placeholder="tu@email.com"
             className={ui.campo}
           />
-          <button disabled={estado === "enviando"} className={`${ui.botonSuave} w-full`}>
+          <button disabled={estado === "enviando"} className={`${ui.boton} w-full py-3.5`}>
             {estado === "enviando" ? "Enviando..." : "Enviarme el enlace de acceso"}
           </button>
           {estado === "error" && (
