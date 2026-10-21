@@ -44,7 +44,7 @@ export function plantilla(step: number, c: Contexto): { asunto: string; html: st
         c,
         `${titulo("Dudas frecuentes")}
          ${parrafo('<strong style="color:#f4f4f2">¿Cuándo recibo el acceso?</strong><br/>Apenas se confirma el pago te llega un email con un botón para entrar.')}
-         ${parrafo('<strong style="color:#f4f4f2">¿Puedo cancelar?</strong><br/>Sí, cuando quieras desde tu cuenta. Mantenés el acceso hasta el fin del período pagado.')}
+         ${parrafo('<strong style="color:#f4f4f2">¿Hay cobros mensuales?</strong><br/>No. Es un pago único, sin suscripción.')}
          ${parrafo('<strong style="color:#f4f4f2">¿Hay reembolso?</strong><br/>Durante los primeros 7 días desde la compra.')}
          ${parrafo('<strong style="color:#f4f4f2">¿Desde dónde lo veo?</strong><br/>Celular, tablet o computadora.')}
          ${boton(volver, "Quiero entrar")}`,

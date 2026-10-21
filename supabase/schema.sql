@@ -106,7 +106,7 @@ as $$
   where lower(s.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
     and s.refunded_at is null
     and (
-      s.status = 'active'
+      (s.status = 'active' and (s.access_until is null or s.access_until > now()))
       or (s.status = 'cancelled' and s.access_until is not null and s.access_until > now())
     )
   order by s.purchased_at desc
@@ -488,13 +488,14 @@ as $$
     select distinct on (lower(s.email)) lower(s.email) as email, s.plan
     from public.subscriptions s
     where s.refunded_at is null
-      and (s.status = 'active' or (s.status = 'cancelled' and s.access_until is not null and s.access_until > now()))
+      and ((s.status = 'active' and (s.access_until is null or s.access_until > now())) or (s.status = 'cancelled' and s.access_until is not null and s.access_until > now()))
     order by lower(s.email), s.purchased_at desc
   )
   select jsonb_build_object(
     'activos', (select count(*) from con_acceso),
     'activos_mensual', (select count(*) from con_acceso where plan = 'monthly'),
     'activos_anual', (select count(*) from con_acceso where plan = 'annual'),
+    'activos_vitalicio', (select count(*) from con_acceso where plan = 'lifetime'),
     'compras', (select count(*) from public.subscriptions),
     'compras_7d', (select count(*) from public.subscriptions where purchased_at > now() - interval '7 days'),
     'reembolsos', (select count(*) from public.subscriptions where refunded_at is not null),
@@ -536,7 +537,7 @@ set search_path = public
 as $$
   select
     s.email, s.plan, s.status, s.purchased_at, s.access_until, s.refunded_at,
-    (s.refunded_at is null and (s.status = 'active' or (s.status = 'cancelled' and s.access_until is not null and s.access_until > now()))),
+    (s.refunded_at is null and ((s.status = 'active' and (s.access_until is null or s.access_until > now())) or (s.status = 'cancelled' and s.access_until is not null and s.access_until > now()))),
     (select count(*)::int from public.lesson_progress p where lower(p.user_email) = lower(s.email)),
     (select coalesce(sum(v.views), 0)::int from public.lesson_views v where lower(v.user_email) = lower(s.email)),
     (select max(v.last_viewed_at) from public.lesson_views v where lower(v.user_email) = lower(s.email))
@@ -658,3 +659,21 @@ create policy "avatars_own_write" on storage.objects
 insert into public.modules (title, description, position, unlock_after_days, is_bonus)
 select 'Bono: Color', 'Técnicas de color para barberos. Se libera a los 7 días de tu acceso.', 100, 7, true
 where not exists (select 1 from public.modules where is_bonus and title = 'Bono: Color');
+
+
+-- ============================================================
+-- Pago único (Hotmart): acceso de 1 año o vitalicio. Reemplaza el modelo de suscripción mensual.
+-- plan 'annual'   = 1 año (access_until = compra + 365 días)
+-- plan 'lifetime' = vitalicio (access_until nulo = no vence)
+-- promo = true marca a las primeras personas que compraron con el precio de lanzamiento.
+-- ============================================================
+
+alter table public.subscriptions drop constraint if exists subscriptions_plan_check;
+alter table public.subscriptions add constraint subscriptions_plan_check check (plan in ('monthly', 'annual', 'lifetime'));
+alter table public.subscriptions alter column paypal_subscription_id drop not null;
+alter table public.subscriptions add column if not exists hotmart_transaction text unique;
+alter table public.subscriptions add column if not exists promo boolean not null default false;
+
+-- Contacto que la persona deja antes de ver la oferta en /ventas
+alter table public.leads add column if not exists name text;
+alter table public.leads add column if not exists phone text;

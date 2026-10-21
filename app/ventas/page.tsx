@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import Checkout from "@/components/Checkout";
+import Oferta from "@/components/Oferta";
+import { vagasPromoRestantes } from "@/lib/promo";
+import { PRECOS } from "@/lib/config";
+import { ui } from "@/lib/ui";
 import NavAcceso from "@/components/NavAcceso";
 import Rastreo from "@/components/Rastreo";
 import { BRAND } from "@/lib/config";
@@ -18,6 +21,11 @@ const linkAcceso = (
     Acceder
   </Link>
 );
+
+async function SeccionOferta() {
+  const restantes = await vagasPromoRestantes();
+  return <Oferta vagasRestantes={restantes} />;
+}
 
 export default function Home() {
   return (
@@ -43,10 +51,7 @@ export default function Home() {
             cada semana, directo a tu celular.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
-            <a
-              href="#comprar"
-              className="rounded-full bg-ink px-7 py-3.5 text-sm font-medium text-bg transition hover:bg-white/85"
-            >
+            <a href="#comprar" className={ui.boton}>
               Quiero acceso ahora
             </a>
             <a href="#incluye" className="px-2 py-3.5 text-sm font-medium text-muted transition hover:text-ink">
@@ -90,8 +95,13 @@ export default function Home() {
 
       {/* Checkout directo */}
       <section className="mx-auto max-w-xl px-6 py-24">
-        <h2 className="mb-10 text-center text-3xl font-semibold tracking-tight">Entrá hoy. Empezá ya.</h2>
-        <Checkout />
+        <h2 className="mb-3 text-center text-3xl font-semibold tracking-tight">Entrá hoy. Empezá ya.</h2>
+        <p className="mb-10 text-center text-sm text-muted">
+          Pago único desde US${PRECOS.anual.valor}. Sin mensualidades.
+        </p>
+        <Suspense fallback={<div className="cristal h-96 rounded-3xl" />}>
+          <SeccionOferta />
+        </Suspense>
         <p className="mt-8 text-center text-sm text-faint">
           ¿Ya sos alumno?{" "}
           <Link href="/entrar" className="text-muted underline underline-offset-4 transition hover:text-ink">

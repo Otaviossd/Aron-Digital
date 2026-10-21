@@ -284,5 +284,17 @@ await db.exec("reset role");
 check("avatar: aluno grava na própria pasta", okAvatar);
 check("avatar: aluno NÃO grava na pasta de outro", bloqueado);
 
+// 14) Pago único: vitalício (sem vencimento) e anual de 1 ano
+await db.exec(`insert into public.subscriptions (email, status, plan, purchased_at, access_until, promo, hotmart_transaction)
+               values ('vitalicio@x.com', 'active', 'lifetime', now() - interval '400 days', null, true, 'HP-1'),
+                      ('anual@x.com', 'active', 'annual', now() - interval '10 days', now() + interval '355 days', false, 'HP-2'),
+                      ('anualvencido@x.com', 'active', 'annual', now() - interval '400 days', now() - interval '35 days', false, 'HP-3')`);
+r = await como("vitalicio@x.com", () => q("select is_unlocked from public.my_modules()"));
+check("vitalício: acesso sem vencimento, tudo aberto", r.length === 5 && r.every((x) => x.is_unlocked));
+r = await como("anual@x.com", () => q("select is_unlocked from public.my_modules()"));
+check("anual dentro do ano: tem acesso", r.length === 5);
+r = await como("anualvencido@x.com", () => q("select * from public.my_modules()"));
+check("anual vencido: sem acesso", r.length === 0);
+
 console.log(falhas === 0 ? "\nTODOS OS TESTES PASSARAM" : `\n${falhas} FALHA(S)`);
 process.exit(falhas === 0 ? 0 : 1);

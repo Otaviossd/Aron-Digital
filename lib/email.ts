@@ -6,7 +6,7 @@ const SITE_URL = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:300
 
 // Gera um link de acesso de um clique (válido por tempo limitado) e envia o e-mail de boas-vindas.
 // Cada tentativa fica registrada em email_log (aparece no painel, em Email > Historial).
-export async function sendWelcomeEmail(params: { to: string; plan: "monthly" | "annual" }) {
+export async function sendWelcomeEmail(params: { to: string; plan: "monthly" | "annual" | "lifetime" }) {
   const admin = createAdminClient();
   const registrar = async (fila: { status: "sent" | "failed"; provider_id?: string | null; error?: string | null }) => {
     // O registro nunca pode impedir nem derrubar o envio.

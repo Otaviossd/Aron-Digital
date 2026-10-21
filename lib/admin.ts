@@ -21,6 +21,7 @@ export type ResumenAdmin = {
   activos: number;
   activos_mensual: number;
   activos_anual: number;
+  activos_vitalicio: number;
   compras: number;
   compras_7d: number;
   reembolsos: number;
@@ -58,14 +59,9 @@ export function estadoConfig() {
   const e = process.env;
   return {
     pagos: [
-      { id: "paypal-id", etiqueta: "PayPal: Client ID", ok: tiene(e.NEXT_PUBLIC_PAYPAL_CLIENT_ID) && tiene(e.PAYPAL_CLIENT_ID) },
-      { id: "paypal-secret", etiqueta: "PayPal: Client Secret", ok: tiene(e.PAYPAL_CLIENT_SECRET) },
-      { id: "paypal-webhook", etiqueta: "PayPal: Webhook ID", ok: tiene(e.PAYPAL_WEBHOOK_ID) },
-      {
-        id: "paypal-planes",
-        etiqueta: "PayPal: planes mensual y anual",
-        ok: tiene(e.PAYPAL_PLAN_ID_MONTHLY) && tiene(e.PAYPAL_PLAN_ID_ANNUAL) && tiene(e.NEXT_PUBLIC_PAYPAL_PLAN_ID_MONTHLY) && tiene(e.NEXT_PUBLIC_PAYPAL_PLAN_ID_ANNUAL),
-      },
+      { id: "hotmart-anual", etiqueta: "Hotmart: link de checkout de 1 año", ok: tiene(e.NEXT_PUBLIC_HOTMART_URL_ANUAL) },
+      { id: "hotmart-vitalicio", etiqueta: "Hotmart: link de checkout vitalicio", ok: tiene(e.NEXT_PUBLIC_HOTMART_URL_VITALICIO) },
+      { id: "hotmart-promo", etiqueta: "Hotmart: link de la promo de lanzamiento", ok: tiene(e.NEXT_PUBLIC_HOTMART_URL_PROMO) },
     ],
     email: [
       { id: "resend", etiqueta: "Resend: API key", ok: tiene(e.RESEND_API_KEY) },
@@ -76,3 +72,5 @@ export function estadoConfig() {
     sitio: [{ id: "site", etiqueta: "URL del sitio (NEXT_PUBLIC_SITE_URL)", ok: tiene(e.NEXT_PUBLIC_SITE_URL) && !/localhost/.test(e.NEXT_PUBLIC_SITE_URL ?? "") }],
   };
 }
+
+export const nombrePlan = (plan: string) => (plan === "lifetime" ? "Vitalicio" : plan === "annual" ? "1 año" : "Mensual");

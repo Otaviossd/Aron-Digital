@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { getMemberData } from "@/lib/members";
 import { DIAS_REEMBOLSO } from "@/lib/config";
-import CancelButton from "../CancelButton";
+import { nombrePlan } from "@/lib/admin";
 import AvatarForm from "@/components/members/AvatarForm";
 
 export default function CuentaPage() {
@@ -45,11 +45,11 @@ async function Cuenta() {
           <>
             <div className="flex justify-between gap-4 px-5 py-4">
               <dt className="text-muted">Plan</dt>
-              <dd className="font-medium">{sub.plan === "annual" ? "Anual" : "Mensual"}</dd>
+              <dd className="font-medium">{nombrePlan(sub.plan)}</dd>
             </div>
             <div className="flex justify-between gap-4 px-5 py-4">
               <dt className="text-muted">Estado</dt>
-              <dd className="font-medium">{sub.status === "active" ? "Activa" : sub.status === "cancelled" ? "Cancelada" : sub.status}</dd>
+              <dd className="font-medium">{sub.status === "active" ? "Activo" : sub.status === "cancelled" ? "Cancelado" : sub.status}</dd>
             </div>
             {compra && (
             <div className="flex justify-between gap-4 px-5 py-4">
@@ -57,29 +57,20 @@ async function Cuenta() {
               <dd className="font-medium">{fmt(compra)}</dd>
             </div>
             )}
-            {sub.access_until && (
             <div className="flex justify-between gap-4 px-5 py-4">
-              <dt className="text-muted">{sub.status === "active" ? "Próxima cobranza" : "Acceso hasta"}</dt>
-              <dd className="font-medium">{fmt(sub.access_until)}</dd>
+              <dt className="text-muted">Acceso hasta</dt>
+              <dd className="font-medium">{sub.access_until ? fmt(sub.access_until) : "Para siempre"}</dd>
             </div>
-            )}
           </>
         )}
       </dl>
 
       {sub && (
-        <div className="text-sm leading-relaxed text-muted">
-          <p className="mb-4">
-            {enVentana && finReembolso
-              ? `Podés pedir reembolso hasta el ${fmt(finReembolso)} escribiéndonos a soporte (menú Soporte). Después de esa fecha solo podés cancelar las próximas cobranzas.`
-              : "El período de reembolso ya terminó. Podés cancelar las próximas cobranzas cuando quieras."}
-          </p>
-          {sub.status === "active" ? (
-            <CancelButton />
-          ) : (
-            <p>Tu suscripción está cancelada. Mantenés el acceso hasta el fin del período pagado.</p>
-          )}
-        </div>
+        <p className="text-sm leading-relaxed text-muted">
+          {enVentana && finReembolso
+            ? `Podés pedir reembolso hasta el ${fmt(finReembolso)} escribiéndonos a soporte (menú Soporte).`
+            : "El período de reembolso ya terminó. Si tenés algún problema con tu acceso, escribinos a soporte."}
+        </p>
       )}
     </div>
   );

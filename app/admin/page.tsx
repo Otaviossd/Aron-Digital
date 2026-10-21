@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PRECOS } from "@/lib/config";
-import { estadoConfig, fmtFecha, hace, type ResumenAdmin } from "@/lib/admin";
+import { estadoConfig, fmtFecha, hace, nombrePlan, type ResumenAdmin } from "@/lib/admin";
 import { Dato, Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
 
 export default function AdminResumenPage() {
@@ -22,7 +22,7 @@ async function Resumen() {
   const res = (r ?? null) as ResumenAdmin | null;
   if (!res) return <Vacio>No pudimos leer los números. Ejecutá de nuevo supabase/schema.sql en el SQL Editor y recargá.</Vacio>;
 
-  const mrr = Math.round(res.activos_mensual * PRECOS.monthly.valor + (res.activos_anual * PRECOS.annual.valor) / 12);
+  const ingresos = res.activos_anual * PRECOS.anual.valor + res.activos_vitalicio * PRECOS.vitalicio.valor;
   const config = estadoConfig();
   const pendientes = [...config.pagos, ...config.email, ...config.sitio].filter((c) => !c.ok && !("opcional" in c && c.opcional));
 
@@ -43,10 +43,10 @@ async function Resumen() {
       )}
 
       <div className="mb-12 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Dato valor={res.activos} etiqueta="Alumnos con acceso" nota={`${res.activos_mensual} mensual · ${res.activos_anual} anual`} />
+        <Dato valor={res.activos} etiqueta="Alumnos con acceso" nota={`${res.activos_anual} de 1 año · ${res.activos_vitalicio} vitalicio`} />
         <Dato valor={res.viendo_7d} etiqueta="Viendo esta semana" nota={`${res.viendo_24h} en las últimas 24 h · ${res.viendo_30d} en 30 días`} />
         <Dato valor={res.compras_7d} etiqueta="Compras en 7 días" nota={`${res.compras} en total`} />
-        <Dato valor={`US$${mrr}`} etiqueta="Ingreso mensual estimado" nota="Según los precios de lib/config.ts" />
+        <Dato valor={`US$${ingresos}`} etiqueta="Ingresos estimados" nota="Alumnos con acceso × precio de lib/config.ts (sin promo)" />
       </div>
 
       <div className="mb-12 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -100,7 +100,7 @@ async function Resumen() {
             {ultimas.map((x) => (
               <tr key={x.email + x.purchased_at}>
                 <td className="px-4 py-3">{x.email}</td>
-                <td className="px-4 py-3 text-muted">{x.plan === "annual" ? "Anual" : "Mensual"}</td>
+                <td className="px-4 py-3 text-muted">{nombrePlan(x.plan)}</td>
                 <td className="px-4 py-3 text-muted">{x.refunded_at ? "Reembolsada" : fmtFecha(x.purchased_at)}</td>
               </tr>
             ))}

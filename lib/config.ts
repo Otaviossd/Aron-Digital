@@ -1,9 +1,22 @@
-// Preços e textos configuráveis num só lugar. Os valores são placeholders: defina
-// os reais antes de publicar e crie os mesmos valores nos planos do PayPal.
+// Precios del curso: pago único (sin suscripción). Se cambian acá y en las ofertas de la Hotmart.
 export const PRECOS = {
-  monthly: { valor: 25, rotulo: "Mensual", detalle: "por mes, cancelás cuando quieras" },
-  annual: { valor: 149, rotulo: "Anual", detalle: "pago único por 12 meses, ahorrás más de 50%" },
+  // 1 año de acceso
+  anual: { valor: 50, rotulo: "Acceso 1 año", detalle: "pago único, acceso por 12 meses" },
+  // Para siempre, con todas las actualizaciones
+  vitalicio: { valor: 70, rotulo: "Acceso vitalicio", detalle: "pago único, para siempre y con todas las actualizaciones" },
+  // Precio de lanzamiento: vitalicio al precio del anual con 50% de descuento, solo para las primeras personas
+  promo: { valor: 25, vagas: 20, rotulo: "Precio de lanzamiento", detalle: "acceso vitalicio al precio promocional" },
 } as const;
+
+// Links de checkout de la Hotmart (uno por oferta). Se definen en la Vercel; sin ellos el botón queda como "próximamente".
+export const CHECKOUT_URLS = {
+  anual: process.env.NEXT_PUBLIC_HOTMART_URL_ANUAL,
+  vitalicio: process.env.NEXT_PUBLIC_HOTMART_URL_VITALICIO,
+  promo: process.env.NEXT_PUBLIC_HOTMART_URL_PROMO,
+} as const;
+
+// Pon NEXT_PUBLIC_PROMO_ACTIVA=0 en la Vercel para cerrar la promo de lanzamiento a mano.
+export const PROMO_ACTIVA = process.env.NEXT_PUBLIC_PROMO_ACTIVA !== "0";
 
 export const DIAS_REEMBOLSO = 7;
 

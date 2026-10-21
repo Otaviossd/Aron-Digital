@@ -29,8 +29,8 @@ const PREGUNTAS = [
     r: "Sí. Funciona desde el celular, la tablet y la computadora. Entrás con tu email y seguís donde te quedaste.",
   },
   {
-    q: "¿Cómo cancelo mi suscripción?",
-    r: "Entrá a “Mi cuenta” y tocá “Cancelar suscripción”. Mantenés el acceso hasta el fin del período que ya pagaste.",
+    q: "¿Tengo que pagar todos los meses?",
+    r: "No. Es un pago único: con el acceso de 1 año no se renueva solo, y con el acceso vitalicio no volvés a pagar nunca.",
   },
   {
     q: "¿Puedo pedir reembolso?",

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { estadoAlumno, fmtFecha, hace, type AlumnoAdmin } from "@/lib/admin";
+import { estadoAlumno, fmtFecha, hace, nombrePlan, type AlumnoAdmin } from "@/lib/admin";
 import { Dato, Pildora, Tabla, Titulo, Vacio } from "@/components/admin/ui";
 
 const ahoraISO = () => new Date().toISOString();
@@ -48,7 +48,7 @@ async function Alumnos() {
             return (
               <tr key={a.email + a.purchased_at}>
                 <td className="px-4 py-3 font-medium">{a.email}</td>
-                <td className="px-4 py-3 text-muted">{a.plan === "annual" ? "Anual" : "Mensual"}</td>
+                <td className="px-4 py-3 text-muted">{nombrePlan(a.plan)}</td>
                 <td className="px-4 py-3">
                   <Pildora tono={a.con_acceso ? "ok" : a.refunded_at ? "error" : "neutro"}>{estado}</Pildora>
                 </td>

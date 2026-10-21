@@ -11,7 +11,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 //   recebe só a boas-vindas.
 // Responde sempre 200 com o mesmo corpo: não revela se o e-mail já existia.
 export async function POST(request: NextRequest) {
-  let body: { email?: unknown; plan?: unknown; source?: unknown };
+  let body: { email?: unknown; plan?: unknown; source?: unknown; name?: unknown; phone?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -19,7 +19,9 @@ export async function POST(request: NextRequest) {
   }
 
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  const plan = body.plan === "annual" ? "annual" : "monthly";
+  const plan = body.plan === "anual" || body.plan === "vitalicio" || body.plan === "promo" ? body.plan : null;
+  const name = typeof body.name === "string" ? body.name.trim().slice(0, 120) || null : null;
+  const phone = typeof body.phone === "string" ? body.phone.replace(/[^\d+\s()-]/g, "").trim().slice(0, 30) || null : null;
   const source = body.source === "captura" ? "captura" : "checkout";
   if (!EMAIL_RE.test(email) || email.length > 254) return NextResponse.json({ ok: true });
 
@@ -38,6 +40,8 @@ export async function POST(request: NextRequest) {
         .insert({
           email,
           plan: source === "checkout" ? plan : null,
+          name,
+          phone,
           source,
           checkout_at: source === "checkout" ? ahora : null,
         })
@@ -47,11 +51,16 @@ export async function POST(request: NextRequest) {
       // Só a primeira vez que o e-mail entra na lista recebe a boas-vindas (evita repetir se enviar de novo)
       if (source === "captura" && nuevo) await enviarBienvenidaLista({ email, token: nuevo.unsubscribe_token });
     } else if (source === "checkout") {
-      // Atualiza o plano e inicia o relógio do carrinho só se ainda não tinha começado.
+      // Atualiza plano/contato e inicia o relógio do carrinho só se ainda não tinha começado.
       // Nunca mexe em created_at, converted_at, unsubscribed_at nem na origem original.
       await admin
         .from("leads")
-        .update(existente.checkout_at ? { plan } : { plan, checkout_at: ahora })
+        .update({
+          ...(plan ? { plan } : {}),
+          ...(name ? { name } : {}),
+          ...(phone ? { phone } : {}),
+          ...(existente.checkout_at ? {} : { checkout_at: ahora }),
+        })
         .eq("id", existente.id);
     }
   } catch (err) {
