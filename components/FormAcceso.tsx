@@ -10,6 +10,9 @@ export default function FormAcceso({ modo, error }: Props) {
   const [email, setEmail] = useState("");
   const [estado, setEstado] = useState<"idle" | "enviando" | "enviado" | "error">(error ? "error" : "idle");
 
+  const [conClave, setConClave] = useState(false);
+  const [clave, setClave] = useState("");
+
   const redirectTo = () => `${window.location.origin}/auth/callback`;
 
   async function entrarConGoogle() {
@@ -26,6 +29,16 @@ export default function FormAcceso({ modo, error }: Props) {
       options: { emailRedirectTo: redirectTo(), shouldCreateUser: true },
     });
     setEstado(err ? "error" : "enviado");
+  }
+
+  // Entrada con contraseña: solo para cuentas que tengan una (por ejemplo, la cuenta de revisión de la Hotmart).
+  async function entrarConClave(e: React.FormEvent) {
+    e.preventDefault();
+    setEstado("enviando");
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password: clave });
+    if (err) return setEstado("error");
+    window.location.href = modo === "equipo" ? "/admin" : "/aulas";
   }
 
   return (
@@ -47,7 +60,25 @@ export default function FormAcceso({ modo, error }: Props) {
         <span className="h-px flex-1 bg-white/10" /> o con tu email <span className="h-px flex-1 bg-white/10" />
       </div>
 
-      {estado === "enviado" ? (
+      {conClave ? (
+        <form onSubmit={entrarConClave} className="space-y-3">
+          <label className={ui.rotulo} htmlFor="email">
+            Email o usuario
+          </label>
+          <input id="email" type="email" required autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com" className={ui.campo} />
+          <label className={ui.rotulo} htmlFor="clave">
+            Contraseña
+          </label>
+          <input id="clave" type="password" required autoComplete="current-password" value={clave} onChange={(e) => setClave(e.target.value)} className={ui.campo} />
+          <button disabled={estado === "enviando"} className={`${ui.boton} w-full py-3.5`}>
+            {estado === "enviando" ? "Entrando..." : "Entrar"}
+          </button>
+          {estado === "error" && <p className="text-sm text-red-300">Email o contraseña incorrectos.</p>}
+          <button type="button" onClick={() => { setConClave(false); setEstado("idle"); }} className="w-full text-center text-xs text-muted underline underline-offset-4 hover:text-ink">
+            Volver al enlace por email
+          </button>
+        </form>
+      ) : estado === "enviado" ? (
         <p className="rounded-xl border border-accent/30 bg-accent/10 p-4 text-sm leading-relaxed text-muted">
           Listo. Te enviamos un enlace a <span className="text-ink">{email}</span>. Revisá tu bandeja de entrada (y
           spam) y tocá el enlace para entrar.
@@ -73,6 +104,9 @@ export default function FormAcceso({ modo, error }: Props) {
           {estado === "error" && (
             <p className="text-sm text-red-300">No pudimos validar el acceso. Revisá el email e intentá de nuevo.</p>
           )}
+          <button type="button" onClick={() => { setConClave(true); setEstado("idle"); }} className="w-full text-center text-xs text-faint underline underline-offset-4 transition hover:text-muted">
+            Entrar con contraseña
+          </button>
         </form>
       )}
 
