@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Avatar from "./Avatar";
@@ -35,6 +35,20 @@ function Icono({ d }: { d: string }) {
 export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, instagramUrl }: Props) {
   const pathname = usePathname();
   const [abierto, setAbierto] = useState(false);
+
+  // Cierra el menú al navegar o con Escape, y bloquea el scroll del fondo mientras está abierto.
+  useEffect(() => setAbierto(false), [pathname]);
+  useEffect(() => {
+    if (!abierto) return;
+    const previo = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const tecla = (e: KeyboardEvent) => e.key === "Escape" && setAbierto(false);
+    window.addEventListener("keydown", tecla);
+    return () => {
+      document.body.style.overflow = previo;
+      window.removeEventListener("keydown", tecla);
+    };
+  }, [abierto]);
 
   const items: { href: string; label: string; icono: string; externo?: boolean }[] = [
     { href: "/aulas", label: "Inicio", icono: "inicio" },
@@ -100,8 +114,9 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, 
       {/* Botón móvil */}
       <button
         onClick={() => setAbierto(true)}
+        aria-expanded={abierto}
         aria-label="Abrir menú"
-        className="fixed left-3 top-3 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-line-strong bg-bg/90 backdrop-blur lg:hidden"
+        className="fixed left-3 top-2.5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-line-strong bg-bg/90 backdrop-blur lg:hidden"
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
           <path d="M4 7h16M4 12h16M4 17h16" />
@@ -113,9 +128,9 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, 
 
       {/* Móvil (drawer) */}
       {abierto && (
-        <div className="fixed inset-0 z-40 lg:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/70" onClick={() => setAbierto(false)} />
-          <aside className="absolute inset-y-0 left-0 w-64 border-r border-line bg-bg">{contenido}</aside>
+          <aside className="absolute inset-y-0 left-0 w-[17rem] max-w-[85vw] border-r border-line bg-bg shadow-2xl">{contenido}</aside>
         </div>
       )}
     </>

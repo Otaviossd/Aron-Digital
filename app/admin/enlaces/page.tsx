@@ -39,12 +39,14 @@ export default function EnlacesPage() {
 
               {p.lista ? (
                 <>
-                  <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-bg px-4 py-3">
+                  <div className="flex flex-col gap-3 rounded-xl border border-line bg-bg px-4 py-3 sm:flex-row sm:items-center">
                     <code className="min-w-0 flex-1 break-all text-sm text-ink">{url}</code>
-                    <CopiarEnlace url={url} />
-                    <a href={url} target="_blank" rel="noreferrer" className="text-sm text-accent underline-offset-4 hover:underline">
-                      Abrir
-                    </a>
+                    <div className="flex shrink-0 items-center gap-4">
+                      <CopiarEnlace url={url} />
+                      <a href={url} target="_blank" rel="noreferrer" className="text-sm text-accent underline-offset-4 hover:underline">
+                        Abrir
+                      </a>
+                    </div>
                   </div>
 
                   <p className="mb-2 mt-5 text-xs font-medium text-muted">Con origen de la visita</p>
@@ -52,10 +54,12 @@ export default function EnlacesPage() {
                     {ORIGENES.map((o) => {
                       const u = `${url}?utm_source=${o.utm}`;
                       return (
-                        <li key={o.utm} className="flex flex-wrap items-center gap-3 bg-bg px-4 py-2.5">
-                          <span className="w-40 shrink-0 text-sm text-muted">{o.nombre}</span>
-                          <code className="min-w-0 flex-1 break-all text-xs text-faint">{u}</code>
-                          <CopiarEnlace url={u} />
+                        <li key={o.utm} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 bg-bg px-4 py-3 md:grid-cols-[10rem_1fr_auto] md:gap-y-0 md:py-2.5">
+                          <span className="text-sm text-muted">{o.nombre}</span>
+                          <span className="row-span-2 col-start-2 row-start-1 md:row-span-1 md:col-start-3">
+                            <CopiarEnlace url={u} />
+                          </span>
+                          <code className="col-span-1 min-w-0 break-all text-xs text-faint md:col-start-2 md:row-start-1">{u}</code>
                         </li>
                       );
                     })}

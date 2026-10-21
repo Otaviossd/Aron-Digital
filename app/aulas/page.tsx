@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import CoverCard from "@/components/members/CoverCard";
 import Row from "@/components/members/Row";
+import Portada from "@/components/members/Portada";
 import { aulasDelModulo, diasRestantes, getMemberData, siguienteAula } from "@/lib/members";
-import { FOTOS } from "@/lib/fotos";
 import { ui } from "@/lib/ui";
 
 export default function AulasPage() {
@@ -52,44 +52,13 @@ async function Inicio() {
 
   return (
     <>
-      {/* Portada */}
-      <section className="relative mb-14 overflow-hidden rounded-3xl border border-white/10 bg-surface">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-[position:75%_center]"
-          style={{ backgroundImage: `url(${FOTOS.portada})` }}
-        />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#07090a] via-[#07090a]/55 to-transparent" />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-[#07090a]/70 via-transparent to-transparent md:via-transparent" />
-        <div className="relative flex min-h-[26rem] max-w-xl flex-col justify-end p-6 pt-48 sm:p-10 md:aspect-[16/8] md:min-h-0">
-          {siguiente ? (
-            <>
-              <p className="mb-3 inline-flex w-fit items-center gap-2 rounded-full border border-accent/30 bg-black/40 px-3.5 py-1.5 text-xs font-medium text-accent backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_rgba(57,255,126,.9)]" />
-                {completadas.size === 0 ? "Empezá acá" : "Seguí donde quedaste"}
-              </p>
-              <h1 className="text-2xl font-semibold leading-[1.1] tracking-tight sm:text-4xl">{siguiente.aula.title}</h1>
-              <p className="mt-2 text-sm text-muted">{siguiente.modulo.title}</p>
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Link href={`/aulas/${siguiente.aula.id}`} className={ui.boton}>
-                  {completadas.size === 0 ? "Ver primera clase" : "Continuar"}
-                </Link>
-                {proximoBono?.m.unlock_at && (
-                  <span className="cristal rounded-full px-4 py-2.5 text-xs text-muted">
-                    {proximoBono.m.title} se libera {diasRestantes(proximoBono.m.unlock_at)}
-                  </span>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="mb-3 text-sm font-medium text-accent">Al día</p>
-              <h1 className="text-2xl font-semibold leading-[1.1] tracking-tight sm:text-4xl">Completaste todo lo disponible</h1>
-              <p className="mt-2 text-sm text-muted">Volvé pronto: se publican clases nuevas cada semana.</p>
-            </>
-          )}
-        </div>
-      </section>
+      <Portada
+        titulo={siguiente?.aula.title}
+        modulo={siguiente?.modulo.title}
+        href={siguiente ? `/aulas/${siguiente.aula.id}` : undefined}
+        empezando={completadas.size === 0}
+        aviso={proximoBono?.m.unlock_at ? `${proximoBono.m.title} se libera ${diasRestantes(proximoBono.m.unlock_at)}` : undefined}
+      />
 
       {enProgreso.length > 0 && (
         <Row titulo="Seguí con estos módulos" subtitulo="Los que ya empezaste">
