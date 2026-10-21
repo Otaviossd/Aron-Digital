@@ -122,14 +122,14 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
           {promo && (
             <div className="relative mb-4 overflow-hidden rounded-2xl border border-accent/40 bg-accent/[0.07] p-5 shadow-[0_0_60px_-20px_rgba(57,255,126,.6)]">
               <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-black">
-                Lanzamiento · quedan {vagasRestantes} de {PRECOS.promo.vagas}
+                Lanzamiento · cupos limitados
               </span>
               <p className="flex items-baseline gap-3">
                 <span className="text-5xl font-semibold tracking-tight">US${PRECOS.promo.valor}</span>
                 <span className="text-lg text-faint line-through">US${PRECOS.vitalicio.valor}</span>
               </p>
               <p className="mt-2 text-sm text-muted">
-                Pago único y acceso <strong className="text-ink">vitalicio</strong> con todas las actualizaciones. Solo para las primeras {PRECOS.promo.vagas} personas.
+                Pago único y acceso <strong className="text-ink">vitalicio</strong> con todas las actualizaciones. Solo para las primeras personas: cuando se agoten los cupos, vuelve al precio normal.
               </p>
               <div className="mt-5">
                 <Boton o="promo" texto="Quiero mi lugar de lanzamiento" destacado />
