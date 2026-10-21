@@ -1,23 +1,34 @@
-// Genera las plantillas de email de Supabase Auth con el mismo molde visual del sitio.
+// Plantillas de email de Supabase Auth. El texto es fijo, así que la tarjeta entera va como IMAGEN
+// (public/email/*.png): Gmail móvil no invierte imágenes y el email se ve oscuro en cualquier tema.
+// Solo el enlace ({{ .ConfirmationURL }}) es dinámico. Si cambiás los textos, hay que regenerar los PNG.
 // Uso: node scripts/gen-email-templates.mjs   (escribe en supabase/email-templates/)
 import { writeFileSync } from "node:fs";
-import { boton, layoutEmail, parrafo, titulo } from "../lib/emails/layout.ts";
 
 const SITE = "https://lanuevaolaacademy.com";
+const fuente = "Inter,'Segoe UI',Helvetica,Arial,sans-serif";
 
-const acceso = (tit, intro, textoBoton) =>
-  layoutEmail({
-    siteUrl: SITE,
-    preheader: "Tu enlace de acceso, válido por poco tiempo.",
-    cuerpo: `${titulo(tit)}${parrafo(intro)}${boton("{{ .ConfirmationURL }}", textoBoton)}${parrafo(
-      "Este enlace vence en poco tiempo y solo se puede usar una vez. Si no lo pediste vos, ignorá este email.",
-    )}`,
-    pie: "Recibís este email porque alguien pidió entrar a La Nueva Ola Academy con esta dirección.",
-  });
+const plantilla = (imagen, alt, preheader) => `<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light"></head>
+<body bgcolor="#07090a" style="margin:0;padding:0;background:#07090a;background-image:linear-gradient(#07090a,#07090a)">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#07090a">${preheader}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#07090a" style="background:#07090a;background-image:linear-gradient(#07090a,#07090a)"><tr><td align="center" style="padding:28px 14px">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
+      <tr><td>
+        <a href="{{ .ConfirmationURL }}"><img src="${SITE}/email/${imagen}.png" width="560" alt="${alt}" style="display:block;width:100%;height:auto;border:0;background:#0e1214"></a>
+      </td></tr>
+      <tr><td align="left" style="padding:16px 8px 0;font-family:${fuente};font-size:12px;line-height:1.6;color:#8a949a">
+        Si el botón no funciona, copiá y pegá este enlace en tu navegador:<br>
+        <a href="{{ .ConfirmationURL }}" style="color:#39ff7e;word-break:break-all">{{ .ConfirmationURL }}</a>
+        <div style="margin-top:12px">Recibís este email porque alguien pidió entrar a La Nueva Ola Academy con esta dirección.</div>
+        <div style="margin-top:6px">La Nueva Ola Academy · Aaron Dalla Rosa</div>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
 
 const out = {
-  "magic-link": acceso("Tu enlace de acceso", "Tocá el botón para entrar a tu curso. No necesitás contraseña.", "Entrar al curso"),
-  "confirm-signup": acceso("Confirmá tu email", "Tocá el botón para confirmar tu email y entrar a tu curso.", "Confirmar y entrar"),
+  "magic-link": plantilla("magic-link", "Tu enlace de acceso. Tocá para entrar al curso.", "Tu enlace de acceso, válido por poco tiempo."),
+  "confirm-signup": plantilla("confirm-signup", "Confirmá tu email. Tocá para entrar al curso.", "Confirmá tu email para entrar al curso."),
 };
 for (const [nombre, html] of Object.entries(out)) writeFileSync(new URL(`../supabase/email-templates/${nombre}.html`, import.meta.url), html);
 console.log("Plantillas generadas:", Object.keys(out).join(", "));
