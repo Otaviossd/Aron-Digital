@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -36,21 +36,17 @@ function Icono({ d }: { d: string }) {
 
 export default function AdminSidebar({ brand, email }: { brand: string; email: string }) {
   const pathname = usePathname();
-  const [abierto, setAbierto] = useState(false);
-
-  // Cierra el menú al navegar o con Escape, y bloquea el scroll del fondo mientras está abierto.
-  useEffect(() => setAbierto(false), [pathname]);
+  // Menú móvil sin depender de JavaScript para abrir: un checkbox oculto + CSS (abre al instante, incluso antes de hidratar).
+  const casilla = useRef<HTMLInputElement>(null);
+  const cerrar = () => {
+    if (casilla.current) casilla.current.checked = false;
+  };
+  useEffect(cerrar, [pathname]);
   useEffect(() => {
-    if (!abierto) return;
-    const previo = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const tecla = (e: KeyboardEvent) => e.key === "Escape" && setAbierto(false);
+    const tecla = (e: KeyboardEvent) => e.key === "Escape" && cerrar();
     window.addEventListener("keydown", tecla);
-    return () => {
-      document.body.style.overflow = previo;
-      window.removeEventListener("keydown", tecla);
-    };
-  }, [abierto]);
+    return () => window.removeEventListener("keydown", tecla);
+  }, []);
   const activo = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
 
   const contenido = (
@@ -66,7 +62,7 @@ export default function AdminSidebar({ brand, email }: { brand: string; email: s
           <Link
             key={it.href}
             href={it.href}
-            onClick={() => setAbierto(false)}
+            onClick={() => cerrar()}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
               activo(it.href) ? "bg-white/[0.07] font-medium text-ink" : "text-muted hover:bg-white/[0.04] hover:text-ink"
             }`}
@@ -90,23 +86,17 @@ export default function AdminSidebar({ brand, email }: { brand: string; email: s
 
   return (
     <>
-      <button
-        onClick={() => setAbierto(true)}
-        aria-expanded={abierto}
-        aria-label="Abrir menú"
-        className="fixed left-3 top-2.5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-line-strong bg-bg/90 backdrop-blur lg:hidden"
-      >
+      <input ref={casilla} id="menu-movil" type="checkbox" className="peer sr-only" tabIndex={-1} aria-hidden="true" />
+      <label htmlFor="menu-movil" role="button" aria-label="Abrir menú" className="fixed left-3 top-2.5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-line-strong bg-bg/90 backdrop-blur lg:hidden cursor-pointer">
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
           <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
-      </button>
+      </label>
       <aside className="fixed inset-y-0 left-0 hidden w-60 border-r border-line bg-bg lg:block">{contenido}</aside>
-      {abierto && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setAbierto(false)} />
-          <aside className="absolute inset-y-0 left-0 w-[17rem] max-w-[85vw] border-r border-line bg-bg shadow-2xl">{contenido}</aside>
-        </div>
-      )}
+      <label htmlFor="menu-movil" aria-label="Cerrar menú" className="fixed inset-0 z-40 hidden bg-black/70 peer-checked:block lg:!hidden" />
+      <aside className="invisible fixed inset-y-0 left-0 z-50 w-[17rem] max-w-[85vw] -translate-x-full border-r border-line bg-bg shadow-2xl transition-[transform,visibility] duration-200 peer-checked:visible peer-checked:translate-x-0 lg:hidden">
+        {contenido}
+      </aside>
     </>
   );
 }
