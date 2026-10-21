@@ -10,6 +10,7 @@ type Props = {
   email: string;
   porcentaje: number;
   esAdmin: boolean;
+  vistaAlumno?: boolean;
   avatarUrl?: string | null;
   instagramUrl?: string;
 };
@@ -32,7 +33,7 @@ function Icono({ d }: { d: string }) {
   );
 }
 
-export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, instagramUrl }: Props) {
+export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno, avatarUrl, instagramUrl }: Props) {
   const pathname = usePathname();
   // Menú móvil sin depender de JavaScript para abrir: un checkbox oculto + CSS (abre al instante, incluso antes de hidratar).
   const casilla = useRef<HTMLInputElement>(null);
@@ -46,13 +47,20 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, 
     return () => window.removeEventListener("keydown", tecla);
   }, []);
 
-  const items: { href: string; label: string; icono: string; externo?: boolean }[] = [
+  const items: { href: string; label: string; icono: string; externo?: boolean; recarga?: boolean }[] = [
     { href: "/aulas", label: "Inicio", icono: "inicio" },
     { href: "/aulas/cuenta", label: "Mi cuenta", icono: "cuenta" },
     { href: "/aulas/ayuda", label: "Preguntas frecuentes", icono: "ayuda" },
     { href: "/aulas/soporte", label: "Soporte", icono: "soporte" },
     ...(instagramUrl ? [{ href: instagramUrl, label: "Instagram", icono: "instagram", externo: true }] : []),
     ...(esAdmin ? [{ href: "/admin", label: "Panel del equipo", icono: "admin" }] : []),
+    ...(esAdmin
+      ? [
+          vistaAlumno
+            ? { href: "/aulas/vista", label: "Salir de vista alumno", icono: "ayuda", externo: false, recarga: true }
+            : { href: "/aulas/vista?modo=nuevo", label: "Ver como alumno nuevo", icono: "ayuda", externo: false, recarga: true },
+        ]
+      : []),
   ];
 
   const activo = (href: string) => (href === "/aulas" ? pathname === "/aulas" : pathname.startsWith(href));
@@ -85,7 +93,11 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, avatarUrl, 
           const clase = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
             activo(it.href) && !it.externo ? "bg-accent/10 font-medium text-ink shadow-[inset_2px_0_0_#39ff7e]" : "text-muted hover:bg-white/[0.04] hover:text-ink"
           }`;
-          return it.externo ? (
+          return it.recarga ? (
+            <a key={it.label} href={it.href} className={clase}>
+              <Icono d={iconos[it.icono]} /> {it.label}
+            </a>
+          ) : it.externo ? (
             <a key={it.label} href={it.href} target="_blank" rel="noreferrer" className={clase}>
               <Icono d={iconos[it.icono]} /> {it.label}
             </a>

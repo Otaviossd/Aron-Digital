@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 import { BRAND } from "@/lib/config";
@@ -47,8 +48,22 @@ export const getMemberData = cache(async function getMemberData() {
       supabase.rpc("is_admin"),
     ]);
 
-  const modulos = ((modulosRaw ?? []) as ModuloEstado[]).sort((a, b) => a.position - b.position);
-  const aulas = (aulasRaw ?? []) as Aula[];
+  let modulos = ((modulosRaw ?? []) as ModuloEstado[]).sort((a, b) => a.position - b.position);
+  let aulas = (aulasRaw ?? []) as Aula[];
+
+  // Vista previa para el equipo: el admin ve todo abierto; con esta cookie ve el curso como un alumno que compró hoy (con candados).
+  const vistaAlumno = admin === true && (await cookies()).get("vista_alumno")?.value === "1";
+  if (vistaAlumno) {
+    const { data: diasAulas } = await supabase.from("lessons").select("id, unlock_after_days");
+    const diasAula = new Map(((diasAulas ?? []) as { id: string; unlock_after_days: number }[]).map((x) => [x.id, x.unlock_after_days]));
+    const diasModulo = new Map(modulos.map((m) => [m.id, m.unlock_after_days]));
+    const ahora = Date.now();
+    const en = (dias: number) => ({ unlock_at: dias > 0 ? new Date(ahora + dias * 86400000).toISOString() : null, is_unlocked: dias <= 0 });
+    modulos = modulos.map((m) => ({ ...m, ...en(m.unlock_after_days) }));
+    aulas = aulas
+      .filter((a) => (diasModulo.get(a.module_id) ?? 0) <= 0)
+      .map((a) => ({ ...a, ...en(Math.max(diasModulo.get(a.module_id) ?? 0, diasAula.get(a.id) ?? 0)) }));
+  }
   const completadas = new Set(((progresoRaw ?? []) as { lesson_id: string }[]).map((p) => p.lesson_id));
 
   // El progreso se calcula sobre las clases ya liberadas, para no penalizar lo que todavía está bloqueado.
@@ -62,6 +77,7 @@ export const getMemberData = cache(async function getMemberData() {
     user,
     email: user.email,
     esAdmin: admin === true,
+    vistaAlumno,
     avatarUrl,
     modulos,
     aulas,

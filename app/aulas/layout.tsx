@@ -14,7 +14,7 @@ export default function AulasLayout({ children }: LayoutProps<"/aulas">) {
 }
 
 async function Shell({ children }: { children: React.ReactNode }) {
-  const { email, esAdmin, porcentaje, avatarUrl } = await getMemberData();
+  const { email, esAdmin, porcentaje, avatarUrl, vistaAlumno } = await getMemberData();
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-bg">
@@ -29,6 +29,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
         email={email}
         porcentaje={porcentaje}
         esAdmin={esAdmin}
+        vistaAlumno={vistaAlumno}
         avatarUrl={avatarUrl}
         instagramUrl={process.env.NEXT_PUBLIC_INSTAGRAM_URL}
       />
