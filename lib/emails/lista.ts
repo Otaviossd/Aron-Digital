@@ -13,6 +13,6 @@ export function htmlLista({ whatsappUrl, bajaUrl, marca }: Datos) {
       ${parrafo(`Te vamos a avisar por email apenas abramos las inscripciones a la nueva plataforma de ${marca}, y vas a entrar antes que el resto.`)}
       ${parrafo("Para quedarte con el descuento exclusivo de la lista de espera, entrá también al grupo de WhatsApp: ahí avisamos todo primero.")}
       ${boton(whatsappUrl, "Entrar al grupo de WhatsApp")}`,
-    pie: `Recibís este email porque lo dejaste en la página de ${marca}. <a href="${bajaUrl}" style="color:#6f787c">Darme de baja</a>`,
+    pie: `Recibís este email porque lo dejaste en la página de ${marca}. <a href="${bajaUrl}" style="color:#7a8588">Darme de baja</a>`,
   });
 }

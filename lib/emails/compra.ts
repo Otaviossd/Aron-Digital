@@ -12,7 +12,7 @@ export function htmlCompra({ accessLink, loginLink, to }: Datos) {
       ${titulo("¡Compra confirmada!")}
       ${parrafo("Gracias por sumarte. Tu acceso ya está activo.")}
       ${boton(accessLink, "Entrar al curso")}
-      ${parrafo(`Este botón entra con un solo clic y vence en poco tiempo. Si venció, entrá siempre desde <a href="${loginLink}" style="color:#39ff7e">${loginLink}</a> con este mismo email (${to}) o con Google.`)}
+      ${parrafo(`Este botón entra con un solo clic y vence en poco tiempo. Si venció, entrá siempre desde <a href="${loginLink}" style="color:#0a8f47">${loginLink}</a> con este mismo email (${to}) o con Google.`)}
       ${parrafo("Algunos módulos y los bonos se liberan automáticamente a los 7 días de tu compra. Podés cancelar la suscripción cuando quieras desde tu cuenta; el reembolso solo está disponible durante los primeros 7 días.")}`,
   });
 }
