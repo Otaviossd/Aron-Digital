@@ -8,12 +8,13 @@ export const FOTOS = {
   auditorio: "/aaron/auditorio.jpg",
   clase: "/aaron/clase.jpg",
   retratoRecorte: "/aaron/retrato-recorte.webp", // retrato sin fondo (PNG/WebP transparente), para ponerlo sobre luces
+  portada: "/aaron/portada.jpg", // banner 16:9 del panel del alumno (auditorio + retrato con luz verde)
   // Uso por página:
   hero: "/aaron/auditorio.jpg", // página de venta, topo
   captura: "/aaron/retrato.jpg", // página de captura (lista de espera)
   sobre: "/aaron/clase.jpg", // sección "Quién es Aaron"
   entrar: "/aaron/espalda.jpg", // pantalla de acceso
-  aulas: "/aaron/auditorio.jpg", // portada del área del alumno
+  aulas: "/aaron/portada.jpg", // portada del área del alumno
 } as const;
 
 // Fotos que se rotan como fondo de las portadas de módulo que no tienen imagen propia.

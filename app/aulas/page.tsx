@@ -53,30 +53,24 @@ async function Inicio() {
   return (
     <>
       {/* Portada */}
-      <section className="relative mb-14 min-h-[24rem] overflow-hidden rounded-3xl border border-white/10 bg-surface sm:min-h-[27rem]">
+      <section className="relative mb-14 overflow-hidden rounded-3xl border border-white/10 bg-surface">
         <div
           aria-hidden="true"
-          className="absolute inset-0 opacity-60"
-          style={{ backgroundImage: `linear-gradient(90deg, #07090a 0%, rgba(7,9,10,.75) 50%, rgba(7,9,10,.35) 100%), url(${FOTOS.aulas})`, backgroundSize: "cover", backgroundPosition: "center 35%" }}
+          className="absolute inset-0 bg-cover bg-[position:75%_center]"
+          style={{ backgroundImage: `url(${FOTOS.portada})` }}
         />
-        <div aria-hidden="true" className="respirar absolute -right-16 -top-10 h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(closest-side,rgba(57,255,126,.5),rgba(57,255,126,.18)_50%,transparent)]" />
-        <div aria-hidden="true" className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-[100px]" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={FOTOS.retratoRecorte}
-          alt=""
-          className="foto-fundida absolute -bottom-2 right-2 hidden h-[112%] w-auto object-contain object-bottom sm:right-6 md:block"
-        />
-        <div className="relative flex min-h-[24rem] max-w-xl flex-col justify-end p-8 sm:min-h-[27rem] sm:p-12">
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#07090a] via-[#07090a]/55 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-[#07090a]/70 via-transparent to-transparent md:via-transparent" />
+        <div className="relative flex min-h-[26rem] max-w-xl flex-col justify-end p-6 pt-48 sm:p-10 md:aspect-[16/8] md:min-h-0">
           {siguiente ? (
             <>
-              <p className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1.5 text-xs font-medium text-accent">
+              <p className="mb-3 inline-flex w-fit items-center gap-2 rounded-full border border-accent/30 bg-black/40 px-3.5 py-1.5 text-xs font-medium text-accent backdrop-blur">
                 <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_rgba(57,255,126,.9)]" />
                 {completadas.size === 0 ? "Empezá acá" : "Seguí donde quedaste"}
               </p>
-              <h1 className="text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">{siguiente.aula.title}</h1>
-              <p className="mt-3 text-sm text-muted">{siguiente.modulo.title}</p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <h1 className="text-2xl font-semibold leading-[1.1] tracking-tight sm:text-4xl">{siguiente.aula.title}</h1>
+              <p className="mt-2 text-sm text-muted">{siguiente.modulo.title}</p>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Link href={`/aulas/${siguiente.aula.id}`} className={ui.boton}>
                   {completadas.size === 0 ? "Ver primera clase" : "Continuar"}
                 </Link>
@@ -89,9 +83,9 @@ async function Inicio() {
             </>
           ) : (
             <>
-              <p className="mb-4 text-sm font-medium text-accent">Al día</p>
-              <h1 className="text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">Completaste todo lo disponible</h1>
-              <p className="mt-3 text-sm text-muted">Volvé pronto: se publican clases nuevas cada semana.</p>
+              <p className="mb-3 text-sm font-medium text-accent">Al día</p>
+              <h1 className="text-2xl font-semibold leading-[1.1] tracking-tight sm:text-4xl">Completaste todo lo disponible</h1>
+              <p className="mt-2 text-sm text-muted">Volvé pronto: se publican clases nuevas cada semana.</p>
             </>
           )}
         </div>
