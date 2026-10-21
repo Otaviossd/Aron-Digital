@@ -62,6 +62,8 @@ export function estadoConfig() {
       { id: "hotmart-anual", etiqueta: "Hotmart: link de checkout de 1 año", ok: tiene(e.NEXT_PUBLIC_HOTMART_URL_ANUAL) },
       { id: "hotmart-vitalicio", etiqueta: "Hotmart: link de checkout vitalicio", ok: tiene(e.NEXT_PUBLIC_HOTMART_URL_VITALICIO) },
       { id: "hotmart-promo", etiqueta: "Hotmart: link de la promo de lanzamiento", ok: tiene(e.NEXT_PUBLIC_HOTMART_URL_PROMO) },
+      { id: "hotmart-hottok", etiqueta: "Hotmart: hottok del webhook (HOTMART_HOTTOK)", ok: tiene(e.HOTMART_HOTTOK) },
+      { id: "hotmart-ofertas", etiqueta: "Hotmart: códigos de las 3 ofertas", ok: tiene(e.HOTMART_OFFER_PROMO) && tiene(e.HOTMART_OFFER_VITALICIO) && tiene(e.HOTMART_OFFER_ANUAL) },
     ],
     email: [
       { id: "resend", etiqueta: "Resend: API key", ok: tiene(e.RESEND_API_KEY) },
