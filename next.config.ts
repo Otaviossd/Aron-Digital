@@ -10,7 +10,15 @@ const nextConfig: NextConfig = {
   },
   // Atalho: quem digitar /vendas cai em /ventas (as páginas ficam em espanhol, o público é hispano).
   async redirects() {
-    return [{ source: "/vendas", destination: "/ventas", permanent: false }];
+    // Atajos: cualquiera de estas direcciones lleva a la página correcta.
+    return [
+      { source: "/vendas", destination: "/ventas", permanent: false },
+      { source: "/venta", destination: "/ventas", permanent: false },
+      { source: "/login", destination: "/entrar", permanent: false },
+      { source: "/acceso", destination: "/entrar", permanent: false },
+      { source: "/alumnos", destination: "/aulas", permanent: false },
+      { source: "/panel", destination: "/admin", permanent: false },
+    ];
   },
   turbopack: {
     rules: {
