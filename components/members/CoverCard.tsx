@@ -19,7 +19,7 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
 
   const tarjeta = (
     <div
-      className={`group relative aspect-[3/4] w-[176px] shrink-0 snap-start overflow-hidden rounded-xl border border-line bg-surface transition duration-300 sm:w-[212px] ${
+      className={`group relative aspect-[3/4] w-full snap-start overflow-hidden rounded-xl border border-line bg-surface transition duration-300 sm:w-[212px] sm:shrink-0 ${
         bloqueado ? "" : "hover:-translate-y-1.5 hover:border-accent/50 hover:shadow-[0_20px_60px_-12px_rgba(57,255,126,.5)]"
       }`}
     >
@@ -44,7 +44,7 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10" />
       {bloqueado && <div className="absolute inset-0 bg-black/55" />}
 
-      <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-ink/90 backdrop-blur">
+      <span className="absolute left-2.5 top-2.5 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-ink/90 backdrop-blur">
         {modulo.is_bonus ? "Bono" : `Módulo ${numero}`}
       </span>
 
@@ -60,8 +60,8 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
         </div>
       )}
 
-      <div className="absolute inset-x-0 bottom-0 p-4">
-        <h3 className="text-lg font-semibold leading-tight tracking-tight">{modulo.title}</h3>
+      <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+        <h3 className="text-[15px] font-semibold leading-tight tracking-tight sm:text-lg">{modulo.title}</h3>
         {!bloqueado && (
           <>
             <p className="mt-1 text-xs text-muted">
@@ -78,10 +78,10 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
   );
 
   return bloqueado ? (
-    <div aria-label={`${modulo.title} (bloqueado)`} className="cursor-not-allowed">
+    <div aria-label={`${modulo.title} (bloqueado)`} className="block shrink-0 cursor-not-allowed">
       {tarjeta}
     </div>
   ) : (
-    <Link href={`/aulas/modulo/${modulo.id}`}>{tarjeta}</Link>
+    <Link href={`/aulas/modulo/${modulo.id}`} className="block shrink-0">{tarjeta}</Link>
   );
 }

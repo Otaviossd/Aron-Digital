@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 
-// Fileira horizontal com setas, estilo "streaming".
+// Móvil: cuadrícula de 2 columnas que llena el ancho. Desde sm: fila horizontal con flechas, estilo "streaming".
 export default function Row({ titulo, subtitulo, children }: { titulo: string; subtitulo?: string; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const mover = (dir: 1 | -1) => ref.current?.scrollBy({ left: dir * 480, behavior: "smooth" });
@@ -27,7 +27,7 @@ export default function Row({ titulo, subtitulo, children }: { titulo: string; s
           ))}
         </div>
       </div>
-      <div ref={ref} className="flex snap-x gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div ref={ref} className="grid grid-cols-2 gap-3 sm:flex sm:snap-x sm:gap-4 sm:overflow-x-auto sm:pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {children}
       </div>
     </section>
