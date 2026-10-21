@@ -59,13 +59,13 @@ async function Inicio() {
           className="absolute inset-0 opacity-60"
           style={{ backgroundImage: `linear-gradient(90deg, #07090a 0%, rgba(7,9,10,.75) 50%, rgba(7,9,10,.35) 100%), url(${FOTOS.aulas})`, backgroundSize: "cover", backgroundPosition: "center 35%" }}
         />
-        <div aria-hidden="true" className="respirar absolute -right-10 top-0 h-[26rem] w-[26rem] rounded-full bg-accent/40 blur-[100px]" />
+        <div aria-hidden="true" className="respirar absolute -right-16 -top-10 h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(closest-side,rgba(57,255,126,.5),rgba(57,255,126,.18)_50%,transparent)]" />
         <div aria-hidden="true" className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-[100px]" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={FOTOS.retratoRecorte}
           alt=""
-          className="foto-fundida absolute -bottom-2 right-2 hidden h-[112%] w-auto object-contain object-bottom drop-shadow-[0_0_30px_rgba(57,255,126,.35)] sm:right-6 md:block"
+          className="foto-fundida absolute -bottom-2 right-2 hidden h-[112%] w-auto object-contain object-bottom sm:right-6 md:block"
         />
         <div className="relative flex min-h-[24rem] max-w-xl flex-col justify-end p-8 sm:min-h-[27rem] sm:p-12">
           {siguiente ? (

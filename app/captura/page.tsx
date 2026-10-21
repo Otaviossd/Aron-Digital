@@ -98,8 +98,7 @@ export default function CapturaPage() {
 
           {/* Foto de Aaron */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div aria-hidden="true" className="respirar absolute left-1/2 top-[40%] h-[20rem] w-[20rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/40 blur-[80px] sm:h-[26rem] sm:w-[26rem]" />
-            <div aria-hidden="true" className="absolute left-1/2 top-[40%] h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/30" />
+            <div aria-hidden="true" className="respirar absolute left-1/2 top-[42%] h-[34rem] w-[34rem] max-w-[140%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(57,255,126,.5),rgba(57,255,126,.2)_45%,rgba(57,255,126,.06)_72%,transparent)]" />
             <div aria-hidden="true" className="absolute left-1/2 top-[40%] hidden h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 sm:block" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -108,7 +107,7 @@ export default function CapturaPage() {
               width={900}
               height={1500}
               fetchPriority="high"
-              className="foto-fundida relative z-10 mx-auto h-auto max-h-[42rem] w-auto max-w-full object-contain drop-shadow-[0_0_28px_rgba(57,255,126,.35)]"
+              className="foto-fundida relative z-10 mx-auto h-auto max-h-[42rem] w-auto max-w-full object-contain"
             />
             <Chip className="left-0 top-[14%] flotar sm:-left-4">
               <p className="text-lg font-semibold tracking-tight text-accent">+2.500</p>
