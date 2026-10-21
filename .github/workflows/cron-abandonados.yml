@@ -16,8 +16,12 @@ jobs:
     steps:
       - name: Chamar a rota de abandonados
         run: |
-          status=$(curl -s -o resposta.json -w "%{http_code}" \
+          # Mostra o status e, se houver redirecionamento, para onde (ajuda a achar um SITE_URL errado).
+          info=$(curl -s -o resposta.json -w "%{http_code} %{redirect_url}" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.SITE_URL }}/api/cron/abandonados")
+          echo "Status e redirecionamento: $info"
           cat resposta.json
+          echo
+          status=${info%% *}
           test "$status" = "200"
