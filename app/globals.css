@@ -82,8 +82,8 @@ body {
 
 /* Foto que se funde con el fondo (cara completa, borde inferior suave) */
 .foto-fundida {
-  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 98%);
 }
 
 /* Botón principal con luz */

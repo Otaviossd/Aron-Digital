@@ -1,8 +1,5 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import FormCaptura from "@/components/FormCaptura";
-import NavAcceso from "@/components/NavAcceso";
 import Rastreo from "@/components/Rastreo";
 import { BRAND } from "@/lib/config";
 import { FOTOS } from "@/lib/fotos";
@@ -43,12 +40,6 @@ const PARA_QUIEN = [
   "Quienes quieren seguir aprendiendo con alguien que enseña lo que hace todos los días.",
 ];
 
-const acceder = (
-  <Link href="/entrar" className="cristal rounded-full px-4 py-2 text-sm font-medium text-ink transition hover:border-accent/40">
-    Acceder
-  </Link>
-);
-
 const Check = () => (
   <svg viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 shrink-0 text-accent" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="12" cy="12" r="9" />
@@ -79,11 +70,8 @@ export default function CapturaPage() {
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-bg to-transparent" />
         </div>
 
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+        <nav className="mx-auto flex max-w-6xl items-center px-6 py-6">
           <span className="text-sm font-semibold tracking-tight">{BRAND}</span>
-          <Suspense fallback={acceder}>
-            <NavAcceso />
-          </Suspense>
         </nav>
 
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.05fr_.95fr] lg:pb-24 lg:pt-10">
@@ -110,9 +98,9 @@ export default function CapturaPage() {
 
           {/* Foto de Aaron */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div aria-hidden="true" className="respirar absolute left-1/2 top-[38%] h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/40 blur-[90px]" />
+            <div aria-hidden="true" className="respirar absolute left-1/2 top-[40%] h-[20rem] w-[20rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/40 blur-[80px] sm:h-[26rem] sm:w-[26rem]" />
             <div aria-hidden="true" className="absolute left-1/2 top-[40%] h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/30" />
-            <div aria-hidden="true" className="absolute left-1/2 top-[40%] h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10" />
+            <div aria-hidden="true" className="absolute left-1/2 top-[40%] hidden h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 sm:block" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={FOTOS.retratoRecorte}
@@ -120,7 +108,7 @@ export default function CapturaPage() {
               width={900}
               height={1500}
               fetchPriority="high"
-              className="relative z-10 mx-auto h-auto max-h-[42rem] w-auto max-w-full object-contain drop-shadow-[0_0_28px_rgba(57,255,126,.35)]"
+              className="foto-fundida relative z-10 mx-auto h-auto max-h-[42rem] w-auto max-w-full object-contain drop-shadow-[0_0_28px_rgba(57,255,126,.35)]"
             />
             <Chip className="left-0 top-[14%] flotar sm:-left-4">
               <p className="text-lg font-semibold tracking-tight text-accent">+2.500</p>
@@ -278,9 +266,6 @@ export default function CapturaPage() {
       <footer className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-xs text-faint">
           <span>© {BRAND}. Todos los derechos reservados.</span>
-          <Link href="/equipo" className="transition hover:text-muted">
-            Equipo
-          </Link>
         </div>
       </footer>
     </main>

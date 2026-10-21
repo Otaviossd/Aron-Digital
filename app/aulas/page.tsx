@@ -65,7 +65,7 @@ async function Inicio() {
         <img
           src={FOTOS.retratoRecorte}
           alt=""
-          className="absolute -bottom-2 right-2 hidden h-[112%] w-auto object-contain object-bottom drop-shadow-[0_0_30px_rgba(57,255,126,.35)] sm:right-6 md:block"
+          className="foto-fundida absolute -bottom-2 right-2 hidden h-[112%] w-auto object-contain object-bottom drop-shadow-[0_0_30px_rgba(57,255,126,.35)] sm:right-6 md:block"
         />
         <div className="relative flex min-h-[24rem] max-w-xl flex-col justify-end p-8 sm:min-h-[27rem] sm:p-12">
           {siguiente ? (
