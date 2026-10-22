@@ -21,6 +21,49 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
   const telefonoValido = telefono.replace(/\D/g, "").length >= 8;
   const promo = vagasRestantes > 0;
 
+  const opciones: {
+    id: Tipo;
+    nombre: string;
+    sub: string;
+    valor: number;
+    tachado?: number;
+    etiqueta?: string;
+    incluye: string[];
+  }[] = [
+    ...(promo
+      ? [
+          {
+            id: "promo" as const,
+            nombre: "Acceso vitalicio · Lanzamiento",
+            sub: "Precio especial para los primeros",
+            valor: PRECOS.promo.valor,
+            tachado: PRECOS.vitalicio.valor,
+            etiqueta: "Cupos limitados",
+            incluye: ["Acceso para siempre", "Todas las actualizaciones y clases nuevas", "Los 2 bonos incluidos", "Pagás una sola vez"],
+          },
+        ]
+      : []),
+    {
+      id: "vitalicio" as const,
+      nombre: "Acceso vitalicio",
+      sub: "El curso para siempre",
+      valor: PRECOS.vitalicio.valor,
+      etiqueta: promo ? undefined : "Recomendado",
+      incluye: ["Acceso para siempre", "Todas las actualizaciones y clases nuevas", "Los 2 bonos incluidos", "Pagás una sola vez"],
+    },
+    {
+      id: "anual" as const,
+      nombre: "Acceso de 1 año",
+      sub: "12 meses desde tu compra",
+      valor: PRECOS.anual.valor,
+      incluye: ["Acceso por 12 meses", "Clases nuevas durante ese año", "Los 2 bonos incluidos", "Pagás una sola vez"],
+    },
+  ];
+  const [eleccion, setEleccion] = useState<Tipo>(promo ? "promo" : "vitalicio");
+  const elegida = opciones.find((o) => o.id === eleccion) ?? opciones[0];
+  const hrefElegido = linkCheckout(elegida.id);
+  const diferencia = PRECOS.vitalicio.valor - PRECOS.anual.valor;
+
   // Link de los emails de carrito abandonado (?email=...): ya dejó sus datos, va directo a la oferta.
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
@@ -69,18 +112,6 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
     }
   }
 
-  const Boton = ({ o, texto, destacado }: { o: Tipo; texto: string; destacado?: boolean }) => {
-    const href = linkCheckout(o);
-    const clase = destacado ? `${ui.boton} w-full` : `${ui.botonSuave} w-full justify-center`;
-    return href ? (
-      <a href={href} className={clase}>
-        {texto}
-      </a>
-    ) : (
-      <span className={`${clase} cursor-not-allowed opacity-50`}>Checkout próximamente</span>
-    );
-  };
-
   return (
     <div id="comprar" className="cristal scroll-mt-8 rounded-3xl p-6 sm:p-8">
       {paso === "datos" ? (
@@ -117,43 +148,72 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
       ) : (
         <div>
           <p className="mb-2 text-sm font-medium text-accent">Paso 2 de 2</p>
-          <h3 className="mb-6 text-2xl font-semibold tracking-tight">{nombre ? `${nombre.split(" ")[0]}, esta es tu oferta` : "Esta es tu oferta"}</h3>
+          <h3 className="mb-2 text-2xl font-semibold tracking-tight">{nombre ? `${nombre.split(" ")[0]}, elegí cómo entrar` : "Elegí cómo entrar"}</h3>
+          <p className="mb-6 text-sm text-muted">Pago único en todos los casos. Sin mensualidades.</p>
 
-          {promo && (
-            <div className="relative mb-4 overflow-hidden rounded-2xl border border-accent/40 bg-accent/[0.07] p-5 shadow-[0_0_60px_-20px_rgba(57,255,126,.6)]">
-              <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-black">
-                Lanzamiento · cupos limitados
-              </span>
-              <p className="flex items-baseline gap-3">
-                <span className="text-5xl font-semibold tracking-tight">US${PRECOS.promo.valor}</span>
-                <span className="text-lg text-faint line-through">US${PRECOS.vitalicio.valor}</span>
-              </p>
-              <p className="mt-2 text-sm text-muted">
-                Pago único y acceso <strong className="text-ink">vitalicio</strong> con todas las actualizaciones. Solo para las primeras personas: cuando se agoten los cupos, vuelve al precio normal.
-              </p>
-              <div className="mt-5">
-                <Boton o="promo" texto="Quiero mi lugar de lanzamiento" destacado />
-              </div>
-            </div>
-          )}
+          <div role="radiogroup" aria-label="Elegí tu acceso" className="space-y-3">
+            {opciones.map((o) => {
+              const activa = eleccion === o.id;
+              return (
+                <button
+                  key={o.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={activa}
+                  onClick={() => setEleccion(o.id)}
+                  className={`relative w-full rounded-2xl border p-5 text-left transition ${
+                    activa ? "border-accent/60 bg-accent/[0.08] shadow-[0_0_50px_-20px_rgba(57,255,126,.7)]" : "border-line bg-white/[0.03] hover:border-line-strong"
+                  }`}
+                >
+                  {o.etiqueta && (
+                    <span className="mb-3 inline-flex rounded-full bg-accent px-3 py-1 text-[11px] font-semibold text-black">{o.etiqueta}</span>
+                  )}
+                  <span className="flex items-start justify-between gap-4">
+                    <span>
+                      <span className="block font-medium tracking-tight">{o.nombre}</span>
+                      <span className="mt-0.5 block text-xs text-faint">{o.sub}</span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-3">
+                      <span className="text-right">
+                        <span className="block text-2xl font-semibold tracking-tight">US${o.valor}</span>
+                        {o.tachado && <span className="block text-xs text-faint line-through">US${o.tachado}</span>}
+                      </span>
+                      <span aria-hidden="true" className={`flex h-5 w-5 items-center justify-center rounded-full border ${activa ? "border-accent bg-accent" : "border-line-strong"}`}>
+                        {activa && <span className="h-2 w-2 rounded-full bg-black" />}
+                      </span>
+                    </span>
+                  </span>
+                  <ul className="mt-4 space-y-1.5">
+                    {o.incluye.map((x) => (
+                      <li key={x} className="flex items-start gap-2 text-sm text-muted">
+                        <svg viewBox="0 0 24 24" className="mt-0.5 h-4 w-4 shrink-0 text-accent" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M5 12.5l4.5 4.5L19 7.5" />
+                        </svg>
+                        {x}
+                      </li>
+                    ))}
+                  </ul>
+                </button>
+              );
+            })}
+          </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-line bg-white/[0.03] p-5">
-              <p className="text-xs font-medium text-muted">{PRECOS.vitalicio.rotulo}</p>
-              <p className="mt-1 text-3xl font-semibold tracking-tight">US${PRECOS.vitalicio.valor}</p>
-              <p className="mb-4 mt-1 text-xs leading-snug text-faint">{PRECOS.vitalicio.detalle}</p>
-              <Boton o="vitalicio" texto="Elegir vitalicio" destacado={!promo} />
-            </div>
-            <div className="rounded-2xl border border-line bg-white/[0.03] p-5">
-              <p className="text-xs font-medium text-muted">{PRECOS.anual.rotulo}</p>
-              <p className="mt-1 text-3xl font-semibold tracking-tight">US${PRECOS.anual.valor}</p>
-              <p className="mb-4 mt-1 text-xs leading-snug text-faint">{PRECOS.anual.detalle}</p>
-              <Boton o="anual" texto="Elegir 1 año" />
-            </div>
+          <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs leading-relaxed text-muted">
+            Por solo <strong className="text-ink">US${diferencia} más</strong> que el acceso de 1 año, tenés el curso para siempre: no volvés a pagar y recibís todas las clases y módulos que Aaron sume en el futuro.
+          </p>
+
+          <div className="mt-5">
+            {hrefElegido ? (
+              <a href={hrefElegido} className={`${ui.boton} w-full py-3.5`}>
+                Continuar al pago · US${elegida.valor}
+              </a>
+            ) : (
+              <span className={`${ui.boton} w-full cursor-not-allowed py-3.5 opacity-50`}>Checkout próximamente</span>
+            )}
           </div>
 
           <p className="mt-5 text-xs leading-relaxed text-faint">
-            Recibís el acceso por email al instante. Es un pago único, sin cobros mensuales. Reembolso disponible solo durante los primeros 7 días.
+            Recibís el acceso por email al instante. Reembolso disponible durante los primeros 7 días.
           </p>
         </div>
       )}

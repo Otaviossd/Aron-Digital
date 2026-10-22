@@ -7,7 +7,7 @@ import Aparece from "@/components/Aparece";
 import BarraMovil from "@/components/BarraMovil";
 import VideoVentas from "@/components/VideoVentas";
 import { vagasPromoRestantes } from "@/lib/promo";
-import { BRAND, DIAS_BONO, DIAS_REEMBOLSO, PRECOS } from "@/lib/config";
+import { BRAND, DIAS_BONO, DIAS_REEMBOLSO } from "@/lib/config";
 import { FOTOS } from "@/lib/fotos";
 import { ui } from "@/lib/ui";
 
@@ -81,26 +81,6 @@ function Chip({ className, children }: { className: string; children: React.Reac
   return <div className={`cristal absolute z-20 rounded-2xl px-4 py-3 text-sm ${className}`}>{children}</div>;
 }
 
-// Precio "desde": depende de si quedan cupos de la promo (consulta al servidor, por eso va en Suspense).
-async function PrecioDesde({ variante }: { variante: "linea" | "boton" }) {
-  const restantes = await vagasPromoRestantes();
-  const desde = restantes > 0 ? PRECOS.promo.valor : PRECOS.anual.valor;
-  if (variante === "boton") return <BarraMovil texto={`Quiero mi lugar · desde US$${desde}`} />;
-  return (
-    <p className="mt-5 text-sm text-muted">
-      {restantes > 0 ? (
-        <>
-          Precio de lanzamiento <span className="font-semibold text-accent">US${desde}</span> con acceso vitalicio · cupos limitados
-        </>
-      ) : (
-        <>
-          Pago único desde <span className="font-semibold text-accent">US${desde}</span> · sin mensualidades
-        </>
-      )}
-    </p>
-  );
-}
-
 async function SeccionOferta() {
   const restantes = await vagasPromoRestantes();
   return <Oferta vagasRestantes={restantes} />;
@@ -148,9 +128,7 @@ export default function VentasPage() {
                 Ver qué incluye ↓
               </a>
             </div>
-            <Suspense fallback={<p className="mt-5 text-sm text-muted">Pago único · sin mensualidades</p>}>
-              <PrecioDesde variante="linea" />
-            </Suspense>
+            <p className="mt-5 text-sm text-muted">Dejá tu email y tu WhatsApp para ver los precios y la oferta de lanzamiento.</p>
           </div>
 
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
@@ -405,9 +383,7 @@ export default function VentasPage() {
         </div>
       </footer>
 
-      <Suspense fallback={null}>
-        <PrecioDesde variante="boton" />
-      </Suspense>
+      <BarraMovil texto="Quiero ver la oferta" />
     </main>
   );
 }
