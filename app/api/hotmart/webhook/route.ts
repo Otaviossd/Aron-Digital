@@ -44,6 +44,8 @@ async function procesar(admin: ReturnType<typeof createAdminClient>, evento: any
     case "PURCHASE_APPROVED": {
       const c = leerCompra(evento);
       if (!c) throw new Error("Compra sin email o transacción");
+      // Bump / producto extra barato: el evento ya queda guardado en webhook_events; no crea suscripción.
+      if (c.extra) return;
       const ahora = new Date();
       const { data: fila, error } = await admin
         .from("subscriptions")

@@ -9,6 +9,8 @@ export type CompraHotmart = {
   transaccion: string;
   plan: PlanCompra;
   promo: boolean;
+  // Compra barata que no es ninguno de los 3 planes (ej. el bump de redes sociales): no da acceso al curso.
+  extra: boolean;
 };
 
 // El webhook de la Hotmart manda el "hottok" (token de verificación de la cuenta) en el header X-HOTMART-HOTTOK.
@@ -43,6 +45,9 @@ export function leerCompra(payload: any, env: Env = process.env): CompraHotmart 
   const transaccion = typeof d?.purchase?.transaction === "string" ? d.purchase.transaction : "";
   if (!email || !transaccion) return null;
   const precio = Number(d?.purchase?.price?.value ?? d?.purchase?.price);
+  const codigo = d?.purchase?.offer?.code;
+  const esPlan = [env.HOTMART_OFFER_PROMO, env.HOTMART_OFFER_VITALICIO, env.HOTMART_OFFER_ANUAL].includes(codigo);
+  const extra = !esPlan && Number.isFinite(precio) && precio > 0 && precio < 15;
   const { plan, promo } = planDeCompra(d?.purchase?.offer?.code, Number.isFinite(precio) ? precio : undefined, env);
   const tel = d?.buyer?.checkout_phone ?? d?.buyer?.phone;
   return {
@@ -52,5 +57,6 @@ export function leerCompra(payload: any, env: Env = process.env): CompraHotmart 
     transaccion,
     plan,
     promo,
+    extra,
   };
 }
