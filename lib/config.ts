@@ -37,5 +37,7 @@ export const DIAS_BONO = 7;
 // Cuando la página de ventas esté lista, cambia `lista` a true y aparece el enlace para copiar.
 export const PAGINAS = [
   { nombre: "Página de captura", ruta: "/captura", detalle: "Lista de espera: email y grupo de WhatsApp", lista: true },
-  { nombre: "Página de ventas", ruta: "/ventas", detalle: "Venta del curso con checkout", lista: false },
+  { nombre: "Página de ventas", ruta: "/ventas", detalle: "Venta del curso: formulario de contacto y checkout de la Hotmart", lista: true },
+  { nombre: "Página de gracias", ruta: "/gracias", detalle: "Página de obrigado: ponela en la Hotmart como página de agradecimiento", lista: true },
+  { nombre: "Acceso de alumnos", ruta: "/entrar", detalle: "Login de la área de miembros (link para la Hotmart: área de miembros externa)", lista: true },
 ] as const;

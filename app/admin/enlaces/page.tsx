@@ -12,7 +12,7 @@ const ORIGENES = [
   { nombre: "Email", utm: "email" },
 ];
 
-const sitio = () => (process.env.NEXT_PUBLIC_SITE_URL || "https://aron-digital.vercel.app").replace(/\/$/, "");
+const sitio = () => (process.env.NEXT_PUBLIC_SITE_URL || "https://www.lanuevaolaacademy.com").replace(/\/$/, "");
 
 export default function EnlacesPage() {
   const base = sitio();
@@ -49,6 +49,8 @@ export default function EnlacesPage() {
                     </div>
                   </div>
 
+                  {(p.ruta === "/captura" || p.ruta === "/ventas") && (
+                  <>
                   <p className="mb-2 mt-5 text-xs font-medium text-muted">Con origen de la visita</p>
                   <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line">
                     {ORIGENES.map((o) => {
@@ -64,6 +66,8 @@ export default function EnlacesPage() {
                       );
                     })}
                   </ul>
+                  </>
+                  )}
                 </>
               ) : (
                 <p className="rounded-xl border border-dashed border-line-strong px-4 py-3 text-sm text-faint">

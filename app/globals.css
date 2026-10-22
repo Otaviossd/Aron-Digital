@@ -117,6 +117,21 @@ body {
   mask-image: radial-gradient(70% 60% at 50% 30%, #000, transparent);
 }
 
+/* Aparece: los bloques entran suavemente al llegar a la pantalla (solo si hay JavaScript) */
+@media (scripting: enabled) {
+  .aparece {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--retraso, 0ms);
+  }
+  .aparece.visto {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .flotar, .flotar-lento, .respirar, .cinta, .texto-luz { animation: none; }
+  .aparece { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
