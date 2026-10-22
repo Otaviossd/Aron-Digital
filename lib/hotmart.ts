@@ -47,7 +47,8 @@ export function leerCompra(payload: any, env: Env = process.env): CompraHotmart 
   const precio = Number(d?.purchase?.price?.value ?? d?.purchase?.price);
   const codigo = d?.purchase?.offer?.code;
   const esPlan = [env.HOTMART_OFFER_PROMO, env.HOTMART_OFFER_VITALICIO, env.HOTMART_OFFER_ANUAL].includes(codigo);
-  const extra = !esPlan && Number.isFinite(precio) && precio > 0 && precio < 15;
+  const esPrueba = (env.HOTMART_TEST_EMAILS ?? "").toLowerCase().split(",").map((x) => x.trim()).includes(email);
+  const extra = !esPlan && !esPrueba && Number.isFinite(precio) && precio > 0 && precio < 15;
   const { plan, promo } = planDeCompra(d?.purchase?.offer?.code, Number.isFinite(precio) ? precio : undefined, env);
   const tel = d?.buyer?.checkout_phone ?? d?.buyer?.phone;
   return {
