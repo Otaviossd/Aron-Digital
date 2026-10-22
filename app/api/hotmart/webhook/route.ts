@@ -45,7 +45,10 @@ async function procesar(admin: ReturnType<typeof createAdminClient>, evento: any
       const c = leerCompra(evento);
       if (!c) throw new Error("Compra sin email o transacción");
       // Bump / producto extra barato: el evento ya queda guardado en webhook_events; no crea suscripción.
-      if (c.extra) return;
+      if (c.extra) {
+        await admin.from("extra_compras").upsert({ transaction: c.transaccion, email: c.email }, { onConflict: "transaction" });
+        return;
+      }
       const ahora = new Date();
       const { data: fila, error } = await admin
         .from("subscriptions")
@@ -85,6 +88,7 @@ async function procesar(admin: ReturnType<typeof createAdminClient>, evento: any
     case "PURCHASE_CHARGEBACK": {
       const t = evento?.data?.purchase?.transaction;
       if (typeof t !== "string") return;
+      await admin.from("extra_compras").delete().eq("transaction", t);
       await admin.from("subscriptions").update({ refunded_at: new Date().toISOString(), status: "cancelled" }).eq("hotmart_transaction", t);
       return;
     }

@@ -41,3 +41,12 @@ export const PAGINAS = [
   { nombre: "Página de gracias", ruta: "/gracias", detalle: "Página de obrigado: ponela en la Hotmart como página de agradecimiento", lista: true },
   { nombre: "Acceso de alumnos", ruta: "/entrar", detalle: "Login de la área de miembros (link para la Hotmart: área de miembros externa)", lista: true },
 ] as const;
+
+// Clase extra (order bump / venta posterior dentro del área de alumnos). Un solo producto barato en la Hotmart.
+export const EXTRA = {
+  titulo: "Cómo crecer en redes sociales como barbero",
+  descripcion: "Una clase práctica para llenar tu agenda: qué publicar, cómo mostrar tus cortes y cómo convertir seguidores en clientes.",
+  valor: 7,
+  checkoutUrl: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA,
+  videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...)
+} as const;

@@ -5,6 +5,7 @@ import Row from "@/components/members/Row";
 import Portada from "@/components/members/Portada";
 import { aulasDelModulo, diasRestantes, getMemberData, siguienteAula } from "@/lib/members";
 import { ui } from "@/lib/ui";
+import { EXTRA } from "@/lib/config";
 
 export default function AulasPage() {
   return (
@@ -81,6 +82,22 @@ async function Inicio() {
           ))}
         </Row>
       )}
+
+      <Link
+        href="/aulas/extra"
+        className="group mt-10 flex items-center gap-4 rounded-2xl border border-accent/30 bg-accent/[0.06] p-5 transition hover:border-accent/60"
+      >
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-black/40 text-accent">
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" />
+          </svg>
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-xs font-medium text-accent">Clase extra</span>
+          <span className="block truncate font-medium tracking-tight">{EXTRA.titulo}</span>
+        </span>
+        <span className="text-sm text-muted transition group-hover:text-ink">Ver →</span>
+      </Link>
     </>
   );
 }
