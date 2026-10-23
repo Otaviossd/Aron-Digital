@@ -63,3 +63,11 @@ export const CUPONES = {
 // Fecha de apertura de las inscripciones (día 0 del lanzamiento), formato AAAA-MM-DD. La secuencia de captura se calcula
 // contra esta fecha: quien entra tarde recibe solo los emails que faltan.
 export const FECHA_LANZAMIENTO = process.env.NEXT_PUBLIC_FECHA_LANZAMIENTO || "";
+
+// Costos para el panel de Finanzas. Cuando la Hotmart informa la tarifa real de una venta (webhook) se usa esa;
+// estos valores solo estiman las ventas donde no vino. Confirmalos en tu cuenta de Hotmart y ajustalos acá.
+export const COSTOS = {
+  tarifaHotmartPct: 9.9, // % que cobra la Hotmart por venta
+  tarifaHotmartFija: 0.5, // US$ fijos por venta
+  parteCoprodutor: 50, // % de lo que queda después de la tarifa que corresponde al coproductor (si el webhook no lo informa)
+} as const;

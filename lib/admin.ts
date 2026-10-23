@@ -17,6 +17,8 @@ export function hace(d: string | Date) {
   return `hace ${dias} ${dias === 1 ? "día" : "días"}`;
 }
 
+export const fmtUsd = (x: number) => `US$${x.toLocaleString("es-PY", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 export type ResumenAdmin = {
   activos: number;
   activos_mensual: number;

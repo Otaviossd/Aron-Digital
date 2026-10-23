@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { PRECOS } from "@/lib/config";
-import { estadoConfig, fmtFecha, hace, nombrePlan, type ResumenAdmin } from "@/lib/admin";
+import { cargarFinanzas } from "@/lib/finanzas-server";
+import { estadoConfig, fmtFecha, fmtUsd, hace, nombrePlan, type ResumenAdmin } from "@/lib/admin";
 import { Dato, Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
 
 export default function AdminResumenPage() {
@@ -15,20 +15,21 @@ export default function AdminResumenPage() {
 
 async function Resumen() {
   const supabase = await createClient();
-  const [{ data: r }, { data: ultimas }] = await Promise.all([
+  const [{ data: r }, { data: ultimas }, fin] = await Promise.all([
     supabase.rpc("admin_resumen"),
     supabase.from("subscriptions").select("email, plan, status, purchased_at, refunded_at").order("purchased_at", { ascending: false }).limit(6),
+    cargarFinanzas(supabase, null),
   ]);
   const res = (r ?? null) as ResumenAdmin | null;
   if (!res) return <Vacio>No pudimos leer los números. Ejecutá de nuevo supabase/schema.sql en el SQL Editor y recargá.</Vacio>;
 
-  const ingresos = res.activos_anual * PRECOS.anual.valor + res.activos_vitalicio * PRECOS.vitalicio.valor;
   const config = estadoConfig();
   const pendientes = [...config.pagos, ...config.email, ...config.sitio].filter((c) => !c.ok && !("opcional" in c && c.opcional));
 
   return (
     <>
       <Titulo titulo="Resumen" sub="Cómo va el curso hoy: alumnos, actividad y ventas." />
+
 
       {pendientes.length > 0 && (
         <div className="mb-10 rounded-2xl border border-amber-400/20 bg-amber-400/[0.04] p-5">
@@ -46,7 +47,11 @@ async function Resumen() {
         <Dato valor={res.activos} etiqueta="Alumnos con acceso" nota={`${res.activos_anual} de 1 año · ${res.activos_vitalicio} vitalicio`} />
         <Dato valor={res.viendo_7d} etiqueta="Viendo esta semana" nota={`${res.viendo_24h} en las últimas 24 h · ${res.viendo_30d} en 30 días`} />
         <Dato valor={res.compras_7d} etiqueta="Compras en 7 días" nota={`${res.compras} en total`} />
-        <Dato valor={`US$${ingresos}`} etiqueta="Ingresos estimados" nota="Alumnos con acceso × precio de lib/config.ts (sin promo)" />
+        <Dato
+          valor={fmtUsd(fin.f.gananciaReal)}
+          etiqueta="Ganancia real"
+          nota={`Neto ${fmtUsd(fin.f.neto)} (sin reembolsos ni tarifas) − anuncios ${fmtUsd(fin.f.gasto)}${fin.f.estimadas ? " · con datos estimados" : ""}`}
+        />
       </div>
 
       <div className="mb-12 grid grid-cols-2 gap-3 lg:grid-cols-4">

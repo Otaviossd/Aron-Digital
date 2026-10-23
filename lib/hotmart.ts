@@ -11,7 +11,45 @@ export type CompraHotmart = {
   promo: boolean;
   // Compra barata que no es ninguno de los 3 planes (ej. el bump de redes sociales): no da acceso al curso.
   extra: boolean;
+  montos: MontosCompra;
 };
+
+// Lo que la Hotmart informa de una compra. Los campos que no vienen en el evento quedan en null
+// (el panel de finanzas los estima y lo avisa).
+export type MontosCompra = {
+  bruto: number | null;
+  moneda: string | null;
+  tarifa: number | null;
+  productor: number | null;
+  coproductor: number | null;
+  afiliado: number | null;
+};
+
+const num = (v: unknown) => {
+  const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : null;
+};
+
+// Lee precio y comisiones del evento (data.purchase.price y data.commissions[] con source MARKETPLACE / PRODUCER / COPRODUCER / AFFILIATE).
+// Si las comisiones vienen en otra moneda que el precio, no se pueden sumar: se descartan y el panel estima.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function leerMontos(payload: any): MontosCompra {
+  const d = payload?.data;
+  const bruto = num(d?.purchase?.price?.value ?? d?.purchase?.price);
+  const moneda = typeof d?.purchase?.price?.currency_value === "string" ? d.purchase.price.currency_value : null;
+  const vacio: MontosCompra = { bruto, moneda, tarifa: null, productor: null, coproductor: null, afiliado: null };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const lista: any[] = Array.isArray(d?.commissions) ? d.commissions : [];
+  if (lista.length === 0) return vacio;
+  const monedas = new Set(lista.map((c) => c?.currency_value ?? c?.currency_conversion?.currency_code).filter(Boolean));
+  if (moneda && monedas.size > 0 && !(monedas.size === 1 && monedas.has(moneda))) return vacio;
+  const suma = (fuente: string) => {
+    const f = lista.filter((c) => String(c?.source ?? "").toUpperCase() === fuente);
+    if (f.length === 0) return null;
+    return Math.round(f.reduce((t, c) => t + (num(c?.value) ?? 0), 0) * 100) / 100;
+  };
+  return { bruto, moneda, tarifa: suma("MARKETPLACE"), productor: suma("PRODUCER"), coproductor: suma("COPRODUCER"), afiliado: suma("AFFILIATE") };
+}
 
 // El webhook de la Hotmart manda el "hottok" (token de verificación de la cuenta) en el header X-HOTMART-HOTTOK.
 export function hottokValido(recibido: string | null, esperado: string | undefined) {
@@ -59,5 +97,6 @@ export function leerCompra(payload: any, env: Env = process.env): CompraHotmart 
     plan,
     promo,
     extra,
+    montos: leerMontos(payload),
   };
 }

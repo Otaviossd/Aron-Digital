@@ -10,6 +10,7 @@ const iconos: Record<string, string> = {
   alumnos: "M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0zM4 21a8 8 0 0 1 16 0",
   contenido: "M4 5h16v14H4V5zm0 5h16M9 5v14",
   email: "M3 6h18v12H3V6zm0 1l9 7 9-7",
+  finanzas: "M12 3v18M16.5 7.5C15.5 6.5 14 6 12 6c-2.5 0-4 1.2-4 3s1.5 2.6 4 3 4 1.2 4 3-1.5 3-4 3c-2 0-3.5-.6-4.5-1.6",
   enlaces: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   equipo: "M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z",
   aluno: "M5 4l14 8-14 8V4z",
@@ -19,6 +20,7 @@ const iconos: Record<string, string> = {
 const items = [
   { href: "/admin", label: "Resumen", icono: "resumen" },
   { href: "/admin/embudo", label: "Embudo", icono: "embudo" },
+  { href: "/admin/finanzas", label: "Finanzas", icono: "finanzas" },
   { href: "/admin/alumnos", label: "Alumnos", icono: "alumnos" },
   { href: "/admin/contenido", label: "Contenido", icono: "contenido" },
   { href: "/admin/email", label: "Email marketing", icono: "email" },

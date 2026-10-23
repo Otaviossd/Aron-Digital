@@ -1,7 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendWelcomeEmail } from "@/lib/email";
-import { hottokValido, leerCompra } from "@/lib/hotmart";
+import { hottokValido, leerCompra, type MontosCompra } from "@/lib/hotmart";
+
+// 42703 = columna inexistente (Postgres), PGRST204 = columna inexistente en el caché de PostgREST
+const faltaColumna = (e: { code?: string }) => e.code === "42703" || e.code === "PGRST204";
+
+const columnasMontos = (m: MontosCompra) => ({
+  gross_amount: m.bruto,
+  currency: m.moneda,
+  fee_amount: m.tarifa,
+  producer_amount: m.productor,
+  coproducer_amount: m.coproductor,
+  affiliate_amount: m.afiliado,
+});
 
 // Webhook de la Hotmart. En la Hotmart: Herramientas > Webhook > Registrar webhook, con la URL
 // https://TU-DOMINIO/api/hotmart/webhook y los eventos de compra. El "hottok" va en HOTMART_HOTTOK.
@@ -46,29 +58,29 @@ async function procesar(admin: ReturnType<typeof createAdminClient>, evento: any
       if (!c) throw new Error("Compra sin email o transacción");
       // Bump / producto extra barato: el evento ya queda guardado en webhook_events; no crea suscripción.
       if (c.extra) {
-        await admin.from("extra_compras").upsert({ transaction: c.transaccion, email: c.email }, { onConflict: "transaction" });
+        const base = { transaction: c.transaccion, email: c.email };
+        const r = await admin.from("extra_compras").upsert({ ...base, ...columnasMontos(c.montos) }, { onConflict: "transaction" });
+        if (r.error && faltaColumna(r.error)) await admin.from("extra_compras").upsert(base, { onConflict: "transaction" });
         return;
       }
       const ahora = new Date();
-      const { data: fila, error } = await admin
-        .from("subscriptions")
-        .upsert(
-          {
-            email: c.email,
-            payer_email: c.email,
-            hotmart_transaction: c.transaccion,
-            plan: c.plan,
-            promo: c.promo,
-            status: "active",
-            purchased_at: ahora.toISOString(),
-            // vitalicio = sin vencimiento; 1 año = 365 días desde la compra
-            access_until: c.plan === "lifetime" ? null : new Date(ahora.getTime() + 365 * 86400000).toISOString(),
-          },
-          { onConflict: "hotmart_transaction", ignoreDuplicates: false },
-        )
-        .select("id, welcome_sent_at")
-        .single();
-      if (error) throw error;
+      const compra = {
+        email: c.email,
+        payer_email: c.email,
+        hotmart_transaction: c.transaccion,
+        plan: c.plan,
+        promo: c.promo,
+        status: "active",
+        purchased_at: ahora.toISOString(),
+        // vitalicio = sin vencimiento; 1 año = 365 días desde la compra
+        access_until: c.plan === "lifetime" ? null : new Date(ahora.getTime() + 365 * 86400000).toISOString(),
+      };
+      const guardar = (fila: Record<string, unknown>) =>
+        admin.from("subscriptions").upsert(fila, { onConflict: "hotmart_transaction", ignoreDuplicates: false }).select("id, welcome_sent_at").single();
+      let { data: fila, error } = await guardar({ ...compra, ...columnasMontos(c.montos) });
+      // Si todavía no se ejecutó supabase/finanzas.sql faltan las columnas de montos: no frenamos la compra por eso.
+      if (error && faltaColumna(error)) ({ data: fila, error } = await guardar(compra));
+      if (error || !fila) throw error ?? new Error("No se pudo guardar la compra");
 
       // Compró: corta la secuencia de carrito abandonado y completa el contacto
       await admin

@@ -131,3 +131,33 @@ export async function quitarAdmin(formData: FormData) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin", "layout");
 }
+
+// ---------- Finanzas (gasto en anuncios) ----------
+
+const PLATAFORMAS = ["Meta (Facebook/Instagram)", "TikTok", "Google / YouTube", "Otra"];
+
+export async function agregarGasto(formData: FormData) {
+  const supabase = await exigirAdmin();
+  const monto = Number(texto(formData, "monto").replace(",", "."));
+  if (!Number.isFinite(monto) || monto <= 0 || monto > 1_000_000) throw new Error("El monto tiene que ser un número mayor que cero (en US$)");
+  const fecha = texto(formData, "fecha");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) throw new Error("Fecha no válida");
+  const plataforma = PLATAFORMAS.includes(texto(formData, "plataforma")) ? texto(formData, "plataforma") : "Otra";
+  const { error } = await supabase.from("ad_spend").insert({
+    spent_on: fecha,
+    platform: plataforma,
+    amount_usd: Math.round(monto * 100) / 100,
+    note: texto(formData, "nota").slice(0, 200) || null,
+  });
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin", "layout");
+}
+
+export async function borrarGasto(formData: FormData) {
+  const supabase = await exigirAdmin();
+  const id = texto(formData, "id");
+  if (!id) return;
+  const { error } = await supabase.from("ad_spend").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin", "layout");
+}
