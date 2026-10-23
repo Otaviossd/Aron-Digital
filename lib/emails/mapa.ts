@@ -35,15 +35,11 @@ const cupon = (codigo: string, pct: string) =>
   bloque(
     `<span style="color:#b9c0c3">Tu cupón de ${pct} de descuento</span><br/><span style="font-size:30px;font-weight:700;letter-spacing:6px;color:#ffffff">${codigo}</span><br/><span style="color:#b9c0c3">Escribilo en el checkout, en el campo "cupón".</span>`,
   );
-// Los testimonios son de ejemplo: hay que reemplazarlos por testimonios reales (con permiso) antes de activar el envío.
-const testimonio = (texto: string, quien: string) =>
-  bloque(`<span style="font-size:16px;line-height:1.6;color:#ffffff">“${texto}”</span><br/><span style="color:#39ff7e;font-weight:600">${quien}</span> <span style="color:#7d878b">· testimonio de ejemplo, reemplazar por uno real</span>`);
 const firma = `<p style="margin:22px 0 0;font-family:Inter,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;color:#ffffff">Aaron Dalla Rosa<br/><span style="color:#b9c0c3">La Nueva Ola Academy</span></p>`;
 
 export function construirMapa(ctx: Ctx) {
   const base = ctx.siteUrl.replace(/\/$/, "");
   const ventas = `${base}/ventas#comprar`;
-  const fin = ctx.ofertaFin || "[fecha de cierre]";
   const mail = enlace(`mailto:${SOPORTE_EMAIL}`, SOPORTE_EMAIL);
   const baja = (txt: string) => `${txt} <a href="#" style="color:#b9c0c3">Darme de baja</a>`;
   const pieLista = baja(`Recibís este email porque dejaste tus datos en ${ctx.marca}.`);
@@ -259,17 +255,19 @@ export function construirMapa(ctx: Ctx) {
     ),
   });
   add("S3", {
-    asunto: "Mirá cómo es una clase por dentro",
+    asunto: "Así es una clase por dentro",
     cuando: "2 días después",
-    objetivo: "Bajar la duda '¿cómo es el curso?' mostrando una muestra, sin depender de testimonios.",
-    nota: "Necesita una clase de muestra o un clip del Aaron con enlace público. Cuando haya alumnos reales, se pueden sumar testimonios acá.",
+    objetivo: "Bajar la duda '¿cómo es el curso?' explicando el formato de cada clase.",
+    nota: "Sin testimonios: el curso todavía no tiene alumnos. Cuando haya alumnos reales (con su permiso), se pueden sumar en este punto.",
     html: L(
-      `${titulo("Mirá cómo es una clase por dentro")}
-       ${parrafo("Antes de decidir, lo mejor es ver el estilo de Aaron: cómo explica, cómo muestra cada paso y a qué ritmo.")}
-       ${boton(ventas, "Ver una clase de muestra")}
-       ${parrafo("[Enlazar acá el clip o la clase de muestra pública.]")}
+      `${titulo("Así es una clase por dentro")}
+       ${parrafo("Antes de decidir, está bien querer saber cómo se aprende. Cada clase está pensada para que no te pierdas:")}
+       ${paso(1, `${fuerte("Explicación clara:")} Aaron muestra cada paso mientras corta, sin saltear nada.`)}
+       ${paso(2, `${fuerte("Pocos minutos por clase:")} las podés ver entre cliente y cliente, desde el celular.`)}
+       ${paso(3, `${fuerte("Para repetir:")} volvés a verla las veces que haga falta, hasta que te salga solo.`)}
+       ${boton(ventas, "Ver cómo es el curso")}
        ${bloque(`${fuerte("Sin riesgo:")} si el curso no es lo que esperabas, tenés ${DIAS_REEMBOLSO} días para pedir el reembolso.`)}`,
-      "Un adelanto del curso.",
+      "Cómo se aprende dentro del curso.",
     ),
   });
   add("S4", {
@@ -327,16 +325,15 @@ export function construirMapa(ctx: Ctx) {
     ),
   });
   add("S8", {
-    asunto: "Novedades en La Nueva Ola Academy",
+    asunto: "Seguimos sumando clases a La Nueva Ola Academy",
     cuando: "21 días después",
-    objetivo: "Aportar algo nuevo (clase, bono o mejora) como motivo para volver.",
-    nota: "Completar con la novedad real del momento antes de enviar.",
+    objetivo: "Mostrar que el curso crece y dar un motivo para volver a mirarlo.",
     html: L(
-      `${titulo("Hay novedades")}
-       ${parrafo("Sumamos contenido nuevo a La Nueva Ola Academy. [Escribir acá la novedad real: nueva clase, bono, mejora.]")}
-       ${parrafo("Si todavía no entraste, este es un buen momento.")}
-       ${boton(ventas, "Ver qué hay de nuevo")}`,
-      "Hay contenido nuevo.",
+      `${titulo("El curso sigue creciendo")}
+       ${parrafo("La Nueva Ola Academy no es un curso cerrado: Aaron sigue sumando clases y mejoras, y con el acceso vitalicio las recibís todas sin pagar de nuevo.")}
+       ${parrafo("Si todavía no entraste, este es un buen momento para empezar y no quedarte mirando.")}
+       ${boton(ventas, "Ver el curso")}`,
+      "El curso sigue creciendo.",
     ),
   });
   add("R1", {
@@ -367,28 +364,29 @@ export function construirMapa(ctx: Ctx) {
     ),
   });
   add("R3", {
-    asunto: "Un consejo de Aaron para esta semana",
+    asunto: "Un consejo para tu próximo corte",
     cuando: "60 días sin comprar",
     objetivo: "Aportar valor gratis para mantener la relación, sin vender fuerte.",
-    nota: "Aaron escribe un consejo corto real de barbería para cada email de este tipo.",
+    nota: "Cada vez que se repita este tipo de email se puede cambiar el consejo.",
     html: L(
-      `${titulo("Un consejo de Aaron para esta semana")}
-       ${parrafo("[Consejo corto y práctico de barbería escrito por Aaron: una técnica, un error común o un hábito.]")}
+      `${titulo("Un consejo para tu próximo corte")}
+       ${parrafo("Antes de tocar la máquina, dedicale dos minutos a la consulta: preguntale al cliente cómo lo usa, cuánto tiempo tiene para peinarse y qué fue lo que no le gustó del último corte.")}
+       ${parrafo("Esa conversación corta evita la mayoría de los reclamos y hace que el cliente sienta que lo escuchás. Y un cliente que se siente escuchado vuelve.")}
        ${parrafo("Si querés aprender así, paso a paso, el curso sigue abierto.")}
        ${boton(ventas, "Ver el curso")}`,
-      "Un consejo para esta semana.",
+      "Un consejo práctico de barbería.",
     ),
   });
   add("R4", {
-    asunto: "Lo nuevo en La Nueva Ola Academy",
+    asunto: "Lo que pasa dentro de La Nueva Ola Academy",
     cuando: "75 días sin comprar",
-    objetivo: "Mostrar que el curso crece: motivo real para volver a mirar.",
-    nota: "Completar con novedades reales.",
+    objetivo: "Mostrar que la plataforma está viva y recordar el formato.",
     html: L(
-      `${titulo("Lo nuevo en La Nueva Ola Academy")}
-       ${parrafo("[Novedades reales: clases nuevas, bonos, mejoras de la plataforma.]")}
-       ${boton(ventas, "Ver qué hay de nuevo")}`,
-      "El curso sigue creciendo.",
+      `${titulo("Lo que pasa dentro de la Academy")}
+       ${parrafo("Mientras vos seguís con tu día, la plataforma sigue creciendo: nuevas clases, mejoras y bonos para quienes ya están adentro.")}
+       ${parrafo("Recordá que el pago es único y que tenés garantía de " + DIAS_REEMBOLSO + " días.")}
+       ${boton(ventas, "Ver qué incluye")}`,
+      "La plataforma sigue creciendo.",
     ),
   });
   add("R5", {
@@ -440,16 +438,15 @@ export function construirMapa(ctx: Ctx) {
     ),
   });
   add("M1", {
-    asunto: "El consejo del mes + novedades",
+    asunto: "El consejo del mes: la regla de los dos minutos",
     cuando: "Cada mes, desde el mes 7 y hasta que compre o pida la baja",
-    objetivo: "Mantener viva la relación a largo plazo: valor gratis + novedades + oferta suave.",
-    nota: "Es un email recurrente: cada mes cambia el consejo y la novedad.",
+    objetivo: "Mantener viva la relación a largo plazo: valor gratis + una puerta abierta al curso.",
+    nota: "Es un email recurrente: el consejo se renueva cada mes (este es el del primer mes).",
     html: L(
       `${titulo("El consejo del mes")}
-       ${parrafo("[Consejo corto de Aaron del mes.]")}
-       ${subtitulo("Novedades")}
-       ${parrafo("[Novedades del curso del mes.]")}
-       ${boton(ventas, "Ver el curso")}`,
+       ${parrafo("Dedicá dos minutos antes de cada corte a revisar la cabeza del cliente: la forma del cráneo, los remolinos y el crecimiento del pelo. Ahí se define cómo va a quedar el corte, antes de empezar.")}
+       ${parrafo("Es un hábito chico que separa a los que cortan de memoria de los que cortan con criterio.")}
+       ${boton(ventas, "Aprender más en el curso")}`,
       "Tu consejo del mes.",
     ),
   });
@@ -579,9 +576,26 @@ export function construirMapa(ctx: Ctx) {
     asunto: ASUNTO_COMPRA,
     cuando: "Al instante, cuando se aprueba el pago",
     objetivo: "Dar el acceso con un clic y dejar claro cómo empezar.",
-    html: htmlCompra({ accessLink: "#", loginLink: `${base}/entrar`, to: "alumno@ejemplo.com", plan: "lifetime" }),
+    html: htmlCompra({ accessLink: "#", loginLink: `${base}/entrar`, to: "tu@email.com", plan: "lifetime" }),
   });
+  const bloqueExtra = bloque(`${fuerte(EXTRA.titulo)}<br/>${EXTRA.descripcion}<br/><br/><span style="font-size:22px;font-weight:700;color:#ffffff">US$${EXTRA.valor}</span> <span style="color:#b9c0c3;text-decoration:line-through">US$${EXTRA.valorAntes}</span> <span style="color:#b9c0c3">precio de alumno durante tus primeros ${EXTRA.diasPrecio} días</span>`);
+  const verExtra = boton(`${base}/aulas/extra`, "Quiero la clase extra");
   add("C2", {
+    asunto: "Una cosa más antes de empezar: sumá la clase extra",
+    cuando: "3 horas después de comprar (solo si no tiene la clase extra)",
+    objetivo: "Primera oferta de la clase extra, con el interés de compra todavía alto.",
+    nota: `Regla de negocio propuesta: el precio de alumno (US$${EXTRA.valor}) vale durante los primeros ${EXTRA.diasPrecio} días de la compra; después vuelve a US$${EXTRA.valorAntes}. Hay que programarlo para que la urgencia sea real. Necesita el producto extra y su enlace en la Hotmart.`,
+    html: A(
+      `${titulo("Una cosa más antes de empezar")}
+       ${parrafo("Ya tenés el curso, y eso es lo más importante. Pero cortar bien es solo la mitad del camino: la otra mitad es que te encuentren y te elijan.")}
+       ${parrafo("Por eso armamos una clase extra, pensada para quienes recién empiezan a mostrar su trabajo:")}
+       ${bloqueExtra}
+       ${verExtra}
+       ${parrafo("Se abre en tu plataforma apenas se confirma el pago, sin esperar.")}`,
+      "Precio especial de alumno por tiempo limitado.",
+    ),
+  });
+  add("C3", {
     asunto: "Tu primera clase te lleva 10 minutos",
     cuando: "1 día después de comprar",
     objetivo: "Activar: quien mira la primera clase en las primeras 24 h casi siempre termina el curso.",
@@ -589,24 +603,28 @@ export function construirMapa(ctx: Ctx) {
       `${titulo("Tu primera clase te lleva 10 minutos")}
        ${parrafo("Lo más difícil es empezar. Hoy lo hacés fácil: abrí la plataforma y mirá solo la primera clase.")}
        ${boton(`${base}/aulas`, "Ir a mi primera clase")}
-       ${parrafo("Después seguí el orden de los módulos. No hace falta apurarse: lo importante es la constancia.")}`,
+       ${parrafo("Después seguí el orden de los módulos. No hace falta apurarse: lo importante es la constancia.")}
+       ${parrafo(`${fuerte("P. D.:")} cuando quieras, también podés sumar ${enlace(`${base}/aulas/extra`, EXTRA.titulo)} a precio de alumno.`)}`,
       "Un primer paso corto.",
     ),
   });
-  add("C3", {
-    asunto: "Una clase extra pensada para llenar tu agenda",
+  add("C4", {
+    asunto: "¿De qué sirve cortar bien si nadie lo ve?",
     cuando: "3 días después de comprar (solo si no tiene la clase extra)",
-    objetivo: "Venta cruzada: ofrecer la clase extra a precio especial de alumno.",
-    nota: "Necesita el producto extra creado en la Hotmart y su link en la Vercel.",
+    objetivo: "Segunda oferta, centrada en el problema real: conseguir clientes.",
     html: A(
-      `${titulo("Una clase extra para llenar tu agenda")}
-       ${parrafo("Saber cortar bien es la mitad. La otra mitad es que te encuentren. Por eso armamos una clase extra.")}
-       ${bloque(`${fuerte(EXTRA.titulo)}<br/>${EXTRA.descripcion}<br/><br/><span style="font-size:20px;font-weight:700;color:#ffffff">US$${EXTRA.valor}</span> <span style="color:#b9c0c3;text-decoration:line-through">US$${EXTRA.valorAntes}</span> <span style="color:#b9c0c3">precio especial para alumnos</span>`)}
-       ${boton(`${base}/aulas/extra`, "Ver la clase extra")}`,
-      "Precio especial solo para alumnos.",
+      `${titulo("¿De qué sirve cortar bien si nadie lo ve?")}
+       ${parrafo("Hay barberos que cortan increíble y tienen la agenda vacía. Y otros que cortan parecido y no dan abasto. La diferencia casi nunca es la técnica: es cómo se muestran.")}
+       ${parrafo("En la clase extra Aaron te explica, sin vueltas:")}
+       ${paso(1, `${fuerte("Qué publicar")} para que te sigan las personas correctas.`)}
+       ${paso(2, `${fuerte("Cómo mostrar tus cortes")} para que se vean profesionales.`)}
+       ${paso(3, `${fuerte("Cómo convertir seguidores en clientes")} que reservan.`)}
+       ${bloqueExtra}
+       ${verExtra}`,
+      "Cortar bien no alcanza si nadie te ve.",
     ),
   });
-  add("C4", {
+  add("C5", {
     asunto: "¿Cómo vas? Si algo no te cierra, escribinos",
     cuando: "5 días después de comprar",
     objetivo: "Prevenir reembolsos: ayudar antes de que termine la garantía de 7 días.",
@@ -618,50 +636,80 @@ export function construirMapa(ctx: Ctx) {
       "Estamos para ayudarte.",
     ),
   });
-  add("C5", {
-    asunto: "Se abrieron tus bonos",
+  add("C6", {
+    asunto: "Se abrieron tus bonos (y un complemento ideal)",
     cuando: `${DIAS_BONO} días después de comprar`,
-    objetivo: "Reenganchar con un motivo real para volver.",
+    objetivo: "Reenganchar con un motivo real para volver, y recordar la clase extra como complemento.",
     html: A(
       `${titulo("Tus bonos ya están abiertos")}
        ${parrafo(`Pasaron ${DIAS_BONO} días y se liberaron los bonos de tu acceso. Entrá y empezá por el que más te sirva.`)}
-       ${boton(`${base}/aulas`, "Ver mis bonos")}`,
+       ${boton(`${base}/aulas`, "Ver mis bonos")}
+       ${subtitulo("Para completar tu aprendizaje")}
+       ${parrafo(`Quienes quieren más clientes suelen sumar ${fuerte(EXTRA.titulo)}. Todavía tenés el precio de alumno: US$${EXTRA.valor} en lugar de US$${EXTRA.valorAntes}.`)}
+       ${enlace(`${base}/aulas/extra`, "Ver la clase extra")}`,
       "Tus bonos ya están disponibles.",
     ),
   });
-  add("C6", {
-    asunto: "Última llamada: la clase extra a precio de alumno",
-    cuando: "10 días después de comprar (solo si no tiene la clase extra)",
-    objetivo: "Segunda y última oferta de la clase extra.",
+  add("C7", {
+    asunto: "Lo que vas a aprender en la clase extra, en 3 puntos",
+    cuando: "9 días después de comprar (solo si no tiene la clase extra)",
+    objetivo: "Tercera oferta: detallar el contenido para quien todavía duda.",
     html: A(
-      `${titulo("Última llamada para la clase extra")}
-       ${parrafo(`Hasta hoy podés sumar "${EXTRA.titulo}" a tu acceso por US$${EXTRA.valor} en lugar de US$${EXTRA.valorAntes}.`)}
-       ${boton(`${base}/aulas/extra`, "Quiero la clase extra")}
-       ${parrafo("Se abre en tu plataforma apenas se confirma el pago.")}`,
-      "Precio de alumno por última vez.",
+      `${titulo("La clase extra, en 3 puntos")}
+       ${paso(1, `${fuerte("Qué publicar.")} Dejás de improvisar contenido: sabés qué mostrar para que te sigan personas de tu zona que buscan un barbero.`)}
+       ${paso(2, `${fuerte("Cómo mostrar tus cortes.")} Ángulos, luz y detalles simples para que cada corte se vea como lo que es: trabajo profesional.`)}
+       ${paso(3, `${fuerte("Cómo convertir seguidores en clientes.")} El paso de "me gusta tu trabajo" a "quiero reservar un turno".`)}
+       ${bloqueExtra}
+       ${verExtra}`,
+      "Qué vas a aprender, punto por punto.",
     ),
   });
-  add("C7", {
+  add("C8", {
+    asunto: "Tu precio de alumno vence en 2 días",
+    cuando: `${EXTRA.diasPrecio - 2} días después de comprar (solo si no tiene la clase extra)`,
+    objetivo: "Urgencia real: el precio de alumno termina a los 14 días.",
+    nota: `Solo es verdad si se programa el vencimiento: a los ${EXTRA.diasPrecio} días de la compra la clase extra pasa a US$${EXTRA.valorAntes}.`,
+    html: A(
+      `${titulo("Tu precio de alumno vence en 2 días")}
+       ${parrafo(`Como alumno tenés la clase extra a US$${EXTRA.valor} durante tus primeros ${EXTRA.diasPrecio} días. En 2 días vuelve a US$${EXTRA.valorAntes}.`)}
+       ${verExtra}
+       ${parrafo("Se abre al instante en tu plataforma. Sin esperar y sin trámites.")}`,
+      "El precio especial está por terminar.",
+    ),
+  });
+  add("C9", {
+    asunto: "Último día: la clase extra a US$10",
+    cuando: `${EXTRA.diasPrecio} días después de comprar (solo si no tiene la clase extra)`,
+    objetivo: "Cierre de la oferta de la clase extra.",
+    html: A(
+      `${titulo("Hoy es el último día")}
+       ${parrafo(`Hoy termina tu precio de alumno. Mañana, "${EXTRA.titulo}" pasa a US$${EXTRA.valorAntes}.`)}
+       ${bloqueExtra}
+       ${verExtra}
+       ${parrafo("Es la última vez que te lo recordamos. Gracias por ser parte de La Nueva Ola Academy.")}`,
+      "Último día del precio de alumno.",
+    ),
+  });
+  add("C10", {
     asunto: "¿Nos contás cómo te fue?",
-    cuando: "14 días después de comprar",
-    objetivo: "Conseguir testimonios reales y feedback para mejorar el curso (y alimentar los emails de prueba social).",
+    cuando: "21 días después de comprar",
+    objetivo: "Conseguir testimonios reales y feedback para mejorar el curso.",
     html: A(
       `${titulo("¿Nos contás cómo te fue?")}
-       ${parrafo("Ya llevás un tiempo con el curso. Tu opinión nos ayuda a mejorarlo y a que otros barberos se animen.")}
+       ${parrafo("Ya llevás unas semanas con el curso. Tu opinión nos ayuda a mejorarlo y a que otros barberos se animen.")}
        ${parrafo(`Respondé este email con una o dos frases sobre tu experiencia, o escribinos a ${mail}.`)}
        ${parrafo("Si nos das permiso, tu comentario puede aparecer en nuestra página.")}`,
       "Tu opinión nos ayuda.",
     ),
   });
-  add("C8", {
+  add("C11", {
     asunto: "Un mes con La Nueva Ola Academy",
     cuando: "30 días después de comprar",
-    objetivo: "Retención y novedades: que siga activo y vuelva a la plataforma.",
-    nota: "Completar con novedades reales.",
+    objetivo: "Retención: que siga activo y vuelva a la plataforma.",
     html: A(
       `${titulo("Un mes juntos")}
-       ${parrafo("Hace un mes que sos parte de La Nueva Ola Academy. Seguí avanzando: lo que más cambia resultados es la constancia.")}
-       ${parrafo("[Novedades del mes: nuevas clases, bonos, mejoras.]")}
+       ${parrafo("Hace un mes que sos parte de La Nueva Ola Academy. Lo que más cambia resultados es la constancia: seguí avanzando clase a clase.")}
+       ${parrafo("La plataforma sigue creciendo, y con tu acceso recibís las novedades.")}
        ${boton(`${base}/aulas`, "Seguir aprendiendo")}`,
       "Un mes después.",
     ),
@@ -773,7 +821,7 @@ export function construirMapa(ctx: Ctx) {
     F4: ["El año se termina", "Faltan 4"], F3: ["Lo que vas a recibir", "Faltan 3"], F2: ["Dejá todo listo", "Faltan 2"],
     F1: ["Mañana abrimos", "Víspera"], F0a: ["¡Hoy abrimos!", "Apertura · mañana"], F0b: ["Primer día", "Apertura · noche"],
   }, 3, 0);
-  nodo({ id: "aVentas", col: 15, row: 0, tipo: "pagina", titulo: "Página de ventas", sub: "Desde la apertura", detalle: "Los emails de apertura llevan a la página de ventas. Quien no compra sigue en la secuencia 'Vio la oferta y no compró' (fila de abajo)." });
+  nodo({ id: "aVentas", col: 15, row: 0, tipo: "mal", titulo: "Apertura: pasan a ventas", sub: "Si no compran: se unen a 'Vio la oferta y no compró'", detalle: "Los emails de apertura llevan a la página de ventas. Después de la apertura, quienes estaban en la lista y todavía no compraron se unen al mismo grupo que los visitantes que vieron la oferta y no avanzaron (fila de abajo, 'Vio la oferta y no compró'), y reciben exactamente los mismos emails hasta que compren." });
 
   // Fila 1 · columna vertebral de ventas
   nodo({ id: "ventas", col: 1, row: 1, tipo: "pagina", titulo: "Página de ventas", sub: "/ventas", detalle: "Sin precios a la vista. Para ver la oferta, la persona deja nombre, email y WhatsApp." });
@@ -792,13 +840,14 @@ export function construirMapa(ctx: Ctx) {
 
   // Filas 3-5 · pagó
   nodo({ id: "bien", col: 5, row: 3, tipo: "bien", titulo: "Pagó", sub: "Se convierte en alumno", detalle: "El webhook libera el acceso, corta toda secuencia de recuperación y envía la confirmación. Según lo que compró, entra a uno de estos caminos." });
-  nodo({ id: "solo", col: 6, row: 3, tipo: "bien", titulo: "Solo el curso", sub: "Sin la clase extra", detalle: "Recibe las ofertas de la clase extra (días 3 y 10) y los emails de seguimiento. Si compra la clase extra, pasa al camino 'Curso + clase extra'." });
+  nodo({ id: "solo", col: 6, row: 3, tipo: "bien", titulo: "Solo el curso", sub: "Sin la clase extra", detalle: "Recibe 6 emails con la oferta de la clase extra (3 horas, días 3, 7, 9, 12 y 14, y una mención en el día 1) mezclados con los de seguimiento. Si compra la clase extra, pasa al camino 'Curso + clase extra' y deja de recibir las ofertas." });
   nodo({ id: "both", col: 6, row: 4, tipo: "bien", titulo: "Curso + clase extra", sub: "Cliente completo", detalle: "Compró también la clase extra (en el checkout o después). Deja de recibir ofertas de la clase extra." });
   nodo({ id: "ren", col: 6, row: 5, tipo: "bien", titulo: "Plan de 1 año", sub: "Antes de que venza", detalle: "Quien compró el acceso de 1 año recibe 3 avisos antes del vencimiento, con la opción de pasar a vitalicio." });
-  const c = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8"];
+  const c = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11"];
   fila(c, {
-    C1: ["Confirmación de compra", "Al instante"], C2: ["Tu primera clase", "1 día"], C3: ["Clase extra a precio de alumno", "3 días"], C4: ["¿Cómo vas?", "5 días"],
-    C5: ["Se abrieron tus bonos", "7 días"], C6: ["Última llamada: clase extra", "10 días"], C7: ["¿Nos contás cómo te fue?", "14 días"], C8: ["Un mes juntos", "30 días"],
+    C1: ["Confirmación de compra", "Al instante"], C2: ["Sumá la clase extra", "3 horas · oferta"], C3: ["Tu primera clase", "1 día"], C4: ["¿De qué sirve cortar bien si nadie lo ve?", "3 días · oferta"],
+    C5: ["¿Cómo vas?", "5 días"], C6: ["Tus bonos + complemento", "7 días · oferta"], C7: ["La clase extra en 3 puntos", "9 días · oferta"], C8: ["Tu precio de alumno vence", "12 días · oferta"],
+    C9: ["Último día: clase extra", "14 días · oferta"], C10: ["¿Nos contás cómo te fue?", "21 días"], C11: ["Un mes juntos", "30 días"],
   }, 7, 3);
   const x = ["X1", "X2", "X3", "X4"];
   fila(x, { X1: ["Compra confirmada: curso + extra", "Al instante"], X2: ["Sacale el máximo", "2 días"], X3: ["Contanos tu resultado", "14 días"], X4: ["Un mes después", "30 días"] }, 7, 4);
@@ -806,7 +855,7 @@ export function construirMapa(ctx: Ctx) {
   fila(y, { Y1: ["Te quedan 2 meses", "Día 300"], Y2: ["Vence en 3 semanas", "Día 340"], Y3: ["Vence mañana", "Día 364"] }, 7, 5);
 
   // Fila 6 · vio la oferta y no fue al checkout + reactivación larga
-  nodo({ id: "sn", col: 3, row: 6, tipo: "mal", titulo: "Vio la oferta y no avanzó", sub: "No llegó al checkout", detalle: "Dejó sus datos (o estaba en la lista de espera) pero no escribió su email en el checkout. Recibe emails por semanas y, si sigue sin comprar, pasa a la reactivación larga." });
+  nodo({ id: "sn", col: 3, row: 6, tipo: "mal", titulo: "Vio la oferta y no compró", sub: "Visitantes + lista de espera", detalle: "Grupo común: visitantes que dejaron sus datos y no avanzaron, y personas de la lista de espera que no compraron tras la apertura. Reciben los mismos emails por semanas y, si siguen sin comprar, pasan a la reactivación larga (meses) hasta que compren o pidan la baja." });
   const s = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"];
   fila(s, {
     S1: ["Tus accesos te esperan", "30 min"], S2: ["Imaginate aprendiendo", "1 día"], S3: ["Mirá una clase por dentro", "2 días"], S4: ["Black Friday: invertí", "4 días"],

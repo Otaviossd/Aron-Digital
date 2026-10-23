@@ -49,6 +49,7 @@ export const EXTRA = {
   descripcion: "Una clase práctica para llenar tu agenda: qué publicar, cómo mostrar tus cortes y cómo convertir seguidores en clientes.",
   valor: 10,
   valorAntes: 20, // precio "de" tachado
+  diasPrecio: 14, // el precio de alumno dura 14 días desde la compra (hay que programarlo en el sitio/Hotmart)
   checkoutUrl: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA,
   videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...)
 } as const;
