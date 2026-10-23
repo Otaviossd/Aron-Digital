@@ -1,14 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { Arista, FichaEmail, Nodo, TipoNodo } from "@/lib/emails/mapa";
 
-const W = 224;
-const HE = 178; // alto de un nodo de email (con miniatura)
+const W = 240;
+const HE = 214; // alto de un nodo de email (con miniatura)
 const HN = 76; // alto de los demás nodos
-const GX = 262;
-const GY = 214;
+const GX = 278;
+const GY = 250;
 const PAD = 28;
+const MINI = (W - 20) / 600; // escala de la miniatura
+const ALTO_MINI = 124; // alto visible de la miniatura
+const ZOOM_VIVO = 0.45; // por debajo de este zoom no se cargan los emails (el mapa se mueve más fluido)
 
 const estilos: Record<TipoNodo, string> = {
   origen: "border-white/25 bg-white/[0.05]",
@@ -45,6 +49,10 @@ export default function MapaEmails({ nodos, aristas, emails }: Props) {
   const [pantalla, setPantalla] = useState(false);
   const [escala, setEscala] = useState(0.6);
   const caja = useRef<HTMLDivElement>(null);
+  const [visibles, setVisibles] = useState<Set<string>>(new Set());
+  const [montado, setMontado] = useState(false);
+  const elementos = useRef(new Map<string, HTMLElement>());
+  useEffect(() => setMontado(true), []);
 
   const porId = useMemo(() => new Map(nodos.map((n) => [n.id, n])), [nodos]);
   const ancho = PAD * 2 + (Math.max(...nodos.map((n) => n.col)) + 1) * GX - (GX - W);
@@ -81,6 +89,27 @@ export default function MapaEmails({ nodos, aristas, emails }: Props) {
       document.body.style.overflow = "";
     };
   }, [pantalla, abierto]);
+
+  // Solo se cargan los emails que están a la vista (y con el mapa lo bastante acercado): evita que el sitio se trabe.
+  useEffect(() => {
+    if (!caja.current) return;
+    const obs = new IntersectionObserver(
+      (entradas) => {
+        setVisibles((prev) => {
+          const sig = new Set(prev);
+          for (const e of entradas) {
+            const id = (e.target as HTMLElement).dataset.id!;
+            if (e.isIntersecting) sig.add(id);
+            else sig.delete(id);
+          }
+          return sig;
+        });
+      },
+      { root: caja.current, rootMargin: "200px" },
+    );
+    elementos.current.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [pantalla, nodos]);
 
   const zoom = (f: number) => setEscala((e) => Math.max(0.25, Math.min(1.4, +(e * f).toFixed(3))));
   const btn = "rounded-full border border-line-strong px-3.5 py-1.5 text-xs font-medium text-ink transition hover:bg-white/5";
@@ -132,42 +161,63 @@ export default function MapaEmails({ nodos, aristas, emails }: Props) {
 
             {nodos.map((n) => {
               const f = n.email ? emails[n.email] : undefined;
+              const vivo = escala >= ZOOM_VIVO && visibles.has(n.id);
               return (
-                <button
+                <div
                   key={n.id}
-                  type="button"
-                  onClick={() => setAbierto(n.id)}
+                  data-id={n.id}
+                  ref={(el) => {
+                    if (el) elementos.current.set(n.id, el);
+                    else elementos.current.delete(n.id);
+                  }}
                   style={{ left: px(n), top: py(n), width: W, height: alto(n) }}
                   className={`absolute flex flex-col rounded-xl border p-2.5 text-left transition ${estilos[n.tipo]} ${n.email ? "" : "justify-center px-3.5"}`}
                 >
-                  <span className="flex items-start gap-2">
-                    {f && <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${f.estado === "activo" ? "bg-emerald-400" : "bg-amber-400"}`} />}
-                    <span className="line-clamp-2 text-[13px] font-medium leading-tight tracking-tight text-ink">{n.titulo}</span>
-                  </span>
-                  {n.sub && <span className="mt-0.5 truncate text-[11px] text-faint">{n.sub}</span>}
+                  <button type="button" onClick={() => setAbierto(n.id)} className="block w-full text-left">
+                    <span className="flex items-start gap-2">
+                      {f && <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${f.estado === "activo" ? "bg-emerald-400" : "bg-amber-400"}`} />}
+                      <span className="line-clamp-2 text-[13px] font-medium leading-tight tracking-tight text-ink">{n.titulo}</span>
+                    </span>
+                    {n.sub && <span className="mt-0.5 block truncate text-[11px] text-faint">{n.sub}</span>}
+                  </button>
                   {f && (
-                    <span className="relative mt-1.5 block flex-1 overflow-hidden rounded-md bg-black">
-                      <iframe
-                        title={`Miniatura: ${f.asunto}`}
-                        srcDoc={f.html}
-                        sandbox=""
-                        tabIndex={-1}
-                        loading="lazy"
-                        className="pointer-events-none absolute left-0 top-0 border-0"
-                        style={{ width: 600, height: 340, transform: "scale(0.34)", transformOrigin: "top left" }}
-                      />
+                    <span className="relative mt-1.5 block overflow-hidden rounded-md bg-black" style={{ height: ALTO_MINI }}>
+                      {vivo ? (
+                        <iframe
+                          title={`Miniatura: ${f.asunto}`}
+                          srcDoc={f.html}
+                          sandbox=""
+                          className="absolute left-0 top-0 border-0"
+                          style={{ width: 600, height: ALTO_MINI / MINI, transform: `scale(${MINI})`, transformOrigin: "top left" }}
+                        />
+                      ) : (
+                        <span className="flex h-full flex-col gap-1.5 p-2.5" aria-hidden="true">
+                          <span className="h-1.5 w-3/5 rounded bg-accent/40" />
+                          <span className="h-1 w-full rounded bg-white/15" />
+                          <span className="h-1 w-5/6 rounded bg-white/15" />
+                          <span className="h-1 w-4/6 rounded bg-white/15" />
+                          <span className="mt-auto h-3 w-1/3 rounded-full bg-accent/50" />
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setAbierto(n.id)}
+                        className="absolute right-1 top-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-medium text-ink backdrop-blur transition hover:bg-accent hover:text-black"
+                      >
+                        Ampliar
+                      </button>
                     </span>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
         </div>
       </div>
 
-      {actual && (
-        <div className="fixed inset-0 z-[60] flex items-stretch justify-center bg-black/80 p-3 sm:p-6" onClick={() => setAbierto(null)}>
-          <div className="flex w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-line bg-surface" onClick={(e) => e.stopPropagation()}>
+      {actual && montado && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-stretch justify-center overflow-hidden bg-black/80 p-2 sm:p-6" onClick={() => setAbierto(null)}>
+          <div className="flex min-w-0 max-w-6xl flex-1 flex-col overflow-hidden rounded-2xl border border-line bg-surface" onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-wrap items-center gap-3 border-b border-line px-5 py-3.5">
               <h2 className="text-base font-semibold tracking-tight">{actual.titulo}</h2>
               {ficha && (
@@ -187,7 +237,7 @@ export default function MapaEmails({ nodos, aristas, emails }: Props) {
               </span>
             </div>
             {ficha ? (
-              <div className="grid min-h-0 flex-1 gap-0 lg:grid-cols-[320px_1fr]">
+              <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] gap-0 overflow-auto lg:grid-cols-[320px_minmax(0,1fr)] lg:grid-rows-1 lg:overflow-hidden">
                 <dl className="space-y-4 overflow-auto border-b border-line p-5 text-sm lg:border-b-0 lg:border-r">
                   <div>
                     <dt className="text-xs font-medium text-faint">Asunto</dt>
@@ -209,14 +259,15 @@ export default function MapaEmails({ nodos, aristas, emails }: Props) {
                   )}
                 </dl>
                 <div className="min-h-0 bg-black">
-                  <iframe title={ficha.asunto} srcDoc={ficha.html} sandbox="" className="h-full min-h-[480px] w-full" />
+                  <iframe title={ficha.asunto} srcDoc={ficha.html} sandbox="" className="block h-full min-h-[520px] w-full" />
                 </div>
               </div>
             ) : (
               <p className="max-w-2xl p-6 text-sm leading-relaxed text-muted">{actual.detalle}</p>
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
