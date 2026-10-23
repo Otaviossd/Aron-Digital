@@ -40,7 +40,7 @@ export default function FormCaptura({ tono = "oscuro", id = "captura", textoBoto
       <div className={`rounded-2xl border p-6 ${claro ? "border-black/10 bg-white text-bg" : "border-accent/30 bg-accent/[0.06]"}`}>
         <p className="text-lg font-semibold tracking-tight">¡Listo, estás en la lista!</p>
         <p className={`mt-2 text-sm leading-relaxed ${claro ? "text-black/60" : "text-muted"}`}>
-          Para quedarte con el descuento exclusivo, entrá ahora al grupo de WhatsApp. Ahí avisamos todo primero.
+          Último paso para quedarte con tu 50% de descuento y el acceso anticipado: entrá ahora al grupo de WhatsApp. Ahí avisamos primero el día de apertura y todo lo de tu descuento.
         </p>
         <a
           href={WHATSAPP_GRUPO_URL}
@@ -48,7 +48,7 @@ export default function FormCaptura({ tono = "oscuro", id = "captura", textoBoto
           rel="noreferrer"
           className="neon mt-5 flex w-full items-center justify-center rounded-full px-6 py-3.5 text-sm font-semibold transition"
         >
-          Entrar al grupo de WhatsApp
+          Entrar al grupo y asegurar mi 50% OFF
         </a>
       </div>
     );
@@ -81,7 +81,7 @@ export default function FormCaptura({ tono = "oscuro", id = "captura", textoBoto
       </button>
       {estado === "error" && <p className="mt-3 text-sm text-red-400">No pudimos guardar tu email. Intentá de nuevo.</p>}
       <p className={`mt-4 text-xs leading-relaxed ${claro ? "text-black/45" : "text-faint"}`}>
-        Usamos tu email solo para avisarte del lanzamiento. Podés darte de baja cuando quieras.
+        Usamos tu email solo para avisarte del lanzamiento y de tu descuento. Podés darte de baja cuando quieras.
       </p>
     </form>
   );

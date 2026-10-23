@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import FormCaptura from "@/components/FormCaptura";
 import Rastreo from "@/components/Rastreo";
-import { BRAND } from "@/lib/config";
+import { BRAND, PRECOS } from "@/lib/config";
 import { FOTOS } from "@/lib/fotos";
 
 export const metadata: Metadata = {
-  title: "La nueva plataforma de Aaron para barberos | Lista de espera",
+  title: "Entrá primero a la plataforma de Aaron: 50% OFF y acceso vitalicio | Lista de espera",
   description:
-    "Todo el conocimiento de Aaron Dalla Rosa en una sola plataforma. Anotate en la lista de espera: entrás primero y te llevás un descuento exclusivo.",
+    "Todo el conocimiento de Aaron Dalla Rosa en una sola plataforma. Anotate en la lista de espera y entrá al grupo de WhatsApp: acceso antes que nadie, 50% de descuento de lanzamiento y acceso vitalicio.",
 };
 
 // Contenido editable de la página (cambiá los textos acá, sin tocar el diseño).
-const CINTA = ["Acceso antes que nadie", "Descuento exclusivo", "Bonos de lanzamiento", "Todo el conocimiento de Aaron", "Algo nunca hecho antes"];
+const CINTA = ["50% OFF en el lanzamiento", "Acceso antes que nadie", "Acceso vitalicio", "Solo para la lista y el grupo de WhatsApp", "Todo el conocimiento de Aaron"];
 
 const PROBLEMAS = [
   "Contenido suelto en redes, sin un orden para aprender.",
@@ -29,9 +29,9 @@ const INCLUYE = [
 ];
 
 const VENTAJAS = [
-  { t: "Acceso antes que nadie", d: "La lista de espera entra primero, antes de que abramos al público." },
-  { t: "Descuento exclusivo", d: "Solo para quienes se anotan y entran al grupo de WhatsApp." },
-  { t: "Bonos de lanzamiento", d: "Los primeros en entrar reciben beneficios que después no vuelven." },
+  { t: "Entrás antes que nadie", d: "Abrimos la plataforma primero para la lista de espera y el grupo de WhatsApp, antes del lanzamiento oficial. Cuando se abra al público, vos ya estás adentro." },
+  { t: "50% de descuento de lanzamiento", d: "Un precio exclusivo para quienes están en la lista y en el grupo. No se repite cuando abramos al público." },
+  { t: "Acceso vitalicio", d: "Pagás una sola vez y la plataforma es tuya para siempre, con todas las clases nuevas que se sumen." },
 ];
 
 const PARA_QUIEN = [
@@ -83,16 +83,28 @@ export default function CapturaPage() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
               </span>
-              Lista de espera abierta · Muy pronto
+              Lista de espera abierta · Cupos limitados
             </p>
             <h1 className="text-[clamp(2rem,4.6vw,3.4rem)] font-semibold leading-[1.05] tracking-[-0.03em]">
-              Todo lo que Aaron aprendió en años de barbería, <span className="texto-luz">en una sola plataforma.</span>
+              Todo lo que Aaron aprendió en años de barbería. <span className="texto-luz">50% OFF y tuyo para siempre.</span>
             </h1>
-            <p className="mb-8 mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
-              Algo que nunca se hizo antes para barberos. Anotate en la lista de espera: entrás primero que todos y te llevás un descuento exclusivo.
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
+              La primera plataforma de Aaron Dalla Rosa para barberos. Quien se anota y entra al grupo de WhatsApp accede antes que todos, con un descuento de lanzamiento que no se repite.
             </p>
+            <ul className="mb-8 mt-6 space-y-2.5">
+              {[
+                "Acceso antes de que abra al público",
+                `50% de descuento, solo para la lista y el grupo (primeras ${PRECOS.promo.vagas} personas)`,
+                "Acceso vitalicio: pagás una vez y es tuyo para siempre",
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-3 text-sm font-medium">
+                  <Check />
+                  {t}
+                </li>
+              ))}
+            </ul>
             <div className="max-w-md">
-              <FormCaptura id="hero" />
+              <FormCaptura id="hero" textoBoton="Quiero mi 50% de descuento" />
             </div>
           </div>
 
@@ -118,8 +130,8 @@ export default function CapturaPage() {
               <p className="text-xs text-muted">con cursos presenciales</p>
             </Chip>
             <Chip className="bottom-[12%] left-2 flotar sm:left-0">
-              <p className="text-sm font-medium">Acceso primero + descuento</p>
-              <p className="text-xs text-muted">para la lista de espera</p>
+              <p className="text-sm font-medium">50% OFF + acceso vitalicio</p>
+              <p className="text-xs text-muted">solo lista de espera y grupo</p>
             </Chip>
           </div>
         </div>
@@ -190,7 +202,7 @@ export default function CapturaPage() {
 
       {/* Por qué anotarte ahora */}
       <section className="mx-auto max-w-6xl px-6 py-24">
-        <h2 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">Por qué anotarte hoy en la lista de espera</h2>
+        <h2 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">Lo que se llevan <span className="texto-luz">solo quienes están adentro</span></h2>
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
           {VENTAJAS.map((v, i) => (
             <div key={v.t} className="relative rounded-2xl border border-accent/20 bg-gradient-to-b from-accent/[0.08] to-transparent p-6">
@@ -253,11 +265,11 @@ export default function CapturaPage() {
           <div className="cristal relative mx-auto max-w-md overflow-hidden rounded-3xl p-8 sm:p-10">
             <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
             <p className="text-center text-sm font-medium text-accent">{BRAND}</p>
-            <h2 className="mt-2 text-center text-3xl font-semibold tracking-tight">Asegurá tu lugar</h2>
+            <h2 className="mt-2 text-center text-3xl font-semibold tracking-tight">Asegurá tu 50% de descuento</h2>
             <p className="mb-7 mt-3 text-center text-sm leading-relaxed text-muted">
-              Dejá tu email y entrá al grupo de WhatsApp para asegurar tu descuento exclusivo y ser de los primeros en entrar.
+              Dejá tu email y entrá al grupo de WhatsApp. Es la forma de entrar antes que todos, con 50% de descuento y acceso para siempre.
             </p>
-            <FormCaptura id="final" textoBoton="Quiero asegurar mi lugar" />
+            <FormCaptura id="final" textoBoton="Quiero entrar primero con 50% OFF" />
           </div>
         </div>
       </section>
