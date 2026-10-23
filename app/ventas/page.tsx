@@ -54,7 +54,7 @@ const PARA_QUIEN = [
 ];
 
 const PREGUNTAS = [
-  { q: "¿Cuándo recibo el acceso?", r: "Apenas se confirma el pago te llega un email con un botón para entrar. Entrás con ese mismo email: tocás el botón o escribís el código que trae." },
+  { q: "¿Cuándo recibo el acceso?", r: "Apenas se confirma el pago te llega un email con un botón para entrar. Entrás con ese mismo email: tocás el botón del email y entrás directo." },
   { q: "¿Es un pago único?", r: "Sí. No hay mensualidades ni renovaciones automáticas. Pagás una vez." },
   { q: "¿Qué diferencia hay entre el acceso de 1 año y el vitalicio?", r: "Con el de 1 año tenés el curso por 12 meses desde tu compra. Con el vitalicio es para siempre, e incluye todas las actualizaciones y clases nuevas." },
   { q: "¿Cuándo se abren los bonos?", r: `Los bonos y algunas clases se liberan ${DIAS_BONO} días después de tu compra. Los ves en tu panel con el candado y el tiempo que falta.` },
