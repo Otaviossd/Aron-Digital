@@ -58,3 +58,7 @@ export const CUPONES = {
   diez: process.env.NEXT_PUBLIC_CUPON_10 || "LNO10",
   veinte: process.env.NEXT_PUBLIC_CUPON_20 || "LNO20",
 } as const;
+
+// Fecha de apertura de las inscripciones (día 0 del lanzamiento), formato AAAA-MM-DD. La secuencia de captura se calcula
+// contra esta fecha: quien entra tarde recibe solo los emails que faltan.
+export const FECHA_LANZAMIENTO = process.env.NEXT_PUBLIC_FECHA_LANZAMIENTO || "";

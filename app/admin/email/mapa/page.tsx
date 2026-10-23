@@ -8,7 +8,7 @@ export const metadata = { title: "Mapa de emails" };
 
 export default function MapaPage() {
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.lanuevaolaacademy.com").replace(/\/$/, "");
-  const { NODOS, ARISTAS, EMAILS } = construirMapa({ siteUrl, marca: BRAND });
+  const { NODOS, ARISTAS, EMAILS } = construirMapa({ siteUrl, marca: BRAND, ofertaFin: process.env.OFERTA_FIN || undefined });
   const total = Object.keys(EMAILS).length;
 
   return (
