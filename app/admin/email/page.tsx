@@ -204,7 +204,7 @@ async function Email() {
       <Seccion titulo="Cómo se ven los emails" sub="Vista previa con datos de ejemplo. Los textos se editan en lib/emails.">
         <div className="grid gap-4 lg:grid-cols-2">
           <Previa titulo="Bienvenida a la lista" asunto={ASUNTO_LISTA} html={htmlLista({ whatsappUrl: WHATSAPP_GRUPO_URL, bajaUrl: "#", marca: BRAND })} />
-          <Previa titulo="Confirmación de compra" asunto={ASUNTO_COMPRA} html={htmlCompra({ accessLink: "#", loginLink: `${ctx.siteUrl}/entrar`, to: ctx.email })} />
+          <Previa titulo="Confirmación de compra" asunto={ASUNTO_COMPRA} html={htmlCompra({ accessLink: "#", loginLink: `${ctx.siteUrl}/entrar`, to: ctx.email, plan: "lifetime" })} />
           {PASOS.map((p) => {
             const t = plantilla(p.step, ctx);
             return <Previa key={p.step} titulo={`Carrito abandonado · email ${p.step} (${pasoTexto(p.afterHours)})`} asunto={t.asunto} html={t.html} />;
