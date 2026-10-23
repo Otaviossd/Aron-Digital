@@ -45,10 +45,10 @@ async function Extra() {
             </svg>
           </span>
           <p className="mt-4 font-medium tracking-tight">Esta clase no está incluida en tu acceso</p>
-          <p className="mt-1 text-sm text-muted">Pago único de US${EXTRA.valor}. Se abre acá mismo apenas se confirma el pago.</p>
+          <p className="mt-1 text-sm text-muted">Pago único de US${EXTRA.valor} (antes US${EXTRA.valorAntes}). Precio especial para alumnos. Se abre acá mismo apenas se confirma el pago.</p>
           {EXTRA.checkoutUrl ? (
             <a href={EXTRA.checkoutUrl} className={`${ui.boton} mt-6`}>
-              Desbloquear por US${EXTRA.valor}
+              Desbloquear por US${EXTRA.valor} · antes US${EXTRA.valorAntes}
             </a>
           ) : (
             <span className={`${ui.boton} mt-6 cursor-not-allowed opacity-50`}>Disponible pronto</span>

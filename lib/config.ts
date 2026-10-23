@@ -46,7 +46,8 @@ export const PAGINAS = [
 export const EXTRA = {
   titulo: "Cómo crecer en redes sociales como barbero",
   descripcion: "Una clase práctica para llenar tu agenda: qué publicar, cómo mostrar tus cortes y cómo convertir seguidores en clientes.",
-  valor: 7,
+  valor: 10,
+  valorAntes: 20, // precio "de" tachado
   checkoutUrl: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA,
   videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...)
 } as const;
