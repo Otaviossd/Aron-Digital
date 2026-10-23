@@ -28,30 +28,26 @@ test("reembolsada: no queda neto ni tarifa", () => {
   assert.equal(l.bruto, 50);
 });
 
-test("finanzas: CAC, ganancia real y reembolsos", () => {
+test("finanzas: bruto, reembolsos, tarifas y neto", () => {
   const compras = [
     { ...base, plan: "lifetime", promo: false, gross_amount: 70, currency: "USD", fee_amount: 7.43 },
     { ...base, plan: "annual", promo: false, gross_amount: 50, currency: "USD", fee_amount: 5.45 },
     { ...base, plan: "annual", promo: false, gross_amount: 50, currency: "USD", fee_amount: 5.45, refunded_at: "2026-10-03" },
   ];
-  const f = calcularFinanzas(compras, [], [{ spent_on: "2026-10-01", platform: "Meta", amount_usd: "30.00" }], 12);
+  const f = calcularFinanzas(compras, []);
   assert.equal(f.ventas, 3);
   assert.equal(f.alumnos, 2);
   assert.equal(f.bruto, 170);
   assert.equal(f.reembolsos, 50);
   assert.equal(f.tarifas, 12.88);
   assert.equal(f.neto, 107.12);
-  assert.equal(f.gasto, 30);
-  assert.equal(f.cac, 15);
-  assert.equal(f.costoPorLead, 2.5);
-  assert.equal(f.gananciaReal, 77.12);
+  assert.equal(f.netoPorAlumno, 53.56);
 });
 
 test("sin ventas no divide por cero", () => {
-  const f = calcularFinanzas([], [], [{ spent_on: "2026-10-01", platform: "Meta", amount_usd: 20 }], 0);
-  assert.equal(f.cac, null);
-  assert.equal(f.gananciaReal, -20);
-  assert.equal(f.roas, 0);
+  const f = calcularFinanzas([], []);
+  assert.equal(f.netoPorAlumno, null);
+  assert.equal(f.neto, 0);
 });
 
 test("leerMontos: suma comisiones por origen y descarta moneda distinta", () => {

@@ -48,9 +48,9 @@ async function Resumen() {
         <Dato valor={res.viendo_7d} etiqueta="Viendo esta semana" nota={`${res.viendo_24h} en las últimas 24 h · ${res.viendo_30d} en 30 días`} />
         <Dato valor={res.compras_7d} etiqueta="Compras en 7 días" nota={`${res.compras} en total`} />
         <Dato
-          valor={fmtUsd(fin.f.gananciaReal)}
-          etiqueta="Ganancia real"
-          nota={`Neto ${fmtUsd(fin.f.neto)} (sin reembolsos ni tarifas) − anuncios ${fmtUsd(fin.f.gasto)}${fin.f.estimadas ? " · con datos estimados" : ""}`}
+          valor={fmtUsd(fin.f.neto)}
+          etiqueta="Facturación real"
+          nota={`Bruto ${fmtUsd(fin.f.bruto)} menos reembolsos y tarifas de la Hotmart${fin.f.estimadas ? " · con datos estimados" : ""}`}
         />
       </div>
 

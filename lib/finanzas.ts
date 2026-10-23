@@ -18,7 +18,6 @@ export type CompraFila = {
 };
 
 export type ExtraFila = Omit<CompraFila, "plan" | "promo" | "refunded_at" | "purchased_at"> & { created_at: string };
-export type GastoFila = { spent_on: string; platform: string; amount_usd: number | string };
 
 const n = (v: unknown) => {
   if (v === null || v === undefined || v === "") return null;
@@ -80,27 +79,17 @@ export type Finanzas = {
   reembolsos: number; // lo que se devolvió
   tarifas: number; // lo que se queda la Hotmart
   neto: number; // lo que realmente entra a la cuenta (a repartir entre productor y coproductor)
+  netoPorAlumno: number | null;
   extra: { ventas: number; bruto: number; neto: number };
   productor: number;
   coproductor: number;
-  gasto: number;
-  gananciaReal: number; // neto - anuncios
-  cac: number | null;
-  costoPorLead: number | null;
-  netoPorAlumno: number | null;
-  gananciaPorAlumno: number | null; // neto por alumno - CAC
-  roas: number | null; // neto recuperado por cada US$1 en anuncios
-  leads: number;
   estimadas: number; // ventas con algún dato estimado
   porPlan: { clave: string; etiqueta: string; ventas: number; reembolsadas: number; bruto: number; neto: number }[];
-  porPlataforma: { plataforma: string; monto: number }[];
 };
 
 export function calcularFinanzas(
   compras: CompraFila[],
   extras: ExtraFila[],
-  gastos: GastoFila[],
-  leads: number,
 ): Finanzas {
   const grupos = new Map<string, { etiqueta: string; ventas: number; reembolsadas: number; bruto: number; neto: number }>();
   const clave = (c: CompraFila) => (c.plan === "annual" ? "annual" : c.promo ? "promo" : "lifetime");
@@ -143,12 +132,6 @@ export function calcularFinanzas(
   }
 
   const alumnos = compras.length - reembolsadas;
-  const gasto = gastos.reduce((t, g) => t + (n(g.amount_usd) ?? 0), 0);
-  const plat = new Map<string, number>();
-  for (const g of gastos) plat.set(g.platform, (plat.get(g.platform) ?? 0) + (n(g.amount_usd) ?? 0));
-
-  const cac = alumnos > 0 && gasto > 0 ? gasto / alumnos : null;
-  const netoPorAlumno = alumnos > 0 ? neto / alumnos : null;
   return {
     ventas: compras.length,
     reembolsadas,
@@ -157,22 +140,14 @@ export function calcularFinanzas(
     reembolsos: r2(reembolsos),
     tarifas: r2(tarifas),
     neto: r2(neto),
+    netoPorAlumno: alumnos > 0 ? r2(neto / alumnos) : null,
     extra: { ventas: extras.length, bruto: r2(extraBruto), neto: r2(extraNeto) },
     productor: r2(productor),
     coproductor: r2(coproductor),
-    gasto: r2(gasto),
-    gananciaReal: r2(neto - gasto),
-    cac: cac === null ? null : r2(cac),
-    costoPorLead: leads > 0 && gasto > 0 ? r2(gasto / leads) : null,
-    netoPorAlumno: netoPorAlumno === null ? null : r2(netoPorAlumno),
-    gananciaPorAlumno: netoPorAlumno !== null && cac !== null ? r2(netoPorAlumno - cac) : null,
-    roas: gasto > 0 ? r2(neto / gasto) : null,
-    leads,
     estimadas,
     porPlan: ["promo", "annual", "lifetime"].flatMap((k) => {
       const g = grupos.get(k);
       return g ? [{ clave: k, ...g, bruto: r2(g.bruto), neto: r2(g.neto) }] : [];
     }),
-    porPlataforma: [...plat.entries()].map(([plataforma, monto]) => ({ plataforma, monto: r2(monto) })).sort((a, b) => b.monto - a.monto),
   };
 }
