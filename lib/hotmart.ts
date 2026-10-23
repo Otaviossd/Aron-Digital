@@ -86,7 +86,12 @@ export function leerCompra(payload: any, env: Env = process.env): CompraHotmart 
   const codigo = d?.purchase?.offer?.code;
   const esPlan = [env.HOTMART_OFFER_PROMO, env.HOTMART_OFFER_VITALICIO, env.HOTMART_OFFER_ANUAL].includes(codigo);
   const esPrueba = (env.HOTMART_TEST_EMAILS ?? "").toLowerCase().split(",").map((x) => x.trim()).includes(email);
-  const extra = !esPlan && !esPrueba && Number.isFinite(precio) && precio > 0 && precio < 15;
+  // La clase extra se reconoce por su producto u oferta (HOTMART_PRODUCT_EXTRA / HOTMART_OFFER_EXTRA, separados por coma);
+  // si no están definidos, por precio: cualquier compra de menos de US$ 25 que no sea uno de los 3 planes (el extra cuesta US$ 10 o 20).
+  const lista = (v?: string) => (v ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+  const idProducto = String(d?.product?.id ?? "");
+  const esExtraDeclarado = (idProducto !== "" && lista(env.HOTMART_PRODUCT_EXTRA).includes(idProducto)) || (typeof codigo === "string" && lista(env.HOTMART_OFFER_EXTRA).includes(codigo));
+  const extra = !esPlan && !esPrueba && (esExtraDeclarado || (Number.isFinite(precio) && precio > 0 && precio < 25));
   const { plan, promo } = planDeCompra(d?.purchase?.offer?.code, Number.isFinite(precio) ? precio : undefined, env);
   const tel = d?.buyer?.checkout_phone ?? d?.buyer?.phone;
   return {

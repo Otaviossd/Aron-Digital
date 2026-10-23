@@ -30,3 +30,13 @@ test("leerCompra extrae email en minúsculas y transacción", () => {
   assert.equal(c?.promo, true);
   assert.equal(leerCompra({ data: { buyer: {}, purchase: {} } }, env), null);
 });
+
+test("clase extra de US$20 u US$10 no crea acceso al curso", () => {
+  const mk = (price: number, extra: Record<string, unknown> = {}) => ({ data: { buyer: { email: "a@x.com" }, product: { id: 999 }, purchase: { transaction: "HP2", price: { value: price }, offer: { code: "zzz" } }, ...extra } });
+  assert.equal(leerCompra(mk(20), env)?.extra, true);
+  assert.equal(leerCompra(mk(10), env)?.extra, true);
+  assert.equal(leerCompra(mk(50, {}), { ...env, HOTMART_PRODUCT_EXTRA: "999" })?.extra, true);
+  // un plan nunca es extra, aunque cueste poco por un cupón
+  const plan = { data: { buyer: { email: "a@x.com" }, purchase: { transaction: "HP3", price: { value: 20 }, offer: { code: "p1" } } } };
+  assert.equal(leerCompra(plan, env)?.extra, false);
+});
