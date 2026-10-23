@@ -18,14 +18,14 @@ export default function Portada({ titulo, modulo, href, empezando, aviso }: Prop
     <section className="relative mb-10 overflow-hidden rounded-2xl border border-white/10 bg-[#07090a] sm:mb-14 md:rounded-3xl">
       <div
         aria-hidden="true"
-        className="relative aspect-video w-full bg-cover bg-center md:absolute md:inset-0 md:aspect-auto md:bg-[position:75%_center]"
+        className="relative aspect-video w-full bg-cover bg-center md:absolute md:inset-0 md:aspect-auto md:bg-[position:75%_0%]"
         style={{ backgroundImage: `url(${FOTOS.portada})` }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-[#07090a] via-transparent to-transparent md:via-[#07090a]/50" />
         <div className="absolute inset-0 hidden bg-gradient-to-r from-[#07090a]/75 via-transparent to-transparent md:block" />
       </div>
 
-      <div className="relative -mt-10 flex flex-col justify-end px-5 pb-6 md:mt-0 md:aspect-[16/8] md:max-w-xl md:p-10">
+      <div className="relative -mt-10 flex flex-col justify-end px-5 pb-6 md:mt-0 md:min-h-[440px] md:max-w-xl md:p-10">
         {href ? (
           <>
             <p className="mb-3 inline-flex w-fit items-center gap-2 rounded-full border border-accent/30 bg-black/40 px-3 py-1.5 text-xs font-medium text-accent backdrop-blur">
