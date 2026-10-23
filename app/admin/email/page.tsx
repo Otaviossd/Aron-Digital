@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { BRAND } from "@/lib/config";
 import { plantilla } from "@/lib/emails/abandono";
@@ -79,6 +80,11 @@ async function Email() {
     <>
       <Titulo
         titulo="Email marketing"
+        derecha={
+          <Link href="/admin/email/mapa" className="inline-flex items-center rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/20">
+            Ver mapa de emails
+          </Link>
+        }
         sub="Los emails que el sistema envía solo, cuántos salieron y qué dicen. Las automatizaciones nuevas se suman a esta misma pantalla."
       />
 

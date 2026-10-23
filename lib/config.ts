@@ -52,3 +52,9 @@ export const EXTRA = {
   checkoutUrl: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA,
   videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...)
 } as const;
+
+// Cupones de recuperación (se crean en la Hotmart, con fecha de vencimiento real). Los emails solo muestran el código.
+export const CUPONES = {
+  diez: process.env.NEXT_PUBLIC_CUPON_10 || "LNO10",
+  veinte: process.env.NEXT_PUBLIC_CUPON_20 || "LNO20",
+} as const;
