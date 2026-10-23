@@ -30,7 +30,7 @@ export async function sendWelcomeEmail(params: { to: string; plan: "monthly" | "
       from: process.env.EMAIL_FROM!,
       to: params.to,
       subject: ASUNTO_COMPRA,
-      html: htmlCompra({ accessLink, loginLink, to: params.to, plan: params.plan }),
+      html: htmlCompra({ accessLink, loginLink, to: params.to, plan: params.plan, codigo: data.properties.email_otp }),
     });
     if (sendError) throw new Error(`Resend error: ${sendError.message}`);
     await registrar({ status: "sent", provider_id: enviado?.id ?? null });

@@ -16,7 +16,11 @@ const plantilla = (imagen, alt, preheader) => `<!doctype html>
       <tr><td>
         <a href="{{ .ConfirmationURL }}"><img src="${SITE}/email/${imagen}.png" width="560" alt="${alt}" style="display:block;width:100%;height:auto;border:0;background:#0e1214"></a>
       </td></tr>
-      <tr><td align="left" style="padding:16px 8px 0;font-family:${fuente};font-size:12px;line-height:1.6;color:#8a949a">
+      <tr><td align="center" style="padding:18px 8px 0">
+        <div style="font-family:${fuente};font-size:13px;line-height:1.5;color:#ffffff">¿Preferís escribir un código? Ingresá este en la pantalla de acceso:</div>
+        <div style="margin-top:10px;font-family:${fuente};font-size:34px;line-height:1.2;font-weight:700;letter-spacing:10px;color:#ffffff">{{ .Token }}</div>
+      </td></tr>
+      <tr><td align="left" style="padding:16px 8px 0;font-family:${fuente};font-size:12px;line-height:1.6;color:#b9c0c3">
         Si el botón no funciona, copiá y pegá este enlace en tu navegador:<br>
         <a href="{{ .ConfirmationURL }}" style="color:#39ff7e;word-break:break-all">{{ .ConfirmationURL }}</a>
         <div style="margin-top:12px">Recibís este email porque alguien pidió entrar a La Nueva Ola Academy con esta dirección.</div>
