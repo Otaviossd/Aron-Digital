@@ -104,7 +104,6 @@ export default function MapaEmails({ nodos, aristas, emails }: Props) {
       <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
         <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-400" /> Ya sale hoy</span>
         <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-amber-400" /> Propuesta (para aprobar)</span>
-        <span className="flex items-center gap-2"><span className="h-px w-5 border-t border-dashed border-muted" /> Camino alternativo</span>
         <span className="text-faint">Cada email se ve en su cuadro: rodá con el mouse sobre él para leerlo completo.</span>
         <span className="ml-auto flex items-center gap-2">
           <button type="button" className={btn} onClick={() => zoom(0.85)} aria-label="Alejar">−</button>

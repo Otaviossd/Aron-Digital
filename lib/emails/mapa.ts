@@ -121,17 +121,18 @@ export function construirMapa(ctx: Ctx) {
     ),
   });
   add("F6", {
-    asunto: "Lo que dicen los que ya aprendieron con Aaron",
+    asunto: "Detrás de escena: cómo se armó el curso",
     cuando: "Faltan 6 días",
-    objetivo: "Prueba social: bajar el miedo a equivocarse.",
-    nota: "Reemplazar los testimonios de ejemplo por reales (con permiso de cada persona) antes de activar.",
+    objetivo: "Mostrar el trabajo detrás del curso (sin testimonios, porque todavía no hay alumnos del curso digital): método, tiempo y cuidado.",
+    nota: "Pre-lanzamiento: no hay alumnos del curso digital, así que no se usan testimonios. La autoridad viene de la trayectoria de Aaron (confirmar datos con él).",
     html: L(
-      `${titulo("Lo que dicen los que ya aprendieron con Aaron")}
-       ${parrafo("Más de 2.500 barberos pasaron por las clases de Aaron. Algunas de sus palabras:")}
-       ${testimonio("Pasé de dudar en cada corte a trabajar con confianza.", "Nombre, ciudad")}
-       ${testimonio("Por fin entendí el porqué de cada paso, no solo copiarlo.", "Nombre, ciudad")}
-       ${parrafo("Cuando abramos, podés ser el próximo.")}`,
-      "Barberos que ya dieron el paso.",
+      `${titulo("Detrás de escena: cómo se armó el curso")}
+       ${parrafo("Armar este curso no fue grabar unos videos y listo. Aaron juntó lo que enseñó durante años en cursos presenciales y lo ordenó clase por clase.")}
+       ${paso(1, `${fuerte("Partió de las dudas reales:")} las preguntas que más se repiten entre barberos que arrancan.`)}
+       ${paso(2, `${fuerte("Lo ordenó con método:")} para que no tengas que adivinar qué aprender primero.`)}
+       ${paso(3, `${fuerte("Lo pensó para el celular:")} clases cortas que podés ver donde estés.`)}
+       ${parrafo("Faltan pocos días para que lo veas por dentro.")}`,
+      "Cómo se armó el curso, paso a paso.",
     ),
   });
   add("F5", {
@@ -258,16 +259,17 @@ export function construirMapa(ctx: Ctx) {
     ),
   });
   add("S3", {
-    asunto: "Lo que dicen los alumnos de Aaron",
+    asunto: "Mirá cómo es una clase por dentro",
     cuando: "2 días después",
-    objetivo: "Prueba social para vencer la duda '¿funciona?'.",
-    nota: "Reemplazar por testimonios reales.",
+    objetivo: "Bajar la duda '¿cómo es el curso?' mostrando una muestra, sin depender de testimonios.",
+    nota: "Necesita una clase de muestra o un clip del Aaron con enlace público. Cuando haya alumnos reales, se pueden sumar testimonios acá.",
     html: L(
-      `${titulo("Lo que dicen los alumnos")}
-       ${testimonio("Aprendí más en pocas clases que en meses por mi cuenta.", "Nombre, ciudad")}
-       ${testimonio("Las explicaciones son claras y se pueden repetir las veces que haga falta.", "Nombre, ciudad")}
-       ${boton(ventas, "Entrar al curso")}`,
-      "Barberos que ya dieron el paso.",
+      `${titulo("Mirá cómo es una clase por dentro")}
+       ${parrafo("Antes de decidir, lo mejor es ver el estilo de Aaron: cómo explica, cómo muestra cada paso y a qué ritmo.")}
+       ${boton(ventas, "Ver una clase de muestra")}
+       ${parrafo("[Enlazar acá el clip o la clase de muestra pública.]")}
+       ${bloque(`${fuerte("Sin riesgo:")} si el curso no es lo que esperabas, tenés ${DIAS_REEMBOLSO} días para pedir el reembolso.`)}`,
+      "Un adelanto del curso.",
     ),
   });
   add("S4", {
@@ -365,18 +367,92 @@ export function construirMapa(ctx: Ctx) {
     ),
   });
   add("R3", {
-    asunto: "Último email: ¿seguimos en contacto?",
+    asunto: "Un consejo de Aaron para esta semana",
     cuando: "60 días sin comprar",
-    objetivo: "Cierre amable: limpia la lista y deja la puerta abierta.",
+    objetivo: "Aportar valor gratis para mantener la relación, sin vender fuerte.",
+    nota: "Aaron escribe un consejo corto real de barbería para cada email de este tipo.",
     html: L(
-      `${titulo("Último email por ahora")}
-       ${parrafo("No queremos llenarte la bandeja. Si el curso no es para vos ahora, está todo bien.")}
-       ${parrafo("Si querés seguir recibiendo novedades, no hagas nada. Si preferís dejar de recibirlas, usá el enlace de baja de abajo.")}
-       ${boton(ventas, "Quiero seguir")}`,
-      "Si no es el momento, está todo bien.",
+      `${titulo("Un consejo de Aaron para esta semana")}
+       ${parrafo("[Consejo corto y práctico de barbería escrito por Aaron: una técnica, un error común o un hábito.]")}
+       ${parrafo("Si querés aprender así, paso a paso, el curso sigue abierto.")}
+       ${boton(ventas, "Ver el curso")}`,
+      "Un consejo para esta semana.",
     ),
   });
-
+  add("R4", {
+    asunto: "Lo nuevo en La Nueva Ola Academy",
+    cuando: "75 días sin comprar",
+    objetivo: "Mostrar que el curso crece: motivo real para volver a mirar.",
+    nota: "Completar con novedades reales.",
+    html: L(
+      `${titulo("Lo nuevo en La Nueva Ola Academy")}
+       ${parrafo("[Novedades reales: clases nuevas, bonos, mejoras de la plataforma.]")}
+       ${boton(ventas, "Ver qué hay de nuevo")}`,
+      "El curso sigue creciendo.",
+    ),
+  });
+  add("R5", {
+    asunto: "Tres meses después: ¿seguís igual?",
+    cuando: "90 días sin comprar",
+    objetivo: "Reflexión sobre el tiempo que pasó, con tono amable.",
+    html: L(
+      `${titulo("Tres meses después")}
+       ${parrafo("Pasaron tres meses desde que viste el curso. ¿Cómo viene tu trabajo? ¿Seguís cortando igual que antes?")}
+       ${parrafo("Si querés dar el salto, el mejor momento sigue siendo hoy. Es un pago único y tenés garantía.")}
+       ${boton(ventas, "Empezar ahora")}`,
+      "Tres meses después.",
+    ),
+  });
+  add("R6", {
+    asunto: "Año nuevo, oficio nuevo",
+    cuando: "120 días sin comprar",
+    objetivo: "Aprovechar el efecto 'empezar de cero' del comienzo de año.",
+    html: L(
+      `${titulo("Año nuevo, oficio nuevo")}
+       ${parrafo("Es el momento del año en que todos se proponen cambiar algo. Hacelo con método y no con ganas sueltas.")}
+       ${boton(ventas, "Empezar con método")}`,
+      "El año arranca. Arrancá vos también.",
+    ),
+  });
+  add("R7", {
+    asunto: "Un regalo para retomar",
+    cuando: "150 días sin comprar",
+    objetivo: "Incentivo especial para quien lleva meses mirando: cupón de reactivación.",
+    nota: "Crear un cupón de reactivación en la Hotmart con vencimiento real.",
+    html: L(
+      `${titulo("Un regalo para retomar")}
+       ${parrafo("Pasó un buen tiempo y sabemos que a veces el momento no era el indicado. Si ahora sí, te dejamos un descuento por tiempo limitado.")}
+       ${cupon(CUPONES.diez, "10%")}
+       ${boton(ventas, "Usar mi cupón")}`,
+      "Un descuento para volver.",
+    ),
+  });
+  add("R8", {
+    asunto: "Medio año después",
+    cuando: "180 días sin comprar",
+    objetivo: "Último mensaje del primer ciclo; después sigue un aviso mensual.",
+    html: L(
+      `${titulo("Medio año después")}
+       ${parrafo("Pasaron seis meses. Seguimos acá y seguimos sumando contenido.")}
+       ${parrafo("A partir de ahora te escribimos una vez por mes con consejos y novedades. Si preferís no recibirlos, usá el enlace de baja.")}
+       ${boton(ventas, "Ver el curso")}`,
+      "Seguimos acá.",
+    ),
+  });
+  add("M1", {
+    asunto: "El consejo del mes + novedades",
+    cuando: "Cada mes, desde el mes 7 y hasta que compre o pida la baja",
+    objetivo: "Mantener viva la relación a largo plazo: valor gratis + novedades + oferta suave.",
+    nota: "Es un email recurrente: cada mes cambia el consejo y la novedad.",
+    html: L(
+      `${titulo("El consejo del mes")}
+       ${parrafo("[Consejo corto de Aaron del mes.]")}
+       ${subtitulo("Novedades")}
+       ${parrafo("[Novedades del curso del mes.]")}
+       ${boton(ventas, "Ver el curso")}`,
+      "Tu consejo del mes.",
+    ),
+  });
   // ════════ 3 · ENTRÓ AL CHECKOUT Y NO PAGÓ ════════
   add("A1", {
     estado: "activo",
@@ -475,11 +551,11 @@ export function construirMapa(ctx: Ctx) {
   add("A8", {
     asunto: "¿Te ayudamos a decidir?",
     cuando: "7 días después",
-    objetivo: "Cambiar de registro: de descuento a ayuda personal, con prueba social.",
+    objetivo: "Cambiar de registro: de descuento a ayuda personal y reducir el riesgo percibido.",
     html: K(
       `${titulo("¿Te ayudamos a decidir?")}
        ${parrafo("Sabemos que comprar un curso es una decisión importante. Si te queda alguna duda, respondé este email y una persona del equipo te contesta.")}
-       ${testimonio("Dudé un par de días y fue de lo mejor que hice por mi trabajo.", "Nombre, ciudad")}
+       ${bloque(`${fuerte("Recordá:")} pago único, sin mensualidades, y ${DIAS_REEMBOLSO} días de garantía para pedir tu reembolso.`)}
        ${boton(ventas, "Ver el curso")}`,
       "Escribinos y te ayudamos a decidir.",
     ),
@@ -679,78 +755,81 @@ export function construirMapa(ctx: Ctx) {
     ),
   });
 
-  // ════════ MAPA ════════
+  // ════════ MAPA (organizado como un árbol: cada camino en su propia fila, sin cruces ni líneas de vuelta) ════════
   const N: Nodo[] = [];
   const nodo = (n: Nodo) => N.push(n);
-  nodo({ id: "ig", col: 0, row: 0, tipo: "origen", titulo: "Instagram, stories y WhatsApp", sub: "Tráfico orgánico", detalle: "Contenido de Aaron y mensajes del equipo. Usá los enlaces con origen de Admin > Enlaces para medir de dónde llega cada visita." });
-  nodo({ id: "ads", col: 0, row: 2, tipo: "origen", titulo: "Tráfico pago", sub: "Anuncios de Meta", detalle: "Durante los 10 días de captura: anuncios a la página de captura. Después de la apertura: anuncios directo a la página de ventas." });
-  nodo({ id: "captura", col: 1, row: 0, tipo: "pagina", titulo: "Página de captura", sub: "/captura · 10 días", detalle: "Lista de espera: dura 10 días. La persona deja su email y entra al grupo de WhatsApp. Cuando se abren las ventas, el tráfico va directo a la página de ventas." });
-  nodo({ id: "lead", col: 2, row: 0, tipo: "accion", titulo: "Lead en la lista", sub: "Calendario hasta la apertura", detalle: "La secuencia se cuenta contra la fecha de apertura, no contra el día en que se anotó. Si entra 8 días después de empezar la captura, recibe el email de bienvenida y solo los 2 emails que faltan antes de la apertura." });
+  const fila = (ids: string[], tit: Record<string, [string, string]>, col0: number, row: number) =>
+    ids.forEach((id, i) => nodo({ id, col: col0 + i, row, tipo: "email", titulo: tit[id][0], sub: tit[id][1], email: id }));
+
+  nodo({ id: "origen", col: 0, row: 0.5, tipo: "origen", titulo: "Instagram, WhatsApp y anuncios", sub: "Orgánico + tráfico pago", detalle: "Durante los 10 días de captura el tráfico (orgánico y de anuncios) va a la página de captura. Después de la apertura va directo a la página de ventas. Usá los enlaces con origen de Admin > Enlaces para medir cada fuente." });
+
+  // Fila 0 · captura
+  nodo({ id: "captura", col: 1, row: 0, tipo: "pagina", titulo: "Página de captura", sub: "/captura · 10 días", detalle: "Lista de espera de 10 días. La persona deja su email y entra al grupo de WhatsApp. Pasada la apertura, el tráfico va directo a la página de ventas." });
+  nodo({ id: "lead", col: 2, row: 0, tipo: "accion", titulo: "Lead en la lista", sub: "Calendario hasta la apertura", detalle: "La secuencia se cuenta contra la fecha de apertura, no contra el día en que se anotó. Si entra 8 días después de empezar la captura, recibe el email de bienvenida y solo los emails que faltan hasta la apertura." });
   const cap = ["W0", "F9", "F8", "F7", "F6", "F5", "F4", "F3", "F2", "F1", "F0a", "F0b"];
-  const capTit: Record<string, [string, string]> = {
+  fila(cap, {
     W0: ["Estás en la lista", "Al instante"], F9: ["Quién es Aaron", "Faltan 9 días"], F8: ["Imaginate en 3 meses", "Faltan 8"],
-    F7: ["El curso por dentro", "Faltan 7"], F6: ["Lo que dicen los alumnos", "Faltan 6"], F5: ["5 errores del barbero", "Faltan 5"],
+    F7: ["El curso por dentro", "Faltan 7"], F6: ["Detrás de escena", "Faltan 6"], F5: ["5 errores del barbero", "Faltan 5"],
     F4: ["El año se termina", "Faltan 4"], F3: ["Lo que vas a recibir", "Faltan 3"], F2: ["Dejá todo listo", "Faltan 2"],
     F1: ["Mañana abrimos", "Víspera"], F0a: ["¡Hoy abrimos!", "Apertura · mañana"], F0b: ["Primer día", "Apertura · noche"],
-  };
-  cap.forEach((id, i) => nodo({ id, col: 3 + i, row: 0, tipo: "email", titulo: capTit[id][0], sub: capTit[id][1], email: id }));
+  }, 3, 0);
+  nodo({ id: "aVentas", col: 15, row: 0, tipo: "pagina", titulo: "Página de ventas", sub: "Desde la apertura", detalle: "Los emails de apertura llevan a la página de ventas. Quien no compra sigue en la secuencia 'Vio la oferta y no compró' (fila de abajo)." });
 
-  nodo({ id: "ventas", col: 1, row: 2, tipo: "pagina", titulo: "Página de ventas", sub: "/ventas", detalle: "Sin precios a la vista. Para ver la oferta, la persona deja nombre, email y WhatsApp." });
-  nodo({ id: "form", col: 2, row: 2, tipo: "accion", titulo: "Deja nombre, email y WhatsApp", sub: "Se vuelve lead", detalle: "Se guarda el contacto y se desbloquean los precios. Desde acá ya podemos recuperarlo." });
-  nodo({ id: "plan", col: 3, row: 2, tipo: "accion", titulo: "Elige su acceso", sub: "Promo, vitalicio o 1 año", detalle: "Compara los planes y toca 'Continuar al pago'." });
-  nodo({ id: "checkout", col: 4, row: 2, tipo: "pagina", titulo: "Checkout Hotmart", sub: "Pago", detalle: "Aquí la persona escribe su email y paga. Si deja el email y no paga, la Hotmart nos avisa (carrito abandonado)." });
+  // Fila 1 · columna vertebral de ventas
+  nodo({ id: "ventas", col: 1, row: 1, tipo: "pagina", titulo: "Página de ventas", sub: "/ventas", detalle: "Sin precios a la vista. Para ver la oferta, la persona deja nombre, email y WhatsApp." });
+  nodo({ id: "form", col: 2, row: 1, tipo: "accion", titulo: "Deja nombre, email y WhatsApp", sub: "Se vuelve lead", detalle: "Se guarda el contacto y se desbloquean los precios. Desde acá ya podemos recuperarlo." });
+  nodo({ id: "plan", col: 3, row: 1, tipo: "accion", titulo: "Elige su acceso", sub: "Promo, vitalicio o 1 año", detalle: "Compara los planes y toca 'Continuar al pago'." });
+  nodo({ id: "checkout", col: 4, row: 1, tipo: "pagina", titulo: "Checkout Hotmart", sub: "Pago", detalle: "Aquí la persona escribe su email y paga. Si deja el email y no paga, la Hotmart nos avisa (carrito abandonado)." });
 
-  nodo({ id: "sn", col: 3, row: 3, tipo: "mal", titulo: "Vio la oferta y no fue al checkout", sub: "Lead frío tibio", detalle: "Dejó sus datos pero no llegó a escribir su email en el checkout. También entra acá quien estaba en la lista y no compró después de la apertura." });
-  const s = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"];
-  const sTit: Record<string, [string, string]> = {
-    S1: ["Tus accesos te esperan", "30 min"], S2: ["Imaginate aprendiendo", "1 día"], S3: ["Lo que dicen los alumnos", "2 días"], S4: ["Black Friday: invertí", "4 días"],
-    S5: ["¿Y si sigue todo igual?", "6 días"], S6: ["¿Es mucho? Hagamos la cuenta", "9 días"], S7: ["Te escribo yo, Aaron", "14 días"], S8: ["Novedades", "21 días"],
-  };
-  s.forEach((id, i) => nodo({ id, col: 4 + i, row: 3, tipo: "email", titulo: sTit[id][0], sub: sTit[id][1], email: id }));
-  nodo({ id: "frio", col: 12, row: 3, tipo: "frio", titulo: "Un mes sin comprar", sub: "Reactivación", detalle: "Quien llega a los 30 días sin comprar (venga del formulario o del checkout) pasa a una secuencia corta de reactivación: recordatorio, encuesta de un clic y despedida amable." });
-  const r = ["R1", "R2", "R3"];
-  const rTit: Record<string, [string, string]> = { R1: ["Hace un mes pasaste por acá", "30 días"], R2: ["¿Qué te frenó?", "45 días"], R3: ["Último email", "60 días"] };
-  r.forEach((id, i) => nodo({ id, col: 13 + i, row: 3, tipo: "email", titulo: rTit[id][0], sub: rTit[id][1], email: id }));
-
-  nodo({ id: "mal", col: 5, row: 4, tipo: "mal", titulo: "No pagó", sub: "Carrito abandonado", detalle: "Escribió su email en el checkout y no pagó. Empieza la secuencia de recuperación y se corta sola si compra. Además puede configurarse en la Hotmart el mensaje de recuperación por WhatsApp (ver nota abajo)." });
+  // Fila 2 · no pagó
+  nodo({ id: "mal", col: 5, row: 2, tipo: "mal", titulo: "No pagó", sub: "Carrito abandonado", detalle: "Escribió su email en el checkout y no pagó. Empieza la secuencia de recuperación y se corta sola si compra. Además puede configurarse en la Hotmart el mensaje de recuperación por WhatsApp." });
   const a = ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9"];
-  const aTit: Record<string, [string, string]> = {
+  fila(a, {
     A1: ["¿Te quedó algo pendiente?", "1 hora"], A2: ["¿Algo falló con el pago?", "4 horas"], A3: ["Dudas frecuentes", "12 horas"], A4: ["10% de descuento", "24 h · cupón"],
     A5: ["El cupón vence mañana", "48 horas"], A6: ["Último día del cupón", "72 horas"], A7: ["Última oportunidad: 20%", "5 días · cupón"], A8: ["¿Te ayudamos a decidir?", "7 días"], A9: ["Antes de que termine el año", "10 días"],
-  };
-  a.forEach((id, i) => nodo({ id, col: 6 + i, row: 4, tipo: "email", titulo: aTit[id][0], sub: aTit[id][1], email: id }));
+  }, 6, 2);
+  nodo({ id: "aFrio", col: 15, row: 2, tipo: "frio", titulo: "Sigue en reactivación", sub: "Mismo ciclo de la fila de abajo", detalle: "Si pasa el día 10 sin comprar, entra al mismo ciclo largo de reactivación (fila de abajo: emails a los 30, 45, 60 días y después cada mes) hasta que compre o pida la baja." });
 
-  nodo({ id: "bien", col: 5, row: 5, tipo: "bien", titulo: "Pagó", sub: "Se convierte en alumno", detalle: "El webhook libera el acceso, corta toda secuencia de recuperación y envía la confirmación. Según lo que compró, entra a uno de estos caminos." });
-  nodo({ id: "solo", col: 6, row: 5, tipo: "bien", titulo: "Solo el curso", sub: "Sin la clase extra", detalle: "Recibe las ofertas de la clase extra (días 3 y 10) y los emails de seguimiento." });
-  nodo({ id: "both", col: 6, row: 6, tipo: "bien", titulo: "Curso + clase extra", sub: "Cliente completo", detalle: "Compró también la clase extra (en el checkout o después). Deja de recibir ofertas de la clase extra." });
-  nodo({ id: "ren", col: 6, row: 7, tipo: "bien", titulo: "Plan de 1 año", sub: "Antes de que venza", detalle: "Quien compró el acceso de 1 año recibe 3 avisos antes del vencimiento, con la opción de pasar a vitalicio." });
+  // Filas 3-5 · pagó
+  nodo({ id: "bien", col: 5, row: 3, tipo: "bien", titulo: "Pagó", sub: "Se convierte en alumno", detalle: "El webhook libera el acceso, corta toda secuencia de recuperación y envía la confirmación. Según lo que compró, entra a uno de estos caminos." });
+  nodo({ id: "solo", col: 6, row: 3, tipo: "bien", titulo: "Solo el curso", sub: "Sin la clase extra", detalle: "Recibe las ofertas de la clase extra (días 3 y 10) y los emails de seguimiento. Si compra la clase extra, pasa al camino 'Curso + clase extra'." });
+  nodo({ id: "both", col: 6, row: 4, tipo: "bien", titulo: "Curso + clase extra", sub: "Cliente completo", detalle: "Compró también la clase extra (en el checkout o después). Deja de recibir ofertas de la clase extra." });
+  nodo({ id: "ren", col: 6, row: 5, tipo: "bien", titulo: "Plan de 1 año", sub: "Antes de que venza", detalle: "Quien compró el acceso de 1 año recibe 3 avisos antes del vencimiento, con la opción de pasar a vitalicio." });
   const c = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8"];
-  const cTit: Record<string, [string, string]> = {
+  fila(c, {
     C1: ["Confirmación de compra", "Al instante"], C2: ["Tu primera clase", "1 día"], C3: ["Clase extra a precio de alumno", "3 días"], C4: ["¿Cómo vas?", "5 días"],
     C5: ["Se abrieron tus bonos", "7 días"], C6: ["Última llamada: clase extra", "10 días"], C7: ["¿Nos contás cómo te fue?", "14 días"], C8: ["Un mes juntos", "30 días"],
-  };
-  c.forEach((id, i) => nodo({ id, col: 7 + i, row: 5, tipo: "email", titulo: cTit[id][0], sub: cTit[id][1], email: id }));
+  }, 7, 3);
   const x = ["X1", "X2", "X3", "X4"];
-  const xTit: Record<string, [string, string]> = { X1: ["Compra confirmada: curso + extra", "Al instante"], X2: ["Sacale el máximo", "2 días"], X3: ["Contanos tu resultado", "14 días"], X4: ["Un mes después", "30 días"] };
-  x.forEach((id, i) => nodo({ id, col: 7 + i, row: 6, tipo: "email", titulo: xTit[id][0], sub: xTit[id][1], email: id }));
+  fila(x, { X1: ["Compra confirmada: curso + extra", "Al instante"], X2: ["Sacale el máximo", "2 días"], X3: ["Contanos tu resultado", "14 días"], X4: ["Un mes después", "30 días"] }, 7, 4);
   const y = ["Y1", "Y2", "Y3"];
-  const yTit: Record<string, [string, string]> = { Y1: ["Te quedan 2 meses", "Día 300"], Y2: ["Vence en 3 semanas", "Día 340"], Y3: ["Vence mañana", "Día 364"] };
-  y.forEach((id, i) => nodo({ id, col: 7 + i, row: 7, tipo: "email", titulo: yTit[id][0], sub: yTit[id][1], email: id }));
+  fila(y, { Y1: ["Te quedan 2 meses", "Día 300"], Y2: ["Vence en 3 semanas", "Día 340"], Y3: ["Vence mañana", "Día 364"] }, 7, 5);
+
+  // Fila 6 · vio la oferta y no fue al checkout + reactivación larga
+  nodo({ id: "sn", col: 3, row: 6, tipo: "mal", titulo: "Vio la oferta y no avanzó", sub: "No llegó al checkout", detalle: "Dejó sus datos (o estaba en la lista de espera) pero no escribió su email en el checkout. Recibe emails por semanas y, si sigue sin comprar, pasa a la reactivación larga." });
+  const s = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"];
+  fila(s, {
+    S1: ["Tus accesos te esperan", "30 min"], S2: ["Imaginate aprendiendo", "1 día"], S3: ["Mirá una clase por dentro", "2 días"], S4: ["Black Friday: invertí", "4 días"],
+    S5: ["¿Y si sigue todo igual?", "6 días"], S6: ["¿Es mucho? Hagamos la cuenta", "9 días"], S7: ["Te escribo yo, Aaron", "14 días"], S8: ["Novedades", "21 días"],
+  }, 4, 6);
+  nodo({ id: "frio", col: 12, row: 6, tipo: "frio", titulo: "Reactivación larga", sub: "30 días sin comprar", detalle: "Quien llega a los 30 días sin comprar (venga del formulario o del checkout) sigue recibiendo emails por meses: recordatorio, encuesta, consejos de Aaron, novedades, un cupón y después un aviso mensual. Solo se corta si compra o pide la baja." });
+  const r = ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"];
+  fila(r, {
+    R1: ["Hace un mes pasaste por acá", "30 días"], R2: ["¿Qué te frenó?", "45 días"], R3: ["Un consejo de Aaron", "60 días"], R4: ["Lo nuevo en la Academy", "75 días"],
+    R5: ["Tres meses después", "90 días"], R6: ["Año nuevo, oficio nuevo", "120 días"], R7: ["Un regalo para retomar", "150 días · cupón"], R8: ["Medio año después", "180 días"],
+  }, 13, 6);
+  fila(["M1"], { M1: ["Consejo del mes + novedades", "Cada mes, hasta que compre"] }, 21, 6);
 
   const cadena = (ids: string[]): Arista[] => ids.slice(1).map((id, i) => ({ de: ids[i], a: id }));
   const AR: Arista[] = [
-    { de: "ig", a: "captura" },
-    { de: "ig", a: "ventas" },
-    { de: "ads", a: "captura" },
-    { de: "ads", a: "ventas" },
-    ...cadena(["captura", "lead", ...cap]),
-    { de: "F0a", a: "ventas", etiqueta: "va a ventas", punteada: true },
+    { de: "origen", a: "captura" },
+    { de: "origen", a: "ventas" },
+    ...cadena(["captura", "lead", ...cap, "aVentas"]),
     ...cadena(["ventas", "form", "plan", "checkout"]),
     { de: "form", a: "sn", etiqueta: "no avanza" },
-    ...cadena(["sn", ...s, "frio", ...r]),
+    ...cadena(["sn", ...s, "frio", ...r, "M1"]),
     { de: "checkout", a: "mal", etiqueta: "no paga" },
-    ...cadena(["mal", ...a]),
-    { de: "A9", a: "frio", punteada: true },
+    ...cadena(["mal", ...a, "aFrio"]),
     { de: "checkout", a: "bien", etiqueta: "paga" },
     { de: "bien", a: "solo" },
     { de: "bien", a: "both", etiqueta: "compra ambos" },
@@ -758,8 +837,6 @@ export function construirMapa(ctx: Ctx) {
     ...cadena(["solo", ...c]),
     ...cadena(["both", ...x]),
     ...cadena(["ren", ...y]),
-    { de: "C3", a: "both", etiqueta: "compra la clase extra", punteada: true },
-    { de: "A4", a: "bien", etiqueta: "compra con cupón", punteada: true },
   ];
 
   return { NODOS: N, ARISTAS: AR, EMAILS: E };
