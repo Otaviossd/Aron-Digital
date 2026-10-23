@@ -22,13 +22,13 @@ export function htmlCompra({ accessLink, loginLink, to, plan }: Datos) {
       ${boton(accessLink, "Entrar automáticamente")}
       ${bloque(`${detallePlan}<strong style="color:#ffffff">Tu cuenta:</strong> ${to}<br/><strong style="color:#ffffff">Pago:</strong> único, sin cobros recurrentes`)}
 
-      ${subtitulo("Cómo empezar")}
-      ${paso(1, "Tocá <strong>Entrar automáticamente</strong>: entrás directo, sin contraseña ni código.")}
-      ${paso(2, "Empezá por el <strong>Módulo 1</strong> y seguí el orden de las clases.")}
-      ${paso(3, `Los <strong>bonos</strong> y algunos módulos se abren solos a los ${DIAS_BONO} días de tu compra.`)}
+      ${subtitulo("Dos formas de entrar")}
+      ${paso(1, "<strong>Automático:</strong> tocá el botón <strong>Entrar automáticamente</strong> de arriba. Entrás directo, sin contraseña. El botón es de un solo uso y vence en poco tiempo.")}
+      ${paso(2, `<strong>Con tu email:</strong> entrá a ${enlace(loginLink, loginLink)}, escribí este mismo email (${to}) y te enviamos un acceso nuevo cuando quieras.`)}
 
-      ${subtitulo("Si el botón venció")}
-      ${parrafo(`El botón es de un solo uso y vence en poco tiempo. Podés entrar siempre desde ${enlace(loginLink, loginLink)}: escribís este mismo email (${to}) y te enviamos un acceso nuevo.`)}
+      ${subtitulo("Cómo empezar")}
+      ${paso(1, "Empezá por el <strong>Módulo 1</strong> y seguí el orden de las clases.")}
+      ${paso(2, `Los <strong>bonos</strong> y algunos módulos se abren solos a los ${DIAS_BONO} días de tu compra.`)}
 
       ${subtitulo("Garantía y soporte")}
       ${parrafo(`Tenés <strong>${DIAS_REEMBOLSO} días</strong> para pedir el reembolso si el curso no es para vos. ¿Alguna duda? Escribinos a ${enlace(`mailto:${SOPORTE_EMAIL}`, SOPORTE_EMAIL)} y te respondemos.`)}`,
