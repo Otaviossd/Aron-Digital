@@ -50,6 +50,8 @@ export const EXTRA = {
   valor: 10,
   valorAntes: 20, // precio "de" tachado
   diasPrecio: 14, // el precio de alumno dura 14 días desde la compra (hay que programarlo en el sitio/Hotmart)
+  portada: "/extra/portada.webp", // portada cuadrada de la clase (también se usa de miniatura)
+  portadaChica: "/extra/portada-chica.webp",
   checkoutUrl: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA,
   videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...)
 } as const;

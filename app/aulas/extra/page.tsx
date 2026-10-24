@@ -22,6 +22,8 @@ async function Extra() {
       <Link href="/aulas" className="text-sm text-muted transition hover:text-ink">
         ← Volver al curso
       </Link>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={EXTRA.portada} alt={EXTRA.titulo} width={1254} height={1254} fetchPriority="high" className="mt-6 aspect-square w-full max-w-sm rounded-2xl border border-accent/30 object-cover" />
       <p className="mt-6 text-xs font-medium text-accent">Clase extra</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight">{EXTRA.titulo}</h1>
       <p className="mt-3 max-w-xl leading-relaxed text-muted">{EXTRA.descripcion}</p>
