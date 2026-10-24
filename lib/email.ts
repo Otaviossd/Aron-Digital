@@ -1,8 +1,9 @@
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ASUNTO_COMPRA, htmlCompra } from "@/lib/emails/compra";
+import { siteUrl } from "@/lib/site";
 
-const SITE_URL = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = siteUrl;
 
 // Gera um link de acesso de um clique (válido por tempo limitado) e envia o e-mail de boas-vindas.
 // Cada tentativa fica registrada em email_log (aparece no painel, em Email > Historial).

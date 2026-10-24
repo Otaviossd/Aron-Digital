@@ -33,6 +33,8 @@ export default function FormAcceso({ modo, error }: Props) {
     const supabase = createClient();
     const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password: clave });
     if (err) return setEstado("error");
+    // Asegura que la sesión quedó guardada en las cookies antes de cambiar de página.
+    await supabase.auth.getSession();
     window.location.href = modo === "equipo" ? "/admin" : "/aulas";
   }
 

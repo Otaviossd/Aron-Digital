@@ -1,7 +1,8 @@
 import { Resend } from "resend";
 import { plantilla } from "@/lib/emails/abandono";
+import { siteUrl } from "@/lib/site";
 
-const SITE_URL = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = siteUrl;
 
 // Envia uma etapa da sequência. Usa um remetente de marketing separado (subdomínio) quando existe,
 // para que problemas nos disparos não afetem o e-mail de confirmação de compra.

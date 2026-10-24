@@ -9,6 +9,7 @@ import { WHATSAPP_GRUPO_URL } from "@/lib/config";
 import { PASOS } from "@/lib/sequence";
 import { estadoConfig, fmtFechaHora, hace } from "@/lib/admin";
 import { Pildora, Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
+import { siteUrl } from "@/lib/site";
 
 type Stats = {
   leads: number;
@@ -68,7 +69,7 @@ async function Email() {
     .slice(0, 40);
 
   const ctx = {
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://tu-sitio.com",
+    siteUrl: siteUrl(),
     email: "alumno@ejemplo.com",
     bajaUrl: "#",
     marca: BRAND,

@@ -4,7 +4,7 @@
 // Uso: node scripts/gen-email-templates.mjs   (escribe en supabase/email-templates/)
 import { writeFileSync } from "node:fs";
 
-const SITE = "https://lanuevaolaacademy.com";
+const SITE = "https://www.lanuevaolaacademy.com";
 const fuente = "Inter,'Segoe UI',Helvetica,Arial,sans-serif";
 
 const plantilla = (imagen, alt, preheader) => `<!doctype html>

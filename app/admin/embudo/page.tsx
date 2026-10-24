@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { siteUrl } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 import { Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
 
@@ -34,7 +35,7 @@ async function Contenido({ searchParams }: { searchParams: Promise<{ d?: string 
 
   const cap = e.paginas.find((p) => p.path === "/captura") ?? { visitantes: 0, registros: 0, checkout: 0 };
   const ven = e.paginas.find((p) => p.path === "/ventas") ?? { visitantes: 0, registros: 0, checkout: 0 };
-  const sitio = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://tu-sitio.com").replace(/\/$/, "");
+  const sitio = siteUrl();
 
   return (
     <>

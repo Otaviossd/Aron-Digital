@@ -1,3 +1,4 @@
+import { siteUrl } from "../site.ts";
 // Molde visual compartido por todos los emails (marca del sitio: verde neón, Inter, cabecera oscura con foto).
 // Gmail móvil en tema oscuro invierte los colores de los emails oscuros. Para evitarlo, los fondos llevan también un
 // background-image (Gmail no invierte imágenes). Los emails de login (Supabase) van como imagen completa: ver scripts/gen-email-templates.mjs.
@@ -16,7 +17,7 @@ export const COLORES = {
   enlace: "#39ff7e",
 };
 
-const sitio = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "https://lanuevaolaacademy.com").replace(/\/$/, "");
+const sitio = siteUrl;
 const fuente = "Inter,'Segoe UI',Helvetica,Arial,sans-serif";
 
 export const boton = (url: string, texto: string) => `

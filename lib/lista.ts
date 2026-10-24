@@ -2,8 +2,9 @@ import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { BRAND, WHATSAPP_GRUPO_URL } from "@/lib/config";
 import { ASUNTO_LISTA, htmlLista } from "@/lib/emails/lista";
+import { siteUrl } from "@/lib/site";
 
-const SITE_URL = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = siteUrl;
 
 // Envia o e-mail de boas-vindas da lista de espera. Se o envio de e-mail ainda não estiver
 // configurado, não faz nada (o cadastro não pode falhar por isso). Cada tentativa vai para email_log.
