@@ -27,6 +27,11 @@ export const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME ?? "Barbería Aaron";
 export const WHATSAPP_GRUPO_URL =
   process.env.NEXT_PUBLIC_WHATSAPP_GROUP_URL || "https://chat.whatsapp.com/B4wYyWa1Lfj0pvgbkY93yg";
 
+// Grupo de WhatsApp de los ALUMNOS (quienes ya compraron). Distinto del grupo de la lista de espera.
+// Para cambiarlo sin tocar el código: NEXT_PUBLIC_WHATSAPP_ALUMNOS_URL en Vercel.
+export const WHATSAPP_ALUMNOS_URL =
+  process.env.NEXT_PUBLIC_WHATSAPP_ALUMNOS_URL || "https://chat.whatsapp.com/HXl5PCWAVzUKxLkN8ZiaN8";
+
 // Soporte al alumno. Para cambiar el email sin tocar el código: NEXT_PUBLIC_SUPPORT_EMAIL en Vercel.
 export const SOPORTE_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "lanuevaolaacademy.soporte@gmail.com";
 
@@ -39,7 +44,9 @@ export const PAGINAS = [
   { nombre: "Página de captura", ruta: "/captura", detalle: "Lista de espera: email y grupo de WhatsApp", lista: true },
   { nombre: "Página de ventas", ruta: "/ventas", detalle: "Venta del curso: formulario de contacto y checkout de la Hotmart", lista: true },
   { nombre: "Checkout (las 3 ofertas)", ruta: "/ventas#comprar", detalle: "Lleva directo al formulario y a la elección de plan; ideal para anuncios y mensajes de cierre", lista: true },
-  { nombre: "Página de gracias", ruta: "/gracias", detalle: "Página de obrigado: ponela en la Hotmart como página de agradecimiento", lista: true },
+  { nombre: "Gracias: compra aprobada", ruta: "/gracias", detalle: "Hotmart > URL para Compras Aprobadas", lista: true },
+  { nombre: "Gracias: pago pendiente", ruta: "/gracias/pendiente", detalle: "Hotmart > URL para Compras a la espera de pago", lista: true },
+  { nombre: "Gracias: pago en análisis", ruta: "/gracias/analisis", detalle: "Hotmart > URL para Compras a la Espera del Análisis de Crédito", lista: true },
   { nombre: "Acceso de alumnos", ruta: "/entrar", detalle: "Login de la área de miembros (link para la Hotmart: área de miembros externa)", lista: true },
 ] as const;
 

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { BRAND, SOPORTE_EMAIL, WHATSAPP_GRUPO_URL } from "@/lib/config";
+import { BRAND, SOPORTE_EMAIL, WHATSAPP_ALUMNOS_URL } from "@/lib/config";
 import { FOTOS } from "@/lib/fotos";
 import { ui } from "@/lib/ui";
 
@@ -50,8 +50,8 @@ export default function PaginaEstado({ etiqueta, titulo, intro, pasos }: Props) 
             </ol>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <a href={WHATSAPP_GRUPO_URL} target="_blank" rel="noreferrer" className={`${ui.boton} w-full sm:w-auto`}>
-                Entrar al grupo de WhatsApp
+              <a href={WHATSAPP_ALUMNOS_URL} target="_blank" rel="noreferrer" className={`${ui.boton} w-full sm:w-auto`}>
+                Entrar al grupo de alumnos
               </a>
               <Link href="/entrar" className={`${ui.botonSuave} w-full sm:w-auto`}>
                 Ya pagué, quiero entrar

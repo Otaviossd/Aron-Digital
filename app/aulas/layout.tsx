@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Sidebar from "@/components/members/Sidebar";
 import { getMemberData } from "@/lib/members";
-import { BRAND } from "@/lib/config";
+import { BRAND, WHATSAPP_ALUMNOS_URL } from "@/lib/config";
 import Link from "next/link";
 import Avatar from "@/components/members/Avatar";
 
@@ -32,6 +32,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
         vistaAlumno={vistaAlumno}
         avatarUrl={avatarUrl}
         instagramUrl={process.env.NEXT_PUBLIC_INSTAGRAM_URL}
+        whatsappUrl={WHATSAPP_ALUMNOS_URL}
       />
 
       <div className="relative lg:pl-60">

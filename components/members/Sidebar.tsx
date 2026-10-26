@@ -13,6 +13,7 @@ type Props = {
   vistaAlumno?: boolean;
   avatarUrl?: string | null;
   instagramUrl?: string;
+  whatsappUrl?: string;
 };
 
 const iconos: Record<string, string> = {
@@ -20,6 +21,7 @@ const iconos: Record<string, string> = {
   cuenta: "M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm-8 10a8 8 0 0 1 16 0",
   soporte: "M4 4h16v12H7l-3 3V4z",
   ayuda: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01",
+  whatsapp: "M4 20l1.3-4.2A8 8 0 1 1 8.3 18.8L4 20zM9 9c0 3 3 6 6 6l1.2-1.4-2-1-1 .7c-.8-.4-1.6-1.2-2-2l.7-1-1-2L9 9z",
   instagram: "M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm5 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8z",
   admin: "M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z",
   salir: "M10 3H5a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h5M16 17l5-5-5-5M21 12H9",
@@ -33,7 +35,7 @@ function Icono({ d }: { d: string }) {
   );
 }
 
-export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno, avatarUrl, instagramUrl }: Props) {
+export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno, avatarUrl, instagramUrl, whatsappUrl }: Props) {
   const pathname = usePathname();
   // Menú móvil sin depender de JavaScript para abrir: un checkbox oculto + CSS (abre al instante, incluso antes de hidratar).
   const casilla = useRef<HTMLInputElement>(null);
@@ -52,6 +54,7 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
     { href: "/aulas/cuenta", label: "Mi cuenta", icono: "cuenta" },
     { href: "/aulas/ayuda", label: "Preguntas frecuentes", icono: "ayuda" },
     { href: "/aulas/soporte", label: "Soporte", icono: "soporte" },
+    ...(whatsappUrl ? [{ href: whatsappUrl, label: "Grupo de WhatsApp", icono: "whatsapp", externo: true }] : []),
     ...(instagramUrl ? [{ href: instagramUrl, label: "Instagram", icono: "instagram", externo: true }] : []),
     ...(esAdmin ? [{ href: "/admin", label: "Panel del equipo", icono: "admin" }] : []),
     ...(esAdmin

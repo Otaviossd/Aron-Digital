@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BRAND, SOPORTE_EMAIL, WHATSAPP_GRUPO_URL } from "@/lib/config";
+import { BRAND, SOPORTE_EMAIL, WHATSAPP_ALUMNOS_URL } from "@/lib/config";
 import { FOTOS } from "@/lib/fotos";
 import { ui } from "@/lib/ui";
 
@@ -57,8 +57,8 @@ export default function GraciasPage() {
               <Link href="/entrar" className={`${ui.boton} w-full sm:w-auto`}>
                 Ir a mi acceso
               </Link>
-              <a href={WHATSAPP_GRUPO_URL} target="_blank" rel="noreferrer" className={`${ui.botonSuave} w-full sm:w-auto`}>
-                Entrar al grupo de WhatsApp
+              <a href={WHATSAPP_ALUMNOS_URL} target="_blank" rel="noreferrer" className={`${ui.botonSuave} w-full sm:w-auto`}>
+                Entrar al grupo de alumnos
               </a>
             </div>
             <p className="mt-6 text-xs leading-relaxed text-faint">

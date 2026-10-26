@@ -1,5 +1,5 @@
 // Texto del e-mail de confirmación de compra (español). Fica separado para o painel poder mostrar a prévia.
-import { SOPORTE_EMAIL, DIAS_BONO, DIAS_REEMBOLSO } from "@/lib/config";
+import { SOPORTE_EMAIL, DIAS_BONO, DIAS_REEMBOLSO, WHATSAPP_ALUMNOS_URL } from "@/lib/config";
 import { bloque, boton, COLORES, layoutEmail, paso, parrafo, subtitulo, titulo } from "./layout";
 
 type Datos = { accessLink: string; loginLink: string; to: string; plan?: "monthly" | "annual" | "lifetime" };
@@ -29,6 +29,10 @@ export function htmlCompra({ accessLink, loginLink, to, plan }: Datos) {
       ${subtitulo("Cómo empezar")}
       ${paso(1, "Empezá por el <strong>Módulo 1</strong> y seguí el orden de las clases.")}
       ${paso(2, `Los <strong>bonos</strong> y algunos módulos se abren solos a los ${DIAS_BONO} días de tu compra.`)}
+
+      ${subtitulo("Grupo de alumnos")}
+      ${parrafo("Sumate al grupo de WhatsApp de alumnos: ahí avisamos las clases nuevas y resolvemos tus dudas.")}
+      ${boton(WHATSAPP_ALUMNOS_URL, "Entrar al grupo de alumnos")}
 
       ${subtitulo("Garantía y soporte")}
       ${parrafo(`Tenés <strong>${DIAS_REEMBOLSO} días</strong> para pedir el reembolso si el curso no es para vos. ¿Alguna duda? Escribinos a ${enlace(`mailto:${SOPORTE_EMAIL}`, SOPORTE_EMAIL)} y te respondemos.`)}`,
