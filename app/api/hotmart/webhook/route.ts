@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendWelcomeEmail } from "@/lib/email";
-import { hottokValido, leerCompra, type MontosCompra } from "@/lib/hotmart";
+import { entornoHotmart, hottokValido, leerCompra, type MontosCompra } from "@/lib/hotmart";
 
 // 42703 = columna inexistente (Postgres), PGRST204 = columna inexistente en el caché de PostgREST
 const faltaColumna = (e: { code?: string }) => e.code === "42703" || e.code === "PGRST204";
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 async function procesar(admin: ReturnType<typeof createAdminClient>, evento: any) {
   switch (evento?.event) {
     case "PURCHASE_APPROVED": {
-      const c = leerCompra(evento);
+      const c = leerCompra(evento, entornoHotmart());
       if (!c) throw new Error("Compra sin email o transacción");
       // Bump / producto extra barato: el evento ya queda guardado en webhook_events; no crea suscripción.
       if (c.extra) {

@@ -1,4 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
+import { OFERTAS_HOTMART } from "./config.ts";
 
 export type PlanCompra = "annual" | "lifetime";
 
@@ -60,6 +61,16 @@ export function hottokValido(recibido: string | null, esperado: string | undefin
 }
 
 type Env = Record<string, string | undefined>;
+
+// Variables de la Hotmart con los códigos de oferta reales como valor por defecto (las variables de la Vercel tienen prioridad).
+export function entornoHotmart(env: Env = process.env): Env {
+  return {
+    ...env,
+    HOTMART_OFFER_PROMO: env.HOTMART_OFFER_PROMO || OFERTAS_HOTMART.promo,
+    HOTMART_OFFER_ANUAL: env.HOTMART_OFFER_ANUAL || OFERTAS_HOTMART.anual,
+    HOTMART_OFFER_VITALICIO: env.HOTMART_OFFER_VITALICIO || OFERTAS_HOTMART.vitalicio,
+  };
+}
 
 // Decide qué se compró. Primero por el código de la oferta (variables HOTMART_OFFER_*), y si no coincide,
 // por el precio: hasta US$ 35 = promo vitalicia, desde US$ 60 = vitalicio, el resto = 1 año.

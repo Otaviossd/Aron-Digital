@@ -88,7 +88,7 @@ async function SeccionOferta() {
 
 export default function VentasPage() {
   return (
-    <main className="overflow-x-clip">
+    <main className="touch-pan-y overflow-x-clip">
       <Rastreo path="/ventas" />
 
       {/* Hero */}

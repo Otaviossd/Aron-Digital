@@ -40,3 +40,12 @@ test("clase extra de US$20 u US$10 no crea acceso al curso", () => {
   const plan = { data: { buyer: { email: "a@x.com" }, purchase: { transaction: "HP3", price: { value: 20 }, offer: { code: "p1" } } } };
   assert.equal(leerCompra(plan, env)?.extra, false);
 });
+
+test("códigos de oferta por defecto: la promo de US$25 se reconoce sin variables de entorno", async () => {
+  const { entornoHotmart } = await import("./hotmart.ts");
+  const e = entornoHotmart({});
+  const c = leerCompra({ data: { buyer: { email: "a@x.com" }, purchase: { transaction: "HP9", price: { value: 25 }, offer: { code: "zpu4tvlu" } } } }, e);
+  assert.equal(c?.plan, "lifetime");
+  assert.equal(c?.promo, true);
+  assert.equal(c?.extra, false);
+});

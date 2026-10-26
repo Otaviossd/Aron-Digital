@@ -9,11 +9,15 @@ export const PRECOS = {
 } as const;
 
 // Links de checkout de la Hotmart (uno por oferta). Se definen en la Vercel; sin ellos el botón queda como "próximamente".
+// Si la variable no está definida (o está vacía) se usa el link de la oferta real de la Hotmart.
 export const CHECKOUT_URLS = {
-  anual: process.env.NEXT_PUBLIC_HOTMART_URL_ANUAL,
-  vitalicio: process.env.NEXT_PUBLIC_HOTMART_URL_VITALICIO,
-  promo: process.env.NEXT_PUBLIC_HOTMART_URL_PROMO,
+  anual: process.env.NEXT_PUBLIC_HOTMART_URL_ANUAL || "https://pay.hotmart.com/L108130682Q?off=snaqp8m9&checkoutMode=10",
+  vitalicio: process.env.NEXT_PUBLIC_HOTMART_URL_VITALICIO || "https://pay.hotmart.com/L108130682Q?off=xz9l3slm&checkoutMode=10",
+  promo: process.env.NEXT_PUBLIC_HOTMART_URL_PROMO || "https://pay.hotmart.com/L108130682Q?off=zpu4tvlu&checkoutMode=10",
 } as const;
+
+// Códigos de las 3 ofertas de la Hotmart (el valor de "off" en cada link). El webhook los usa para saber qué plan se compró.
+export const OFERTAS_HOTMART = { promo: "zpu4tvlu", anual: "snaqp8m9", vitalicio: "xz9l3slm" } as const;
 
 // Pon NEXT_PUBLIC_PROMO_ACTIVA=0 en la Vercel para cerrar la promo de lanzamiento a mano.
 export const PROMO_ACTIVA = process.env.NEXT_PUBLIC_PROMO_ACTIVA !== "0";

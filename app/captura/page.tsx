@@ -57,7 +57,7 @@ function Chip({ className, children }: { className: string; children: React.Reac
 
 export default function CapturaPage() {
   return (
-    <main className="overflow-x-clip">
+    <main className="touch-pan-y overflow-x-clip">
       <Rastreo path="/captura" />
 
       {/* Hero */}
