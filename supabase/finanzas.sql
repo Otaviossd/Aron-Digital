@@ -1,5 +1,13 @@
 -- Finanzas: montos reales de cada compra. Ejecutar UNA vez en el SQL Editor de Supabase.
 
+-- 0) Por si todavía no existe la tabla de la clase extra (si ya existe, no cambia nada)
+create table if not exists public.extra_compras (
+  transaction text primary key,
+  email text not null,
+  created_at timestamptz not null default now()
+);
+alter table public.extra_compras enable row level security;
+
 -- 1) Montos reales de cada compra (los llena el webhook de la Hotmart)
 --    gross  = lo que pagó el cliente
 --    fee    = tarifa de la Hotmart (comisión "MARKETPLACE")
