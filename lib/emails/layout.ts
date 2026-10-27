@@ -39,31 +39,35 @@ type Opciones = {
   preheader?: string;
 };
 
+// Gmail en el celular, con el tema oscuro, "invierte" los colores del texto (el blanco se vuelve gris oscuro) pero no toca las imágenes.
+// -webkit-text-fill-color repite cada color de texto por otra vía que ese ajuste no cambia: el texto queda del color exacto que definimos.
+const fijarTexto = (html: string) => html.replace(/(^|[;"'\s])color:\s*(#[0-9a-fA-F]{3,8})/g, "$1color:$2;-webkit-text-fill-color:$2");
+
 export function layoutEmail({ cuerpo, pie, siteUrl, conFoto = true, preheader }: Opciones) {
   const base = (siteUrl ?? sitio()).replace(/\/$/, "");
-  return `<!doctype html>
+  return fijarTexto(`<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light"></head>
 <body bgcolor="${COLORES.fondo}" style="margin:0;padding:0;background:${COLORES.fondo};background-image:linear-gradient(${COLORES.fondo},${COLORES.fondo})">
   ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${COLORES.fondo}">${preheader}</div>` : ""}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${COLORES.fondo}" style="background:${COLORES.fondo};background-image:linear-gradient(${COLORES.fondo},${COLORES.fondo})"><tr><td align="center" style="padding:28px 14px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
-      <tr><td bgcolor="${COLORES.tarjeta}" style="background:${COLORES.tarjeta};background-image:linear-gradient(${COLORES.tarjeta},${COLORES.tarjeta});border:1px solid ${COLORES.borde};border-radius:22px;overflow:hidden">
+      <tr><td bgcolor="${COLORES.borde}" style="padding:1px;background:${COLORES.borde};background-image:linear-gradient(${COLORES.borde},${COLORES.borde});border-radius:22px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="${COLORES.tarjeta}" style="background:${COLORES.tarjeta};background-image:linear-gradient(${COLORES.tarjeta},${COLORES.tarjeta});border-radius:21px;overflow:hidden">
         <div style="height:3px;line-height:3px;background:${COLORES.acento};background-image:linear-gradient(90deg,${COLORES.acento},${COLORES.acento2},${COLORES.acento})">&nbsp;</div>
         ${conFoto ? `<a href="${base}"><img src="${base}/aaron/email-header.jpg" width="560" alt="La Nueva Ola Academy" style="display:block;width:100%;height:auto;border:0;background:#000000"></a>` : ""}
         <div style="padding:30px 30px 26px">${cuerpo}</div>
-      </td></tr>
+      </td></tr></table></td></tr>
       <tr><td align="left" style="padding:18px 8px 0;font-family:${fuente};font-size:12px;line-height:1.6;color:${COLORES.tenue}">
         ${pie ?? ""}
         <div style="margin-top:10px;color:#ffffff;font-weight:600">La Nueva Ola Academy</div><div>Aaron Dalla Rosa · Cursos de barbería</div>
       </td></tr>
     </table>
   </td></tr></table>
-</body></html>`;
+</body></html>`);
 }
 
 // Bloques extra para emails más completos
 export const bloque = (html: string) =>
-  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px"><tr><td bgcolor="#0b0f11" style="background:#0b0f11;background-image:linear-gradient(#0b0f11,#0b0f11);border:1px solid ${COLORES.borde};border-radius:14px;padding:16px 18px;font-family:${fuente};font-size:14px;line-height:1.6;color:#ffffff">${html}</td></tr></table>`;
+  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px"><tr><td bgcolor="${COLORES.borde}" style="padding:1px;background:${COLORES.borde};background-image:linear-gradient(${COLORES.borde},${COLORES.borde});border-radius:14px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="#0b0f11" style="background:#0b0f11;background-image:linear-gradient(#0b0f11,#0b0f11);border-radius:13px;padding:16px 18px;font-family:${fuente};font-size:14px;line-height:1.6;color:#ffffff">${html}</td></tr></table></td></tr></table>`;
 
 export const paso = (n: number, texto: string) =>
   `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 12px"><tr>

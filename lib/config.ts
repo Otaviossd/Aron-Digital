@@ -9,11 +9,11 @@ export const PRECOS = {
 } as const;
 
 // Links de checkout de la Hotmart (uno por oferta). Se definen en la Vercel; sin ellos el botón queda como "próximamente".
-// Si la variable no está definida (o está vacía) se usa el link de la oferta real de la Hotmart.
+// Links fijos de las 3 ofertas. No dependen de variables de la Vercel, para que un valor viejo allá no mande al checkout antiguo.
 export const CHECKOUT_URLS = {
-  anual: process.env.NEXT_PUBLIC_HOTMART_URL_ANUAL || "https://pay.hotmart.com/L108130682Q?off=snaqp8m9&checkoutMode=10",
-  vitalicio: process.env.NEXT_PUBLIC_HOTMART_URL_VITALICIO || "https://pay.hotmart.com/L108130682Q?off=xz9l3slm&checkoutMode=10",
-  promo: process.env.NEXT_PUBLIC_HOTMART_URL_PROMO || "https://pay.hotmart.com/L108130682Q?off=zpu4tvlu&checkoutMode=10",
+  anual: "https://pay.hotmart.com/L108130682Q?off=snaqp8m9&checkoutMode=10",
+  vitalicio: "https://pay.hotmart.com/L108130682Q?off=xz9l3slm&checkoutMode=10",
+  promo: "https://pay.hotmart.com/L108130682Q?off=zpu4tvlu&checkoutMode=10",
 } as const;
 
 // Códigos de las 3 ofertas de la Hotmart (el valor de "off" en cada link). El webhook los usa para saber qué plan se compró.
@@ -57,7 +57,7 @@ export const PAGINAS = [
 // Clase extra (order bump / venta posterior dentro del área de alumnos). Un solo producto barato en la Hotmart.
 export const EXTRA = {
   titulo: "Cómo crecer en redes sociales como barbero",
-  descripcion: "Una clase práctica para llenar tu agenda: qué publicar, cómo mostrar tus cortes y cómo convertir seguidores en clientes.",
+  descripcion: "Tu Instagram puede llenarte la agenda. En esta clase Aaron te muestra qué publicar, cómo mostrar tus cortes para que la gente quiera reservar y cómo convertir a tus seguidores en clientes.",
   valor: 10,
   valorAntes: 20, // precio "de" tachado
   diasPrecio: 14, // el precio de alumno dura 14 días desde la compra (hay que programarlo en el sitio/Hotmart)

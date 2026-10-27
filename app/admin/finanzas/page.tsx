@@ -23,15 +23,23 @@ export default function FinanzasPage(props: PageProps<"/admin/finanzas">) {
   );
 }
 
-async function Contenido({ searchParams }: { searchParams: Promise<{ d?: string | string[] }> }) {
+type Params = { d?: string | string[]; desde?: string | string[]; hasta?: string | string[] };
+const uno = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+const FECHA = /^\d{4}-\d{2}-\d{2}$/;
+
+async function Contenido({ searchParams }: { searchParams: Promise<Params> }) {
   const sp = await searchParams;
-  const crudo = Number(Array.isArray(sp.d) ? sp.d[0] : sp.d);
-  const dias = RANGOS.some((r) => r.d === crudo) ? crudo : 30;
+  const desdeP = uno(sp.desde);
+  const hastaP = uno(sp.hasta);
+  const personalizado = Boolean(desdeP && hastaP && FECHA.test(desdeP) && FECHA.test(hastaP) && desdeP <= hastaP);
+  const crudo = Number(uno(sp.d));
+  const dias = personalizado ? -1 : RANGOS.some((r) => r.d === crudo) ? crudo : 30;
 
   const supabase = await createClient();
-  const { f } = await cargarFinanzas(supabase, dias || null);
-  const periodo = dias ? `los últimos ${dias} días` : "todo el período";
+  const { f } = await cargarFinanzas(supabase, personalizado ? { desde: desdeP!, hasta: hastaP! } : dias || null);
+  const periodo = personalizado ? `del ${desdeP} al ${hastaP}` : dias ? `los últimos ${dias} días` : "todo el período";
   const cuentas = f.ventas + f.extra.ventas;
+  const hoy = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Asuncion" });
 
   return (
     <>
@@ -39,16 +47,29 @@ async function Contenido({ searchParams }: { searchParams: Promise<{ d?: string 
         titulo="Finanzas"
         sub="Lo que realmente entra: ventas de la Hotmart después de reembolsos y de la tarifa. Todo en dólares. No incluye gastos de anuncios."
         derecha={
-          <div className="flex gap-1 rounded-full border border-line p-1 text-sm">
-            {RANGOS.map((r) => (
-              <Link
-                key={r.d}
-                href={`/admin/finanzas?d=${r.d}`}
-                className={`rounded-full px-3.5 py-1.5 transition ${r.d === dias ? "bg-white/10 font-medium text-ink" : "text-muted hover:text-ink"}`}
-              >
-                {r.etiqueta}
-              </Link>
-            ))}
+          <div className="flex flex-col items-start gap-3 sm:items-end">
+            <div className="flex flex-wrap gap-1 rounded-full border border-line p-1 text-sm">
+              {RANGOS.map((r) => (
+                <Link
+                  key={r.d}
+                  href={`/admin/finanzas?d=${r.d}`}
+                  className={`rounded-full px-3.5 py-1.5 transition ${r.d === dias ? "bg-white/10 font-medium text-ink" : "text-muted hover:text-ink"}`}
+                >
+                  {r.etiqueta}
+                </Link>
+              ))}
+            </div>
+            <form method="get" className="flex flex-wrap items-end gap-2 text-xs text-muted">
+              <label className="flex flex-col gap-1">
+                Desde
+                <input type="date" name="desde" required defaultValue={personalizado ? desdeP : undefined} max={hoy} className="rounded-lg border border-line bg-white/[0.03] px-3 py-2 text-sm text-ink outline-none focus:border-white/35" />
+              </label>
+              <label className="flex flex-col gap-1">
+                Hasta
+                <input type="date" name="hasta" required defaultValue={personalizado ? hastaP : undefined} max={hoy} className="rounded-lg border border-line bg-white/[0.03] px-3 py-2 text-sm text-ink outline-none focus:border-white/35" />
+              </label>
+              <button className={`rounded-full px-4 py-2 text-sm font-medium transition ${personalizado ? "bg-white/10 text-ink" : "border border-line text-muted hover:text-ink"}`}>Aplicar fechas</button>
+            </form>
           </div>
         }
       />

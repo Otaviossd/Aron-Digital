@@ -3,40 +3,47 @@
 import { useEffect, useState } from "react";
 import { ui } from "@/lib/ui";
 
-// Barra fija con el botón de compra, solo en el celular. Se muestra al bajar y se esconde cuando ya se ve la oferta.
+// Barra fija con el botón de compra, solo en el celular. Aparece al bajar del inicio y se esconde en cuanto
+// se ve el cuadro de la oferta (#comprar), para no tapar sus botones.
 export default function BarraMovil({ texto }: { texto: string }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    let pasoHero = false;
-    let oferta = false;
-    const actualizar = () => setVisible(pasoHero && !oferta);
-    const onScroll = () => {
-      pasoHero = window.scrollY > 700;
-      actualizar();
+    let espera = false;
+    const calcular = () => {
+      espera = false;
+      // Se busca el cuadro en cada medición: el contenido de la oferta cambia de paso y se vuelve a dibujar.
+      const el = document.getElementById("comprar");
+      const r = el?.getBoundingClientRect();
+      const ofertaALaVista = Boolean(r && r.top < window.innerHeight * 0.92 && r.bottom > 80);
+      setVisible(window.scrollY > 700 && !ofertaALaVista);
     };
-    onScroll();
+    const onScroll = () => {
+      if (!espera) {
+        espera = true;
+        requestAnimationFrame(calcular);
+      }
+    };
+    calcular();
     window.addEventListener("scroll", onScroll, { passive: true });
-    const el = document.getElementById("comprar");
-    const obs = el
-      ? new IntersectionObserver(([e]) => {
-          oferta = e.isIntersecting;
-          actualizar();
-        })
-      : null;
-    if (el) obs?.observe(el);
+    window.addEventListener("resize", onScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
-      obs?.disconnect();
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
+
+  function ir(e: React.MouseEvent) {
+    e.preventDefault();
+    document.getElementById("comprar")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <div
       className={`fixed inset-x-0 bottom-0 z-40 p-3 transition duration-300 md:hidden ${visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0"}`}
       aria-hidden={!visible}
     >
-      <a href="#comprar" tabIndex={visible ? 0 : -1} className={`${ui.boton} w-full py-3.5 shadow-[0_-10px_40px_-10px_rgba(0,0,0,.9)]`}>
+      <a href="#comprar" onClick={ir} tabIndex={visible ? 0 : -1} className={`${ui.boton} w-full py-3.5 shadow-[0_-10px_40px_-10px_rgba(0,0,0,.9)]`}>
         {texto}
       </a>
     </div>
