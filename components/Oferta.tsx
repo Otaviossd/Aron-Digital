@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CHECKOUT_URLS, PRECOS } from "@/lib/config";
 import { enviarEvento } from "@/components/Rastreo";
 import { ui } from "@/lib/ui";
+import CuentaRegresiva from "@/components/CuentaRegresiva";
 import { normalizarTelefono, telefonoValido as validarTelefono } from "@/lib/telefono";
 
 const CLAVE = "lno_oferta_datos";
@@ -12,7 +13,7 @@ type Tipo = "promo" | "anual" | "vitalicio";
 
 // Antes de ver los precios y pasar al checkout, la persona deja nombre, email y WhatsApp.
 // Así podemos recuperar la venta por email y por WhatsApp si no termina de pagar.
-export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
+export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: number; promoFin: string }) {
   const [paso, setPaso] = useState<"datos" | "oferta">("datos");
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -170,6 +171,22 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
         <div>
           <p className="mb-2 text-sm font-medium text-accent">Paso 2 de 2</p>
           <h3 className="mb-2 text-2xl font-semibold tracking-tight">{nombre ? `${nombre.split(" ")[0]}, elegí cómo entrar` : "Elegí cómo entrar"}</h3>
+          {promo && (
+            <div className="mb-6 rounded-2xl border border-accent/40 bg-accent/[0.07] p-4 text-center">
+              <p className="text-sm font-semibold text-accent">Oferta de lanzamiento: 3 días o hasta agotar los {PRECOS.promo.vagas} cupos</p>
+              <p className="mt-1 text-xs text-muted">Lo que ocurra primero. Después vuelve al precio normal.</p>
+              <div className="mt-3">
+                <CuentaRegresiva fin={promoFin} />
+              </div>
+              <p className="mt-3 text-sm text-ink">
+                {vagasRestantes <= PRECOS.promo.vagas ? (
+                  <>
+                    Quedan <strong className="text-accent">{vagasRestantes}</strong> de {PRECOS.promo.vagas} cupos
+                  </>
+                ) : null}
+              </p>
+            </div>
+          )}
           <p className="mb-6 text-sm text-muted">
             Pago único en todos los casos. Sin mensualidades.{" "}
             <button

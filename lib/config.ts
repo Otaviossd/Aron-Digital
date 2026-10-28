@@ -22,6 +22,10 @@ export const OFERTAS_HOTMART = { promo: "zpu4tvlu", anual: "snaqp8m9", vitalicio
 // Pon NEXT_PUBLIC_PROMO_ACTIVA=0 en la Vercel para cerrar la promo de lanzamiento a mano.
 export const PROMO_ACTIVA = process.env.NEXT_PUBLIC_PROMO_ACTIVA !== "0";
 
+// La promo de lanzamiento dura 3 días (7 a 10 de noviembre) o hasta agotar los cupos, lo que ocurra primero.
+// Pasada esta fecha (hora de Paraguay) la oferta de lanzamiento desaparece sola del sitio. Se puede cambiar con NEXT_PUBLIC_PROMO_FIN.
+export const PROMO_FIN = process.env.NEXT_PUBLIC_PROMO_FIN || "2026-11-10T23:59:59-03:00";
+
 export const DIAS_REEMBOLSO = 7;
 
 export const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME ?? "Barbería Aaron";
@@ -60,10 +64,12 @@ export const EXTRA = {
   descripcion: "Tu Instagram puede llenarte la agenda. En esta clase Aaron te muestra qué publicar, cómo mostrar tus cortes para que la gente quiera reservar y cómo convertir a tus seguidores en clientes.",
   valor: 10,
   valorAntes: 20, // precio "de" tachado
-  diasPrecio: 14, // el precio de alumno dura 14 días desde la compra (hay que programarlo en el sitio/Hotmart)
+  diasPrecio: 15, // el precio de alumno (US$10) dura 15 días desde la compra del curso; después vuelve a US$20 (lo calcula el sitio)
   portada: "/extra/portada.webp", // portada cuadrada de la clase (también se usa de miniatura)
   portadaChica: "/extra/portada-chica.webp",
-  checkoutUrl: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA,
+  checkoutUrl: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA, // oferta de US$10 (precio de alumno)
+  // Link del precio normal (US$20). Si no se define, se usa el mismo link sin el parámetro "off" (la oferta base del producto).
+  checkoutUrlNormal: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA_NORMAL,
   videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...)
 } as const;
 

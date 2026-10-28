@@ -3,6 +3,7 @@
 import { CUPONES, DIAS_BONO, DIAS_REEMBOLSO, EXTRA, SOPORTE_EMAIL, WHATSAPP_GRUPO_URL } from "@/lib/config";
 import { bloque, boton, COLORES, layoutEmail, paso, parrafo, subtitulo, titulo } from "./layout";
 import { htmlCompra, ASUNTO_COMPRA } from "./compra";
+import { plantillaExtra } from "./extra";
 
 export type TipoNodo = "origen" | "pagina" | "accion" | "email" | "bien" | "mal" | "frio";
 
@@ -578,23 +579,23 @@ export function construirMapa(ctx: Ctx) {
     objetivo: "Dar el acceso con un clic y dejar claro cómo empezar.",
     html: htmlCompra({ accessLink: "#", loginLink: `${base}/entrar`, to: "tu@email.com", plan: "lifetime" }),
   });
-  const bloqueExtra = bloque(`${fuerte(EXTRA.titulo)}<br/>${EXTRA.descripcion}<br/><br/><span style="font-size:22px;font-weight:700;color:#ffffff">US$${EXTRA.valor}</span> <span style="color:#b9c0c3;text-decoration:line-through">US$${EXTRA.valorAntes}</span> <span style="color:#b9c0c3">precio de alumno durante tus primeros ${EXTRA.diasPrecio} días</span>`);
-  const verExtra = boton(`${base}/aulas/extra`, "Quiero la clase extra");
-  add("C2", {
-    asunto: "Una cosa más antes de empezar: sumá la clase extra",
-    cuando: "3 horas después de comprar (solo si no tiene la clase extra)",
-    objetivo: "Primera oferta de la clase extra, con el interés de compra todavía alto.",
-    nota: `Regla de negocio propuesta: el precio de alumno (US$${EXTRA.valor}) vale durante los primeros ${EXTRA.diasPrecio} días de la compra; después vuelve a US$${EXTRA.valorAntes}. Hay que programarlo para que la urgencia sea real. Necesita el producto extra y su enlace en la Hotmart.`,
-    html: A(
-      `${titulo("Una cosa más antes de empezar")}
-       ${parrafo("Ya tenés el curso, y eso es lo más importante. Pero cortar bien es solo la mitad del camino: la otra mitad es que te encuentren y te elijan.")}
-       ${parrafo("Por eso armamos una clase extra, pensada para quienes recién empiezan a mostrar su trabajo:")}
-       ${bloqueExtra}
-       ${verExtra}
-       ${parrafo("Se abre en tu plataforma apenas se confirma el pago, sin esperar.")}`,
-      "Precio especial de alumno por tiempo limitado.",
-    ),
-  });
+  // Emails de la clase extra: los mismos que salen de verdad (lib/emails/extra.ts). Se envían solos cuando EXTRA_EMAILS_ACTIVAS=1.
+  const ejExtra = (step: number, horas: number | null) =>
+    plantillaExtra(step, { siteUrl: base, email: "tu@email.com", bajaUrl: "#", marca: ctx.marca, link: "#", horasRestantes: horas });
+  const notaExtra = `Sale solo (hora a hora) si el alumno no compró la clase extra y no se dio de baja. Precio de alumno: US$${EXTRA.valor} durante ${EXTRA.diasPrecio} días desde la compra; después US$${EXTRA.valorAntes}. El vencimiento es real: lo calcula el sitio.`;
+  const pasoExtra = (id: string, step: number, horas: number | null, cuando: string, objetivo: string) =>
+    add(id, { estado: "activo", asunto: ejExtra(step, horas).asunto, cuando, objetivo, nota: notaExtra, html: ejExtra(step, horas).html });
+  pasoExtra("C2", 1, 357, "3 horas después de comprar (solo si no tiene la clase extra)", "Primera oferta de la clase extra, con el interés de compra todavía alto.");
+  pasoExtra("C4", 2, 280, "3 días después de comprar (solo si no tiene la clase extra)", "Segunda oferta, centrada en el problema real: conseguir clientes.");
+  pasoExtra("C7", 3, 144, "9 días después de comprar (solo si no tiene la clase extra)", "Tercera oferta: detallar el contenido para quien todavía duda.");
+  pasoExtra("C8", 4, 70, "12 días después de comprar (vence en 3 días)", "Escasez real: el precio de alumno termina a los 15 días.");
+  pasoExtra("C9", 5, 20, "14 días después de comprar (últimas 24 horas)", "Cierre de la oferta: mañana vuelve a US$20.");
+  pasoExtra("C9b", 6, 8, "14 días y 14 horas (últimas horas)", "Último aviso del precio de alumno.");
+  pasoExtra("P7", 7, null, "17 días después de comprar (ya a US$20)", "Seguir vendiendo a precio normal, sin urgencia inventada.");
+  pasoExtra("P8", 8, null, "25 días después de comprar (a US$20)", "Argumento de retorno: un cliente nuevo paga la clase.");
+  pasoExtra("P9", 9, null, "40 días después de comprar (a US$20)", "Resolver dudas frecuentes.");
+  pasoExtra("P10", 10, null, "60 días después de comprar (a US$20)", "Aportar un consejo útil y recordar la clase.");
+  pasoExtra("P11", 11, null, "90 días después de comprar (a US$20)", "Último recordatorio; después no se manda más.");
   add("C3", {
     asunto: "Tu primera clase te lleva 10 minutos",
     cuando: "1 día después de comprar",
@@ -606,22 +607,6 @@ export function construirMapa(ctx: Ctx) {
        ${parrafo("Después seguí el orden de los módulos. No hace falta apurarse: lo importante es la constancia.")}
        ${parrafo(`${fuerte("P. D.:")} cuando quieras, también podés sumar ${enlace(`${base}/aulas/extra`, EXTRA.titulo)} a precio de alumno.`)}`,
       "Un primer paso corto.",
-    ),
-  });
-  add("C4", {
-    asunto: "¿De qué sirve cortar bien si nadie lo ve?",
-    cuando: "3 días después de comprar (solo si no tiene la clase extra)",
-    objetivo: "Segunda oferta, centrada en el problema real: conseguir clientes.",
-    html: A(
-      `${titulo("¿De qué sirve cortar bien si nadie lo ve?")}
-       ${parrafo("Hay barberos que cortan increíble y tienen la agenda vacía. Y otros que cortan parecido y no dan abasto. La diferencia casi nunca es la técnica: es cómo se muestran.")}
-       ${parrafo("En la clase extra Aaron te explica, sin vueltas:")}
-       ${paso(1, `${fuerte("Qué publicar")} para que te sigan las personas correctas.`)}
-       ${paso(2, `${fuerte("Cómo mostrar tus cortes")} para que se vean profesionales.`)}
-       ${paso(3, `${fuerte("Cómo convertir seguidores en clientes")} que reservan.`)}
-       ${bloqueExtra}
-       ${verExtra}`,
-      "Cortar bien no alcanza si nadie te ve.",
     ),
   });
   add("C5", {
@@ -648,46 +633,6 @@ export function construirMapa(ctx: Ctx) {
        ${parrafo(`Quienes quieren más clientes suelen sumar ${fuerte(EXTRA.titulo)}. Todavía tenés el precio de alumno: US$${EXTRA.valor} en lugar de US$${EXTRA.valorAntes}.`)}
        ${enlace(`${base}/aulas/extra`, "Ver la clase extra")}`,
       "Tus bonos ya están disponibles.",
-    ),
-  });
-  add("C7", {
-    asunto: "Lo que vas a aprender en la clase extra, en 3 puntos",
-    cuando: "9 días después de comprar (solo si no tiene la clase extra)",
-    objetivo: "Tercera oferta: detallar el contenido para quien todavía duda.",
-    html: A(
-      `${titulo("La clase extra, en 3 puntos")}
-       ${paso(1, `${fuerte("Qué publicar.")} Dejás de improvisar contenido: sabés qué mostrar para que te sigan personas de tu zona que buscan un barbero.`)}
-       ${paso(2, `${fuerte("Cómo mostrar tus cortes.")} Ángulos, luz y detalles simples para que cada corte se vea como lo que es: trabajo profesional.`)}
-       ${paso(3, `${fuerte("Cómo convertir seguidores en clientes.")} El paso de "me gusta tu trabajo" a "quiero reservar un turno".`)}
-       ${bloqueExtra}
-       ${verExtra}`,
-      "Qué vas a aprender, punto por punto.",
-    ),
-  });
-  add("C8", {
-    asunto: "Tu precio de alumno vence en 2 días",
-    cuando: `${EXTRA.diasPrecio - 2} días después de comprar (solo si no tiene la clase extra)`,
-    objetivo: "Urgencia real: el precio de alumno termina a los 14 días.",
-    nota: `Solo es verdad si se programa el vencimiento: a los ${EXTRA.diasPrecio} días de la compra la clase extra pasa a US$${EXTRA.valorAntes}.`,
-    html: A(
-      `${titulo("Tu precio de alumno vence en 2 días")}
-       ${parrafo(`Como alumno tenés la clase extra a US$${EXTRA.valor} durante tus primeros ${EXTRA.diasPrecio} días. En 2 días vuelve a US$${EXTRA.valorAntes}.`)}
-       ${verExtra}
-       ${parrafo("Se abre al instante en tu plataforma. Sin esperar y sin trámites.")}`,
-      "El precio especial está por terminar.",
-    ),
-  });
-  add("C9", {
-    asunto: "Último día: la clase extra a US$10",
-    cuando: `${EXTRA.diasPrecio} días después de comprar (solo si no tiene la clase extra)`,
-    objetivo: "Cierre de la oferta de la clase extra.",
-    html: A(
-      `${titulo("Hoy es el último día")}
-       ${parrafo(`Hoy termina tu precio de alumno. Mañana, "${EXTRA.titulo}" pasa a US$${EXTRA.valorAntes}.`)}
-       ${bloqueExtra}
-       ${verExtra}
-       ${parrafo("Es la última vez que te lo recordamos. Gracias por ser parte de La Nueva Ola Academy.")}`,
-      "Último día del precio de alumno.",
     ),
   });
   add("C10", {
@@ -840,14 +785,16 @@ export function construirMapa(ctx: Ctx) {
 
   // Filas 3-5 · pagó
   nodo({ id: "bien", col: 5, row: 3, tipo: "bien", titulo: "Pagó", sub: "Se convierte en alumno", detalle: "El webhook libera el acceso, corta toda secuencia de recuperación y envía la confirmación. Según lo que compró, entra a uno de estos caminos." });
-  nodo({ id: "solo", col: 6, row: 3, tipo: "bien", titulo: "Solo el curso", sub: "Sin la clase extra", detalle: "Recibe 6 emails con la oferta de la clase extra (3 horas, días 3, 7, 9, 12 y 14, y una mención en el día 1) mezclados con los de seguimiento. Si compra la clase extra, pasa al camino 'Curso + clase extra' y deja de recibir las ofertas." });
+  nodo({ id: "solo", col: 6, row: 3, tipo: "bien", titulo: "Solo el curso", sub: "Sin la clase extra", detalle: "Recibe 6 emails con la oferta de la clase extra en sus primeros 15 días (3 horas, días 3, 9, 12 y 14, y un último aviso ese mismo día) a US$10, y después otros 5 a US$20 (días 17, 25, 40, 60 y 90). Si compra la clase extra, pasa al camino 'Curso + clase extra' y deja de recibir las ofertas." });
   nodo({ id: "both", col: 6, row: 4, tipo: "bien", titulo: "Curso + clase extra", sub: "Cliente completo", detalle: "Compró también la clase extra (en el checkout o después). Deja de recibir ofertas de la clase extra." });
   nodo({ id: "ren", col: 6, row: 5, tipo: "bien", titulo: "Plan de 1 año", sub: "Antes de que venza", detalle: "Quien compró el acceso de 1 año recibe 3 avisos antes del vencimiento, con la opción de pasar a vitalicio." });
-  const c = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11"];
+  const c = ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C9b", "P7", "C10", "P8", "C11", "P9", "P10", "P11"];
   fila(c, {
     C1: ["Confirmación de compra", "Al instante"], C2: ["Sumá la clase extra", "3 horas · oferta"], C3: ["Tu primera clase", "1 día"], C4: ["¿De qué sirve cortar bien si nadie lo ve?", "3 días · oferta"],
     C5: ["¿Cómo vas?", "5 días"], C6: ["Tus bonos + complemento", "7 días · oferta"], C7: ["La clase extra en 3 puntos", "9 días · oferta"], C8: ["Tu precio de alumno vence", "12 días · oferta"],
-    C9: ["Último día: clase extra", "14 días · oferta"], C10: ["¿Nos contás cómo te fue?", "21 días"], C11: ["Un mes juntos", "30 días"],
+    C9: ["Últimas 24 h: clase extra", "14 días · oferta"], C9b: ["Se termina hoy", "14 d 14 h · oferta"], P7: ["Terminó el precio de alumno", "17 días · US$20"],
+    C10: ["¿Nos contás cómo te fue?", "21 días"], P8: ["Un cliente nuevo la paga", "25 días · US$20"], C11: ["Un mes juntos", "30 días"],
+    P9: ["Dudas sobre la clase extra", "40 días · US$20"], P10: ["Consejo para mostrar tus cortes", "60 días · US$20"], P11: ["Último recordatorio", "90 días · US$20"],
   }, 7, 3);
   const x = ["X1", "X2", "X3", "X4"];
   fila(x, { X1: ["Compra confirmada: curso + extra", "Al instante"], X2: ["Sacale el máximo", "2 días"], X3: ["Contanos tu resultado", "14 días"], X4: ["Un mes después", "30 días"] }, 7, 4);

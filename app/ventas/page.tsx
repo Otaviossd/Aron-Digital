@@ -7,7 +7,7 @@ import Aparece from "@/components/Aparece";
 import BarraMovil from "@/components/BarraMovil";
 import VideoVentas from "@/components/VideoVentas";
 import { vagasPromoRestantes } from "@/lib/promo";
-import { BRAND, DIAS_BONO, DIAS_REEMBOLSO } from "@/lib/config";
+import { BRAND, DIAS_BONO, DIAS_REEMBOLSO, PROMO_FIN } from "@/lib/config";
 import { FOTOS } from "@/lib/fotos";
 import { ui } from "@/lib/ui";
 
@@ -83,7 +83,7 @@ function Chip({ className, children }: { className: string; children: React.Reac
 
 async function SeccionOferta() {
   const restantes = await vagasPromoRestantes();
-  return <Oferta vagasRestantes={restantes} />;
+  return <Oferta vagasRestantes={restantes} promoFin={PROMO_FIN} />;
 }
 
 export default function VentasPage() {

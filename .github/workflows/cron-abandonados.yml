@@ -25,3 +25,14 @@ jobs:
           echo
           status=${info%% *}
           test "$status" = "200"
+      - name: Chamar a rota da clase extra (emails a alunos)
+        if: always()
+        run: |
+          info=$(curl -s -o resposta2.json -w "%{http_code} %{redirect_url}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/extra")
+          echo "Status e redirecionamento: $info"
+          cat resposta2.json
+          echo
+          status=${info%% *}
+          test "$status" = "200"

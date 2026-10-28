@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { getMemberData } from "@/lib/members";
 import { EXTRA } from "@/lib/config";
+import { enlaceExtra, precioExtra, textoRestante, URLS_EXTRA } from "@/lib/extra";
 import { ui } from "@/lib/ui";
 
 export default function ExtraPage() {
@@ -13,9 +14,20 @@ export default function ExtraPage() {
 }
 
 async function Extra() {
-  const { supabase } = await getMemberData();
+  const { supabase, email } = await getMemberData();
   const { data } = await supabase.rpc("tiene_extra");
   const tiene = data === true;
+
+  // US$10 durante los primeros 15 días desde la compra del curso; después US$20.
+  const { data: compras } = await supabase
+    .from("subscriptions")
+    .select("purchased_at")
+    .is("refunded_at", null)
+    .order("purchased_at", { ascending: true })
+    .limit(1);
+  const compraEn = compras?.[0]?.purchased_at ? new Date(compras[0].purchased_at) : null;
+  const precio = precioExtra(compraEn, new Date());
+  const enlace = enlaceExtra(precio.enOferta, URLS_EXTRA, email);
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -47,11 +59,33 @@ async function Extra() {
             </svg>
           </span>
           <p className="mt-4 text-lg font-semibold tracking-tight">Desbloqueá esta clase extra</p>
-          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted">
-            Es un extra aparte de tu curso, con precio especial para alumnos: <strong className="text-ink">US${EXTRA.valor} en vez de US${EXTRA.valorAntes}</strong>, pago único. Se abre acá mismo apenas se confirma el pago.
-          </p>
-          {EXTRA.checkoutUrl ? (
-            <a href={EXTRA.checkoutUrl} className={`${ui.boton} mt-6`}>
+          {precio.enOferta ? (
+            <>
+              <p className="mx-auto mt-3 inline-flex items-baseline gap-2">
+                <span className="text-4xl font-semibold tracking-tight">US${precio.valor}</span>
+                <span className="text-lg text-faint line-through">US${precio.valorAntes}</span>
+              </p>
+              <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted">
+                Precio especial de alumno, pago único.
+                {precio.horasRestantes !== null && (
+                  <>
+                    {" "}
+                    <strong className="text-accent">Te quedan {textoRestante(precio.horasRestantes)}</strong>: después vuelve a US${EXTRA.valorAntes}.
+                  </>
+                )}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="mx-auto mt-3 text-4xl font-semibold tracking-tight">US${precio.valor}</p>
+              <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted">
+                Pago único. El precio de alumno (US${EXTRA.valor}) duraba {EXTRA.diasPrecio} días desde tu compra y ya terminó, pero la clase sigue disponible para vos.
+              </p>
+            </>
+          )}
+          <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">Se abre acá mismo apenas se confirma el pago.</p>
+          {enlace ? (
+            <a href={enlace} className={`${ui.boton} mt-6`}>
               Quiero la clase extra
             </a>
           ) : (
