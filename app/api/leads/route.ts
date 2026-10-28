@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { enviarBienvenidaLista } from "@/lib/lista";
+import { normalizarTelefono } from "@/lib/telefono";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -21,7 +22,9 @@ export async function POST(request: NextRequest) {
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const plan = body.plan === "anual" || body.plan === "vitalicio" || body.plan === "promo" ? body.plan : null;
   const name = typeof body.name === "string" ? body.name.trim().slice(0, 120) || null : null;
-  const phone = typeof body.phone === "string" ? body.phone.replace(/[^\d+\s()-]/g, "").trim().slice(0, 30) || null : null;
+  // Solo se guarda un WhatsApp con código de país real; si no, queda vacío (no ensucia la lista).
+  const telNormal = typeof body.phone === "string" ? normalizarTelefono(body.phone) : null;
+  const phone = telNormal ? `+${telNormal}` : null;
   const source = body.source === "captura" ? "captura" : "checkout";
   if (!EMAIL_RE.test(email) || email.length > 254) return NextResponse.json({ ok: true });
 

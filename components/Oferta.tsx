@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { CHECKOUT_URLS, PRECOS } from "@/lib/config";
 import { enviarEvento } from "@/components/Rastreo";
 import { ui } from "@/lib/ui";
+import { normalizarTelefono, telefonoValido as validarTelefono } from "@/lib/telefono";
+
+const CLAVE = "lno_oferta_datos";
 
 type Tipo = "promo" | "anual" | "vitalicio";
 
@@ -18,7 +21,7 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
   const [error, setError] = useState("");
 
   const emailValido = /^\S+@\S+\.\S+$/.test(email.trim());
-  const telefonoValido = telefono.replace(/\D/g, "").length >= 8;
+  const telefonoValido = validarTelefono(telefono);
   const promo = vagasRestantes > 0;
 
   const opciones: {
@@ -65,6 +68,7 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
   const diferencia = PRECOS.vitalicio.valor - PRECOS.anual.valor;
 
   // Link de los emails de carrito abandonado (?email=...): ya dejó sus datos, va directo a la oferta.
+  // Si ya dejó sus datos y vuelve del checkout, no se los pedimos de nuevo.
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     const e = q.get("email");
@@ -73,6 +77,18 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
       const n = q.get("nombre");
       if (n) setNombre(n);
       setPaso("oferta");
+      return;
+    }
+    try {
+      const g = JSON.parse(window.localStorage.getItem(CLAVE) ?? "null");
+      if (g && typeof g.email === "string" && /^\S+@\S+\.\S+$/.test(g.email)) {
+        setEmail(g.email);
+        if (typeof g.nombre === "string") setNombre(g.nombre);
+        if (typeof g.telefono === "string") setTelefono(g.telefono);
+        setPaso("oferta");
+      }
+    } catch {
+      /* sin almacenamiento: vuelve a pedir los datos */
     }
   }, []);
 
@@ -81,7 +97,7 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
     setError("");
     if (nombre.trim().length < 2) return setError("Escribí tu nombre.");
     if (!emailValido) return setError("Revisá tu email.");
-    if (!telefonoValido) return setError("Escribí tu WhatsApp con el código de país.");
+    if (!telefonoValido) return setError("Revisá tu WhatsApp: tiene que llevar el código de país, por ejemplo +595 981 123 456.");
     setEnviando(true);
     try {
       await fetch("/api/leads", {
@@ -91,6 +107,11 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
       });
     } catch {
       /* si falla el guardado igual la dejamos avanzar */
+    }
+    try {
+      window.localStorage.setItem(CLAVE, JSON.stringify({ nombre: nombre.trim(), email: email.trim().toLowerCase(), telefono: telefono.trim() }));
+    } catch {
+      /* ignorar */
     }
     enviarEvento("/ventas", "checkout");
     setEnviando(false);
@@ -105,7 +126,7 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
       const u = new URL(base);
       if (email) u.searchParams.set("email", email.trim().toLowerCase());
       if (nombre) u.searchParams.set("name", nombre.trim());
-      if (telefono) u.searchParams.set("phonenumber", telefono.replace(/\D/g, ""));
+      if (telefono) u.searchParams.set("phonenumber", normalizarTelefono(telefono) ?? telefono.replace(/\D/g, ""));
       return u.toString();
     } catch {
       return base;
@@ -149,7 +170,23 @@ export default function Oferta({ vagasRestantes }: { vagasRestantes: number }) {
         <div>
           <p className="mb-2 text-sm font-medium text-accent">Paso 2 de 2</p>
           <h3 className="mb-2 text-2xl font-semibold tracking-tight">{nombre ? `${nombre.split(" ")[0]}, elegí cómo entrar` : "Elegí cómo entrar"}</h3>
-          <p className="mb-6 text-sm text-muted">Pago único en todos los casos. Sin mensualidades.</p>
+          <p className="mb-6 text-sm text-muted">
+            Pago único en todos los casos. Sin mensualidades.{" "}
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  window.localStorage.removeItem(CLAVE);
+                } catch {
+                  /* ignorar */
+                }
+                setPaso("datos");
+              }}
+              className="text-faint underline underline-offset-2 hover:text-ink"
+            >
+              Cambiar mis datos
+            </button>
+          </p>
 
           <div role="radiogroup" aria-label="Elegí tu acceso" className="space-y-3">
             {opciones.map((o) => {
