@@ -178,13 +178,11 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
               <div className="mt-3">
                 <CuentaRegresiva fin={promoFin} />
               </div>
-              <p className="mt-3 text-sm text-ink">
-                {vagasRestantes <= PRECOS.promo.vagas ? (
-                  <>
-                    Quedan <strong className="text-accent">{vagasRestantes}</strong> de {PRECOS.promo.vagas} cupos
-                  </>
-                ) : null}
-              </p>
+              {vagasRestantes <= PRECOS.promo.vagas - PRECOS.promo.mostrarCuposDesde && (
+                <p className="mt-3 text-sm text-ink">
+                  Quedan <strong className="text-accent">{vagasRestantes}</strong> de {PRECOS.promo.vagas} cupos
+                </p>
+              )}
             </div>
           )}
           <p className="mb-6 text-sm text-muted">

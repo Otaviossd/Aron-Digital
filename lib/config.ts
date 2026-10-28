@@ -5,7 +5,7 @@ export const PRECOS = {
   // Para siempre, con todas las actualizaciones
   vitalicio: { valor: 70, rotulo: "Acceso vitalicio", detalle: "pago único, para siempre y con todas las actualizaciones" },
   // Precio de lanzamiento: vitalicio al precio del anual con 50% de descuento, solo para las primeras personas
-  promo: { valor: 25, vagas: 50, rotulo: "Precio de lanzamiento", detalle: "acceso vitalicio al precio promocional" },
+  promo: { valor: 25, vagas: 50, mostrarCuposDesde: 30, /* ventas a partir de las cuales se muestra "Quedan X cupos" */ rotulo: "Precio de lanzamiento", detalle: "acceso vitalicio al precio promocional" },
 } as const;
 
 // Links de checkout de la Hotmart (uno por oferta). Se definen en la Vercel; sin ellos el botón queda como "próximamente".
