@@ -63,9 +63,9 @@ async function Contenido({ searchParams }: { searchParams: Promise<{ d?: string 
           ruta="/captura"
           filas={[
             { etiqueta: "Visitantes", valor: cap.visitantes, base: cap.visitantes },
-            { etiqueta: "Dejaron su email", valor: cap.registros, base: cap.visitantes, tasa: pct(cap.registros, cap.visitantes) },
+            { etiqueta: "Dejaron su email", valor: e.registros_lista, base: cap.visitantes, tasa: pct(e.registros_lista, cap.visitantes) },
           ]}
-          pie={`${e.registros_lista} personas se sumaron a la lista en este período.`}
+          pie="Cuenta emails únicos guardados en la lista: si alguien se anota dos veces con el mismo email, cuenta una sola vez."
         />
         <Paso
           titulo="Página de ventas"
@@ -83,7 +83,7 @@ async function Contenido({ searchParams }: { searchParams: Promise<{ d?: string 
         {e.origenes.length === 0 ? (
           <Vacio>Todavía no hay visitas registradas en este período.</Vacio>
         ) : (
-          <Tabla cabeceras={["Origen", "Visitantes", "Dejaron email", "Llegaron al checkout"]}>
+          <Tabla cabeceras={["Origen", "Visitantes", "Envíos del formulario*", "Llegaron al checkout"]}>
             {e.origenes.map((o) => (
               <tr key={o.origen}>
                 <td className="px-4 py-3 font-medium">{o.origen}</td>
@@ -94,6 +94,7 @@ async function Contenido({ searchParams }: { searchParams: Promise<{ d?: string 
             ))}
           </Tabla>
         )}
+        <p className="mt-2 text-xs text-faint">* Por origen no se puede distinguir el email: si una persona se anota dos veces, cuenta dos. El número real de personas está en “Página de captura”.</p>
       </Seccion>
 
       <Seccion titulo="Enlaces para compartir" sub="Cada uno marca el origen con utm_source. Cambiá la palabra después del = si querés otro nombre.">
