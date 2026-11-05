@@ -4,6 +4,7 @@ import { CUPONES, DIAS_BONO, DIAS_REEMBOLSO, EXTRA, SOPORTE_EMAIL, WHATSAPP_GRUP
 import { bloque, boton, COLORES, layoutEmail, paso, parrafo, subtitulo, titulo } from "./layout";
 import { htmlCompra, ASUNTO_COMPRA } from "./compra";
 import { plantillaExtra } from "./extra";
+import { fichasCaptura, plantillaCaptura } from "./captura";
 
 export type TipoNodo = "origen" | "pagina" | "accion" | "email" | "bien" | "mal" | "frio";
 
@@ -73,161 +74,19 @@ export function construirMapa(ctx: Ctx) {
       "Entrás primero. Sumate al grupo de WhatsApp.",
     ),
   });
-  add("F9", {
-    asunto: "Quién es Aaron (y por qué armó este curso)",
-    cuando: "Faltan 9 días para la apertura",
-    objetivo: "Construir confianza: autoridad e historia, sin vender todavía.",
-    nota: "Datos del brief (7 años cortando, 3 enseñando, +2.500 barberos, 6 países): Aaron debe confirmarlos.",
-    html: L(
-      `${titulo("Quién es Aaron (y por qué armó este curso)")}
-       ${parrafo("Aaron Dalla Rosa lleva 7 años cortando y 3 dedicado a enseñar. Formó a más de 2.500 barberos y dio cursos presenciales en 6 países.")}
-       ${parrafo("Después de ver a tanta gente aprender a los golpes, decidió ordenar todo lo que sabe en un solo curso: paso a paso, para ver desde el celular y a tu ritmo.")}
-       ${bloque(`${fuerte("La idea es simple:")} que dejes de improvisar y empieces a cortar con método.`)}
-       ${parrafo("En los próximos días te voy mostrando cómo es por dentro.")}`,
-      "El barbero detrás de La Nueva Ola Academy.",
-    ),
-  });
-  add("F8", {
-    asunto: "Imaginate dentro de 3 meses",
-    cuando: "Faltan 8 días",
-    objetivo: "Visualización: que se vea ya en la versión mejor de su oficio. Activa el deseo antes del precio.",
-    html: L(
-      `${titulo("Imaginate dentro de 3 meses")}
-       ${parrafo("Es lunes. Abrís la barbería y tu agenda ya está llena.")}
-       ${parrafo("Los clientes que se sientan en tu silla se van mirándose en el espejo, sacan una foto y la suben. Vuelven. Y traen a un amigo.")}
-       ${parrafo("No empezaste a cortar mejor por suerte: empezaste a seguir un método, clase tras clase, hasta que las manos lo hicieron solo.")}
-       ${bloque(`${fuerte("Eso empieza con una decisión chica:")} dedicarte unos minutos por día a aprender de verdad.`)}
-       ${parrafo("En unos días abrimos. Quedate cerca.")}`,
-      "Un lunes con la agenda llena.",
-    ),
-  });
-  add("F7", {
-    asunto: "Así es el curso por dentro",
-    cuando: "Faltan 7 días",
-    objetivo: "Mostrar el formato y bajar la barrera: simple de usar, desde el celular, a tu ritmo.",
-    nota: "Ajustar con la lista final de módulos.",
-    html: L(
-      `${titulo("Así es el curso por dentro")}
-       ${parrafo("Pensamos la plataforma para que aprender sea fácil y no te pierdas.")}
-       ${paso(1, `${fuerte("Módulos en orden:")} empezás por lo básico y avanzás clase a clase.`)}
-       ${paso(2, `${fuerte("Desde cualquier lugar:")} celular, tablet o computadora.`)}
-       ${paso(3, `${fuerte("Clases nuevas:")} Aaron sigue sumando contenido.`)}
-       ${paso(4, `${fuerte("Bonos:")} regalos de lanzamiento que se abren a los ${DIAS_BONO} días de tu acceso.`)}
-       ${parrafo("Mañana te cuento qué dicen quienes ya aprendieron con Aaron.")}`,
-      "Módulos, bonos y cómo se ve la plataforma.",
-    ),
-  });
-  add("F6", {
-    asunto: "Detrás de escena: cómo se armó el curso",
-    cuando: "Faltan 6 días",
-    objetivo: "Mostrar el trabajo detrás del curso (sin testimonios, porque todavía no hay alumnos del curso digital): método, tiempo y cuidado.",
-    nota: "Pre-lanzamiento: no hay alumnos del curso digital, así que no se usan testimonios. La autoridad viene de la trayectoria de Aaron (confirmar datos con él).",
-    html: L(
-      `${titulo("Detrás de escena: cómo se armó el curso")}
-       ${parrafo("Armar este curso no fue grabar unos videos y listo. Aaron juntó lo que enseñó durante años en cursos presenciales y lo ordenó clase por clase.")}
-       ${paso(1, `${fuerte("Partió de las dudas reales:")} las preguntas que más se repiten entre barberos que arrancan.`)}
-       ${paso(2, `${fuerte("Lo ordenó con método:")} para que no tengas que adivinar qué aprender primero.`)}
-       ${paso(3, `${fuerte("Lo pensó para el celular:")} clases cortas que podés ver donde estés.`)}
-       ${parrafo("Faltan pocos días para que lo veas por dentro.")}`,
-      "Cómo se armó el curso, paso a paso.",
-    ),
-  });
-  add("F5", {
-    asunto: "5 errores que frenan a un barbero (y cómo evitarlos)",
-    cuando: "Faltan 5 días",
-    objetivo: "Dar valor real y gratis: demuestra que Aaron sabe, y deja la puerta abierta al curso.",
-    html: L(
-      `${titulo("5 errores que frenan a un barbero")}
-       ${paso(1, `${fuerte("Cortar sin método:")} improvisar cada vez hace que los resultados cambien según el día.`)}
-       ${paso(2, `${fuerte("No practicar con constancia:")} mejorar son repeticiones, no inspiración.`)}
-       ${paso(3, `${fuerte("Cobrar de menos:")} cuando no confiás en tu trabajo, tampoco lo defendés.`)}
-       ${paso(4, `${fuerte("Descuidar la imagen:")} tu local, tus redes y tu trato también venden.`)}
-       ${paso(5, `${fuerte("No invertir en formación:")} quien aprende rápido se adelanta a quien espera.`)}
-       ${parrafo("El curso está pensado para cambiar justo esto. Faltan pocos días.")}`,
-      "Empezá por corregir esto hoy.",
-    ),
-  });
-  add("F4", {
-    asunto: "El año se termina. ¿Empezás el próximo igual?",
-    cuando: "Faltan 4 días",
-    objetivo: "Contexto emocional del cierre de año y de la Black Friday: invertir en el oficio y no solo gastar.",
-    html: L(
-      `${titulo("El año se termina")}
-       ${parrafo("Se acerca la Black Friday y todos van a gastar en cosas que se rompen, se pasan de moda o se olvidan en un cajón.")}
-       ${parrafo("Hay otra forma de aprovechar estas semanas: gastar en algo que te devuelva más de lo que cuesta.")}
-       ${bloque(`${fuerte("Lo que aprendés no se rompe ni se devuelve.")} Se queda con vos, se nota en tus cortes y se paga solo cada vez que un cliente vuelve.`)}
-       ${parrafo("Empezá el año nuevo con una habilidad nueva, no con la misma rutina.")}`,
-      "Gastar vs. invertir en tu oficio.",
-    ),
-  });
-  add("F3", {
-    asunto: "Lo que vas a recibir (y cómo se paga)",
-    cuando: "Faltan 3 días",
-    objetivo: "Adelantar la oferta con claridad: pago único, dos tipos de acceso, bonos y garantía.",
-    nota: "No se muestran precios en el email: se ven al entrar a la página de ventas.",
-    html: L(
-      `${titulo("Lo que vas a recibir")}
-       ${paso(1, `${fuerte("El curso completo,")} módulos y clases para ver a tu ritmo.`)}
-       ${paso(2, `${fuerte("Dos formas de acceso:")} 1 año o vitalicio (para siempre y con todas las novedades).`)}
-       ${paso(3, `${fuerte("Bonos de lanzamiento,")} que se abren a los ${DIAS_BONO} días.`)}
-       ${paso(4, `${fuerte("Pago único:")} sin mensualidades ni letra chica.`)}
-       ${paso(5, `${fuerte(`Garantía de ${DIAS_REEMBOLSO} días:`)} si no es para vos, te devolvemos tu dinero.`)}
-       ${parrafo("El día de la apertura, los primeros tienen un precio especial con acceso vitalicio. Cupos limitados.")}`,
-      "Qué incluye y cómo se paga.",
-    ),
-  });
-  add("F2", {
-    asunto: "Faltan 2 días: dejá todo listo",
-    cuando: "Faltan 2 días",
-    objetivo: "Acción previa: que tenga el mismo email y un medio de pago a mano, para cerrar rápido.",
-    html: L(
-      `${titulo("Faltan 2 días")}
-       ${parrafo("Para que no pierdas ni un minuto el día de la apertura, dejá esto listo hoy:")}
-       ${paso(1, "Usá el mismo email con el que vas a comprar: ahí llega tu acceso.")}
-       ${paso(2, "Entrá al grupo de WhatsApp: ahí avisamos primero.")}
-       ${paso(3, "Tené a mano tu medio de pago.")}
-       ${boton(WHATSAPP_GRUPO_URL, "Entrar al grupo de WhatsApp")}`,
-      "Tres cosas para dejar listas hoy.",
-    ),
-  });
-  add("F1", {
-    asunto: "Mañana abrimos",
-    cuando: "Faltan 1 día (víspera)",
-    objetivo: "Generar expectativa real. Un solo mensaje claro: mañana pasa algo.",
-    html: L(
-      `${titulo("Mañana abrimos")}
-       ${parrafo("Mañana abrimos las inscripciones a La Nueva Ola Academy.")}
-       ${parrafo("Vas a recibir un email con el enlace a la oferta de lanzamiento. Los primeros en entrar tienen el mejor precio, con cupos limitados.")}
-       ${bloque(`${fuerte("Tip:")} agregá este remitente a tus contactos para que el email no se pierda en spam o promociones.`)}`,
-      "Mañana pasa algo importante.",
-    ),
-  });
-  add("F0a", {
-    asunto: "¡Hoy abrimos! Tu oferta de lanzamiento",
-    cuando: "Día de la apertura, a la mañana",
-    objetivo: "Primera venta: llevar a la lista caliente a la página de ventas.",
-    html: L(
-      `${titulo("¡Abrimos las inscripciones!")}
-       ${parrafo("Ya podés entrar a La Nueva Ola Academy. Elegí tu acceso y empezá hoy.")}
-       ${boton(ventas, "Ver la oferta de lanzamiento")}
-       ${bloque(`${fuerte("Pago único.")} Sin mensualidades. Reembolso durante ${DIAS_REEMBOLSO} días.`)}
-       ${parrafo("Las condiciones de apertura son por cupos limitados.")}`,
-      "Abrieron las inscripciones. Entrá primero.",
-    ),
-  });
-  add("F0b", {
-    asunto: "Primer día: la oferta de apertura está corriendo",
-    cuando: "Día de la apertura, a la noche (solo a quienes no entraron al checkout)",
-    objetivo: "Segundo toque el mismo día, con cierre del día y recordatorio del cupo.",
-    nota: "Decir que 'los cupos se están llenando' solo si es verdad. Si no, dejar el texto neutro.",
-    html: L(
-      `${titulo("Hoy fue el primer día")}
-       ${parrafo("Muchos ya entraron a la oferta de apertura. Si todavía no viste cómo es, tenés tiempo de elegir tu acceso.")}
-       ${boton(ventas, "Ver los accesos")}
-       ${parrafo(`Recordá: pago único, ${DIAS_REEMBOLSO} días de garantía y cupos limitados en el precio de lanzamiento.`)}`,
-      "El precio de apertura sigue disponible.",
-    ),
-  });
+  // Emails de captura y lanzamiento: los mismos que salen de verdad (lib/emails/captura.ts), a su hora fija.
+  // Se envían solos cada hora (GitHub Actions → /api/cron/captura). Pausar: CAPTURA_EMAILS_PAUSADAS=1 en la Vercel.
+  for (const f of fichasCaptura()) {
+    const ej = plantillaCaptura(f.id, { siteUrl: base, email: "tu@email.com", nombre: null, bajaUrl: "#", marca: ctx.marca });
+    add(f.id, {
+      estado: "activo",
+      asunto: ej.asunto,
+      cuando: f.cuando,
+      objetivo: f.objetivo,
+      nota: "Sale solo, a esa hora (Paraguay). Quien se anota tarde recibe solo los que todavía no salieron; quien compra o se da de baja deja de recibirlos.",
+      html: ej.html,
+    });
+  }
 
   // ════════ 2 · VIO LA OFERTA Y NO FUE AL CHECKOUT (desde el formulario de ventas o la apertura) ════════
   add("S1", {
@@ -757,16 +616,17 @@ export function construirMapa(ctx: Ctx) {
   nodo({ id: "origen", col: 0, row: 0.5, tipo: "origen", titulo: "Instagram, WhatsApp y anuncios", sub: "Orgánico + tráfico pago", detalle: "Durante los 10 días de captura el tráfico (orgánico y de anuncios) va a la página de captura. Después de la apertura va directo a la página de ventas. Usá los enlaces con origen de Admin > Enlaces para medir cada fuente." });
 
   // Fila 0 · captura
-  nodo({ id: "captura", col: 1, row: 0, tipo: "pagina", titulo: "Página de captura", sub: "/captura · 10 días", detalle: "Lista de espera de 10 días. La persona deja su email y entra al grupo de WhatsApp. Pasada la apertura, el tráfico va directo a la página de ventas." });
+  nodo({ id: "captura", col: 1, row: 0, tipo: "pagina", titulo: "Página de captura", sub: "/captura · 5 al 10 de noviembre", detalle: "Lista de espera del 5 al 10 de noviembre. El 11 a las 9:00 el sitio pasa solo a la página de ventas. La persona deja su email y entra al grupo de WhatsApp. Pasada la apertura, el tráfico va directo a la página de ventas." });
   nodo({ id: "lead", col: 2, row: 0, tipo: "accion", titulo: "Lead en la lista", sub: "Calendario hasta la apertura", detalle: "La secuencia se cuenta contra la fecha de apertura, no contra el día en que se anotó. Si entra 8 días después de empezar la captura, recibe el email de bienvenida y solo los emails que faltan hasta la apertura." });
-  const cap = ["W0", "F9", "F8", "F7", "F6", "F5", "F4", "F3", "F2", "F1", "F0a", "F0b"];
+  const cap = ["W0", "K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10", "L1", "L2", "L3", "L4"];
   fila(cap, {
-    W0: ["Estás en la lista", "Al instante"], F9: ["Quién es Aaron", "Faltan 9 días"], F8: ["Imaginate en 3 meses", "Faltan 8"],
-    F7: ["El curso por dentro", "Faltan 7"], F6: ["Detrás de escena", "Faltan 6"], F5: ["5 errores del barbero", "Faltan 5"],
-    F4: ["El año se termina", "Faltan 4"], F3: ["Lo que vas a recibir", "Faltan 3"], F2: ["Dejá todo listo", "Faltan 2"],
-    F1: ["Mañana abrimos", "Víspera"], F0a: ["¡Hoy abrimos!", "Apertura · mañana"], F0b: ["Primer día", "Apertura · noche"],
+    W0: ["Estás en la lista", "Al instante"], K1: ["Quién es Aaron", "6 nov · 09:00"], K2: ["Imaginate en 3 meses", "6 nov · 19:00"],
+    K3: ["El curso por dentro", "7 nov · 09:00"], K4: ["5 errores del barbero", "7 nov · 19:00"], K5: ["Lo que vas a recibir", "8 nov · 09:00"],
+    K6: ["El año se termina", "8 nov · 19:00"], K7: ["Detrás de escena", "9 nov · 09:00"], K8: ["Tu lugar entre los 50", "9 nov · 19:00"],
+    K9: ["Mañana abrimos", "10 nov · 09:00"], K10: ["Mañana a las 9:00", "10 nov · 19:00"], L1: ["¡Abrimos! 50% OFF", "11 nov · 09:00"],
+    L2: ["Primer día", "11 nov · 19:00"], L3: ["Último día de la oferta", "13 nov · 09:00"], L4: ["Cierra esta noche", "13 nov · 19:00"],
   }, 3, 0);
-  nodo({ id: "aVentas", col: 15, row: 0, tipo: "mal", titulo: "Apertura: pasan a ventas", sub: "Si no compran: se unen a 'Vio la oferta y no compró'", detalle: "Los emails de apertura llevan a la página de ventas. Después de la apertura, quienes estaban en la lista y todavía no compraron se unen al mismo grupo que los visitantes que vieron la oferta y no avanzaron (fila de abajo, 'Vio la oferta y no compró'), y reciben exactamente los mismos emails hasta que compren." });
+  nodo({ id: "aVentas", col: 19, row: 0, tipo: "mal", titulo: "Apertura: pasan a ventas", sub: "Si no compran: se unen a 'Vio la oferta y no compró'", detalle: "Los emails de apertura llevan a la página de ventas. Después de la apertura, quienes estaban en la lista y todavía no compraron se unen al mismo grupo que los visitantes que vieron la oferta y no avanzaron (fila de abajo, 'Vio la oferta y no compró'), y reciben exactamente los mismos emails hasta que compren." });
 
   // Fila 1 · columna vertebral de ventas
   nodo({ id: "ventas", col: 1, row: 1, tipo: "pagina", titulo: "Página de ventas", sub: "/ventas", detalle: "Sin precios a la vista. Para ver la oferta, la persona deja nombre, email y WhatsApp." });

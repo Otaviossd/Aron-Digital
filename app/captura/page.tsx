@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import FormCaptura from "@/components/FormCaptura";
 import Rastreo from "@/components/Rastreo";
-import { BRAND, PRECOS } from "@/lib/config";
+import { BRAND, LANZAMIENTO_APERTURA, PRECOS } from "@/lib/config";
+import CuentaRegresiva from "@/components/CuentaRegresiva";
 import { FOTOS } from "@/lib/fotos";
 
 export const metadata: Metadata = {
@@ -91,10 +92,14 @@ export default function CapturaPage() {
             <p className="mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
               La primera plataforma de Aaron Dalla Rosa para barberos. Quien se anota y entra al grupo de WhatsApp accede antes que todos, con un descuento de lanzamiento que no se repite.
             </p>
+            <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/[0.06] p-4 text-center">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-accent">Abrimos el 11 de noviembre · 9:00 (hora de Paraguay)</p>
+              <CuentaRegresiva fin={LANZAMIENTO_APERTURA} />
+            </div>
             <ul className="mb-8 mt-6 space-y-2.5">
               {[
                 "Acceso antes de que abra al público",
-                `50% de descuento, solo para la lista y el grupo (primeras ${PRECOS.promo.vagas} personas)`,
+                `50% de descuento para los primeros ${PRECOS.promo.vagas} que compren (lista y grupo se enteran primero)`,
                 "Acceso vitalicio: pagás una vez y es tuyo para siempre",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-3 text-sm font-medium">

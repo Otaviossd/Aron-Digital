@@ -36,3 +36,14 @@ jobs:
           echo
           status=${info%% *}
           test "$status" = "200"
+      - name: Chamar a rota da lista de espera e acessos pendentes
+        if: always()
+        run: |
+          info=$(curl -s -o resposta3.json -w "%{http_code} %{redirect_url}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/captura")
+          echo "Status e redirecionamento: $info"
+          cat resposta3.json
+          echo
+          status=${info%% *}
+          test "$status" = "200"

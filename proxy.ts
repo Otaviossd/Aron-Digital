@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseAnonKey, supabaseUrl } from "@/lib/env";
+import { LANZAMIENTO_APERTURA } from "@/lib/config";
 
 const ZONAS_PROTEGIDAS = ["/aulas", "/admin"];
 
@@ -15,11 +16,11 @@ function aviso(mensaje: string) {
 // Nunca derruba as páginas públicas: se algo falhar na configuração, a página de venda continua abrindo.
 export async function proxy(request: NextRequest) {
   // A raiz do domínio leva à etapa atual: antes do lançamento "captura", depois "ventas".
-  // Troque a variável PAGINA_INICIAL na Vercel (e faça um Redeploy) no dia em que abrir as vendas.
-  if (request.nextUrl.pathname === "/") {
-    const etapa = process.env.PAGINA_INICIAL === "ventas" ? "/ventas" : "/captura";
+  // A virada é automática no dia e hora da abertura (LANZAMIENTO_APERTURA). Para forçar: PAGINA_INICIAL=ventas ou PAGINA_INICIAL=captura_fija.
+  const abierto = process.env.PAGINA_INICIAL === "ventas" || (process.env.PAGINA_INICIAL !== "captura_fija" && Date.now() >= new Date(LANZAMIENTO_APERTURA).getTime());
+  if (request.nextUrl.pathname === "/" || (abierto && request.nextUrl.pathname === "/captura")) {
     const destino = request.nextUrl.clone();
-    destino.pathname = etapa;
+    destino.pathname = abierto ? "/ventas" : "/captura";
     return NextResponse.redirect(destino);
   }
 
