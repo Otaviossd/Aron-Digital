@@ -20,16 +20,23 @@ export const COLORES = {
 const sitio = siteUrl;
 const fuente = "Inter,'Segoe UI',Helvetica,Arial,sans-serif";
 
+// Gmail (iPhone y Android) con tema oscuro invierte el color del texto: el blanco queda gris oscuro sobre nuestro fondo negro.
+// Truco de mix-blend-mode: el selector "u + .body" solo existe en Gmail; ahí el texto pasa por dos capas negras
+// (screen + difference) que deshacen la inversión, y en los demás clientes no cambia nada.
+// Solo envuelve TEXTO: un botón o un fondo de color dentro de estas capas quedaría con el color invertido.
+export const CSS_GMAIL = `u + .body .gm-s{background:#000000;mix-blend-mode:screen}u + .body .gm-d{background:#000000;mix-blend-mode:difference}`;
+export const claro = (html: string) => `<div class="gm-s"><div class="gm-d">${html}</div></div>`;
+
 export const boton = (url: string, texto: string) => `
   <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0"><tr><td style="border-radius:999px;background:${COLORES.acento};background-image:linear-gradient(135deg,${COLORES.acento},${COLORES.acento2})">
     <a href="${url}" style="display:inline-block;padding:15px 30px;font-family:${fuente};font-size:15px;font-weight:700;color:#04120a;text-decoration:none;border-radius:999px">${texto}</a>
   </td></tr></table>`;
 
 export const parrafo = (html: string) =>
-  `<p style="margin:0 0 16px;font-family:${fuente};font-size:16px;line-height:1.65;color:${COLORES.suave}">${html}</p>`;
+  `<div style="margin:0 0 16px;font-family:${fuente};font-size:16px;line-height:1.65;color:${COLORES.suave}">${claro(html)}</div>`;
 
 export const titulo = (texto: string) =>
-  `<h1 style="margin:0 0 16px;font-family:${fuente};font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-0.5px;color:${COLORES.texto}">${texto}</h1>`;
+  `<h1 style="margin:0 0 16px;font-family:${fuente};font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-0.5px;color:${COLORES.texto}">${claro(texto)}</h1>`;
 
 type Opciones = {
   cuerpo: string;
@@ -46,8 +53,8 @@ const fijarTexto = (html: string) => html.replace(/(^|[;"'\s])color:\s*(#[0-9a-f
 export function layoutEmail({ cuerpo, pie, siteUrl, conFoto = true, preheader }: Opciones) {
   const base = (siteUrl ?? sitio()).replace(/\/$/, "");
   return fijarTexto(`<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light"></head>
-<body bgcolor="${COLORES.fondo}" style="margin:0;padding:0;background:${COLORES.fondo};background-image:linear-gradient(${COLORES.fondo},${COLORES.fondo})">
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light"><style>${CSS_GMAIL}</style></head>
+<body class="body" bgcolor="${COLORES.fondo}" style="margin:0;padding:0;background:${COLORES.fondo};background-image:linear-gradient(${COLORES.fondo},${COLORES.fondo})"><u></u>
   ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${COLORES.fondo}">${preheader}</div>` : ""}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${COLORES.fondo}" style="background:${COLORES.fondo};background-image:linear-gradient(${COLORES.fondo},${COLORES.fondo})"><tr><td align="center" style="padding:28px 14px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
@@ -57,8 +64,8 @@ export function layoutEmail({ cuerpo, pie, siteUrl, conFoto = true, preheader }:
         <div style="padding:30px 30px 26px">${cuerpo}</div>
       </td></tr></table></td></tr>
       <tr><td align="left" style="padding:18px 8px 0;font-family:${fuente};font-size:12px;line-height:1.6;color:${COLORES.tenue}">
-        ${pie ?? ""}
-        <div style="margin-top:10px;color:#ffffff;font-weight:600">La Nueva Ola Academy</div><div>Aaron Dalla Rosa · Cursos de barbería</div>
+        ${claro(`${pie ?? ""}
+        <div style="margin-top:10px;color:#ffffff;font-weight:600">La Nueva Ola Academy</div><div>Aaron Dalla Rosa · Cursos de barbería</div>`)}
       </td></tr>
     </table>
   </td></tr></table>
@@ -67,13 +74,13 @@ export function layoutEmail({ cuerpo, pie, siteUrl, conFoto = true, preheader }:
 
 // Bloques extra para emails más completos
 export const bloque = (html: string) =>
-  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px"><tr><td bgcolor="${COLORES.borde}" style="padding:1px;background:${COLORES.borde};background-image:linear-gradient(${COLORES.borde},${COLORES.borde});border-radius:14px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="#0b0f11" style="background:#0b0f11;background-image:linear-gradient(#0b0f11,#0b0f11);border-radius:13px;padding:16px 18px;font-family:${fuente};font-size:14px;line-height:1.6;color:#ffffff">${html}</td></tr></table></td></tr></table>`;
+  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px"><tr><td bgcolor="${COLORES.borde}" style="padding:1px;background:${COLORES.borde};background-image:linear-gradient(${COLORES.borde},${COLORES.borde});border-radius:14px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="#0b0f11" style="background:#0b0f11;background-image:linear-gradient(#0b0f11,#0b0f11);border-radius:13px;padding:16px 18px;font-family:${fuente};font-size:14px;line-height:1.6;color:#ffffff">${claro(html)}</td></tr></table></td></tr></table>`;
 
 export const paso = (n: number, texto: string) =>
   `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 12px"><tr>
     <td valign="top" width="34"><div style="width:26px;height:26px;line-height:26px;text-align:center;border-radius:13px;background:${COLORES.acento};background-image:linear-gradient(135deg,${COLORES.acento},${COLORES.acento2});color:#04120a;font-family:${fuente};font-size:13px;font-weight:700">${n}</div></td>
-    <td valign="top" style="font-family:${fuente};font-size:15px;line-height:1.55;color:#ffffff;padding-top:2px">${texto}</td>
+    <td valign="top" style="font-family:${fuente};font-size:15px;line-height:1.55;color:#ffffff;padding-top:2px">${claro(texto)}</td>
   </tr></table>`;
 
 export const subtitulo = (texto: string) =>
-  `<h2 style="margin:26px 0 12px;font-family:${fuente};font-size:13px;line-height:1.3;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:${COLORES.acento}">${texto}</h2>`;
+  `<h2 style="margin:26px 0 12px;font-family:${fuente};font-size:13px;line-height:1.3;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:${COLORES.acento}">${claro(texto)}</h2>`;
