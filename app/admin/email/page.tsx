@@ -10,6 +10,7 @@ import { PASOS } from "@/lib/sequence";
 import { estadoConfig, fmtFechaHora, hace } from "@/lib/admin";
 import { Pildora, Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
 import { siteUrl } from "@/lib/site";
+import { Seguimiento } from "./Seguimiento";
 
 type Stats = {
   leads: number;
@@ -34,7 +35,7 @@ async function Email() {
   const supabase = await createClient();
   const [{ data: es }, { data: sends }, { data: log }, { data: leads }, { count: compras }, { count: bienvenidas }] = await Promise.all([
     supabase.rpc("email_stats"),
-    supabase.from("email_sends").select("step, sent_at, leads(email)").order("sent_at", { ascending: false }).limit(40),
+    supabase.from("email_sends").select("sequence, step, sent_at, leads(email)").order("sent_at", { ascending: false }).limit(40),
     supabase.from("email_log").select("to_email, kind, status, created_at").order("created_at", { ascending: false }).limit(40),
     supabase.from("leads").select("email, created_at, source, checkout_at, converted_at, unsubscribed_at").order("created_at", { ascending: false }).limit(15),
     supabase.from("email_log").select("id", { count: "exact", head: true }).eq("kind", "compra").eq("status", "sent"),
@@ -60,7 +61,7 @@ async function Email() {
       return {
         cuando: s.sent_at as string,
         para: (lead?.email as string | undefined) ?? "—",
-        tipo: `Carrito abandonado · email ${s.step}`,
+        tipo: s.sequence === "captura" ? `Captura y lanzamiento · email ${s.step}` : `Carrito abandonado · email ${s.step}`,
         estado: "enviado" as const,
       };
     }),
@@ -88,6 +89,10 @@ async function Email() {
         }
         sub="Los emails que el sistema envía solo, cuántos salieron y qué dicen. Las automatizaciones nuevas se suman a esta misma pantalla."
       />
+
+      <Suspense fallback={<div className="h-64" />}>
+        <Seguimiento />
+      </Suspense>
 
       {/* Estado del envío */}
       <Seccion titulo="Estado del envío">
