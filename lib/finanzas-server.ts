@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cargarExcluidos, enLista } from "./excluidos.ts";
 import { calcularFinanzas, type CompraFila, type ExtraFila } from "./finanzas.ts";
 
 // Período: últimos N días, todo (null) o un rango de fechas AAAA-MM-DD (horario de Paraguay, UTC-3).
@@ -13,8 +14,9 @@ export async function cargarFinanzas(supabase: SupabaseClient, periodo: Periodo)
   const dias = typeof periodo === "number" ? periodo : null;
   const desdeIso = rango ? inicioDia(rango.desde) : dias ? new Date(Date.now() - dias * 86400000).toISOString() : null;
   const hastaIso = rango ? inicioDiaSiguiente(rango.hasta) : null;
-  let qCompras = supabase.from("subscriptions").select("*").order("purchased_at", { ascending: false }).limit(5000);
-  let qExtras = supabase.from("extra_compras").select("*").limit(5000);
+  const excl = await cargarExcluidos(supabase);
+  let qCompras = supabase.from("subscriptions").select("*").not("email", "in", enLista(excl)).order("purchased_at", { ascending: false }).limit(5000);
+  let qExtras = supabase.from("extra_compras").select("*").not("email", "in", enLista(excl)).limit(5000);
   if (desdeIso) {
     qCompras = qCompras.gte("purchased_at", desdeIso);
     qExtras = qExtras.gte("created_at", desdeIso);

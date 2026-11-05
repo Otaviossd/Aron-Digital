@@ -4,6 +4,7 @@ import { fichasCaptura } from "@/lib/emails/captura";
 import { PASOS_CAPTURA } from "@/lib/sequence-captura";
 import { PASOS_EXTRA } from "@/lib/sequence-extra";
 import { PASOS } from "@/lib/sequence";
+import { cargarExcluidos, enLista } from "@/lib/excluidos";
 import { fmtFechaHora, hace } from "@/lib/admin";
 import { Dato, Pildora, Seccion, Tabla, Vacio } from "@/components/admin/ui";
 
@@ -36,22 +37,24 @@ async function entregaResend(): Promise<Entrega | null> {
 
 export async function Seguimiento() {
   const supabase = await createClient();
+  const excl = await cargarExcluidos(supabase);
+  const L = enLista(excl);
   const hoy = inicioDeHoy().toISOString();
   const hace7 = haceDias(7);
   const cont = (q: PromiseLike<{ count: number | null }>) => q.then((r) => r.count ?? 0, () => 0);
 
   const [leads, captura, compraron, bajas, logOk, logFail, logHoy, sendsHoy, extraHoy, leads7, fallos, entrega] = await Promise.all([
-    cont(supabase.from("leads").select("id", { count: "exact", head: true })),
-    cont(supabase.from("leads").select("id", { count: "exact", head: true }).eq("source", "captura")),
-    cont(supabase.from("leads").select("id", { count: "exact", head: true }).not("converted_at", "is", null)),
-    cont(supabase.from("leads").select("id", { count: "exact", head: true }).not("unsubscribed_at", "is", null)),
-    cont(supabase.from("email_log").select("id", { count: "exact", head: true }).eq("status", "sent")),
-    cont(supabase.from("email_log").select("id", { count: "exact", head: true }).eq("status", "failed")),
-    cont(supabase.from("email_log").select("id", { count: "exact", head: true }).eq("status", "sent").gte("created_at", hoy)),
-    cont(supabase.from("email_sends").select("id", { count: "exact", head: true }).gte("sent_at", hoy)),
-    cont(supabase.from("extra_sends").select("id", { count: "exact", head: true }).gte("sent_at", hoy)),
-    supabase.from("leads").select("created_at").eq("source", "captura").gte("created_at", hace7).order("created_at").limit(1000),
-    supabase.from("email_log").select("to_email, kind, error, created_at").eq("status", "failed").order("created_at", { ascending: false }).limit(8),
+    cont(supabase.from("leads").select("id", { count: "exact", head: true }).not("email", "in", L)),
+    cont(supabase.from("leads").select("id", { count: "exact", head: true }).not("email", "in", L).eq("source", "captura")),
+    cont(supabase.from("leads").select("id", { count: "exact", head: true }).not("email", "in", L).not("converted_at", "is", null)),
+    cont(supabase.from("leads").select("id", { count: "exact", head: true }).not("email", "in", L).not("unsubscribed_at", "is", null)),
+    cont(supabase.from("email_log").select("id", { count: "exact", head: true }).not("to_email", "in", L).eq("status", "sent")),
+    cont(supabase.from("email_log").select("id", { count: "exact", head: true }).not("to_email", "in", L).eq("status", "failed")),
+    cont(supabase.from("email_log").select("id", { count: "exact", head: true }).not("to_email", "in", L).eq("status", "sent").gte("created_at", hoy)),
+    cont(supabase.from("email_sends").select("id, leads!inner(email)", { count: "exact", head: true }).not("leads.email", "in", L).gte("sent_at", hoy)),
+    cont(supabase.from("extra_sends").select("id", { count: "exact", head: true }).not("email", "in", L).gte("sent_at", hoy)),
+    supabase.from("leads").select("created_at").not("email", "in", L).eq("source", "captura").gte("created_at", hace7).order("created_at").limit(1000),
+    supabase.from("email_log").select("to_email, kind, error, created_at").not("to_email", "in", L).eq("status", "failed").order("created_at", { ascending: false }).limit(8),
     entregaResend(),
   ]);
 
@@ -59,15 +62,15 @@ export async function Seguimiento() {
   const [porCaptura, porAbandono, porExtra] = await Promise.all([
     Promise.all(
       PASOS_CAPTURA.map((p) =>
-        cont(supabase.from("email_sends").select("id", { count: "exact", head: true }).eq("sequence", "captura").eq("step", p.step)),
+        cont(supabase.from("email_sends").select("id, leads!inner(email)", { count: "exact", head: true }).not("leads.email", "in", L).eq("sequence", "captura").eq("step", p.step)),
       ),
     ),
     Promise.all(
       PASOS.map((p) =>
-        cont(supabase.from("email_sends").select("id", { count: "exact", head: true }).eq("sequence", "abandono").eq("step", p.step)),
+        cont(supabase.from("email_sends").select("id, leads!inner(email)", { count: "exact", head: true }).not("leads.email", "in", L).eq("sequence", "abandono").eq("step", p.step)),
       ),
     ),
-    Promise.all(PASOS_EXTRA.map((p) => cont(supabase.from("extra_sends").select("id", { count: "exact", head: true }).eq("step", p.step)))),
+    Promise.all(PASOS_EXTRA.map((p) => cont(supabase.from("extra_sends").select("id", { count: "exact", head: true }).not("email", "in", L).eq("step", p.step)))),
   ]);
 
   const enviosCaptura = porCaptura.reduce((a, b) => a + b, 0);

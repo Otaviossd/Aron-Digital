@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { cargarExcluidos, enLista } from "@/lib/excluidos";
 import { cargarFinanzas } from "@/lib/finanzas-server";
 import { estadoConfig, fmtFecha, fmtUsd, hace, nombrePlan, type ResumenAdmin } from "@/lib/admin";
 import { Dato, Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
@@ -15,9 +16,10 @@ export default function AdminResumenPage() {
 
 async function Resumen() {
   const supabase = await createClient();
+  const L = enLista(await cargarExcluidos(supabase));
   const [{ data: r }, { data: ultimas }, fin] = await Promise.all([
     supabase.rpc("admin_resumen"),
-    supabase.from("subscriptions").select("email, plan, status, purchased_at, refunded_at").order("purchased_at", { ascending: false }).limit(6),
+    supabase.from("subscriptions").select("email, plan, status, purchased_at, refunded_at").not("email", "in", L).order("purchased_at", { ascending: false }).limit(6),
     cargarFinanzas(supabase, null),
   ]);
   const res = (r ?? null) as ResumenAdmin | null;
