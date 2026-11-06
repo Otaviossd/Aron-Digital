@@ -18,7 +18,15 @@ stable
 security definer
 set search_path = public
 as $$
-  select (public.current_subscription()).id is not null or public.is_admin()
+  select public.is_admin() or exists (
+    select 1 from public.subscriptions s
+    where lower(s.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+      and s.refunded_at is null
+      and (
+        (s.status = 'active' and (s.access_until is null or s.access_until > now()))
+        or (s.status = 'cancelled' and s.access_until is not null and s.access_until > now())
+      )
+  )
 $$;
 
 -- Los módulos de clases en vivo (grabaciones) no cuentan para el progreso ni para el certificado.
@@ -58,7 +66,7 @@ as $$
     m.is_bonus,
     m.is_live
   from public.modules m
-  where (public.current_subscription()).id is not null or public.is_admin()
+  where public.tiene_acceso()
   order by m.position
 $$;
 
