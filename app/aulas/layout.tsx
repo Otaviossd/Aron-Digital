@@ -4,6 +4,8 @@ import { getMemberData } from "@/lib/members";
 import { BRAND, WHATSAPP_ALUMNOS_URL } from "@/lib/config";
 import Link from "next/link";
 import Avatar from "@/components/members/Avatar";
+import BarraInferior from "@/components/members/BarraInferior";
+import { LiveBanner, LiveProvider } from "@/components/live/LiveProvider";
 
 export default function AulasLayout({ children }: LayoutProps<"/aulas">) {
   return (
@@ -14,15 +16,20 @@ export default function AulasLayout({ children }: LayoutProps<"/aulas">) {
 }
 
 async function Shell({ children }: { children: React.ReactNode }) {
-  const { email, esAdmin, porcentaje, avatarUrl, vistaAlumno } = await getMemberData();
+  const { supabase, email, esAdmin, porcentaje, avatarUrl, vistaAlumno } = await getMemberData();
+  // ¿Hay una clase en vivo ahora? (si todavía no se creó la tabla, simplemente no hay)
+  const { data: liveRaw } = await supabase.rpc("live_actual");
+  const live = (Array.isArray(liveRaw) ? liveRaw[0] : null) as { estado: string; titulo: string } | null;
+  const enVivo = live?.estado === "en_vivo";
 
   return (
+    <LiveProvider inicial={{ enVivo, titulo: enVivo ? live!.titulo : null }}>
     <div className="relative min-h-screen overflow-x-clip bg-bg">
       {/* Luces suaves de fondo */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-accent/[0.22] blur-[130px] respirar" />
-        <div className="absolute left-1/3 top-[34rem] h-[28rem] w-[28rem] rounded-full bg-cyan-400/[0.10] blur-[120px] respirar [animation-delay:-3s]" />
-        <div className="absolute -left-20 top-[70rem] h-[26rem] w-[26rem] rounded-full bg-accent/[0.10] blur-[120px]" />
+        <div className="luz absolute -right-56 -top-56 h-[44rem] w-[44rem]" />
+        <div className="luz absolute left-1/3 top-[30rem] h-[36rem] w-[36rem] [--luz:rgba(34,211,238,0.09)]" />
+        <div className="luz absolute -left-32 top-[64rem] h-[34rem] w-[34rem] [--luz:rgba(57,255,126,0.09)]" />
       </div>
       <Sidebar
         brand={BRAND}
@@ -36,7 +43,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
       />
 
       <div className="relative lg:pl-60">
-        <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-line bg-bg/85 py-3 pl-16 pr-4 backdrop-blur lg:px-10">
+        <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-line bg-bg/95 py-3 pl-16 pr-4 lg:px-10">
           <form action="/aulas/buscar" className="w-full max-w-md">
             <input
               name="q"
@@ -51,8 +58,13 @@ async function Shell({ children }: { children: React.ReactNode }) {
           </Link>
         </header>
 
-        <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10">{children}</div>
+        <div className="mx-auto max-w-6xl px-5 pb-28 pt-8 lg:px-10 lg:py-10">
+          <LiveBanner />
+          {children}
+        </div>
       </div>
+      <BarraInferior />
     </div>
+    </LiveProvider>
   );
 }

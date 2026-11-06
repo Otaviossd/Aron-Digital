@@ -3,17 +3,18 @@ import { getMemberData } from "@/lib/members";
 import { DIAS_REEMBOLSO } from "@/lib/config";
 import { nombrePlan } from "@/lib/admin";
 import AvatarForm from "@/components/members/AvatarForm";
+import NombreForm from "@/components/members/NombreForm";
 
 export default function CuentaPage() {
   return (
-    <Suspense fallback={<div className="h-96" />}>
+    <Suspense fallback={<div className="esqueleto h-96" />}>
       <Cuenta />
     </Suspense>
   );
 }
 
 async function Cuenta() {
-  const { supabase, email, avatarUrl } = await getMemberData();
+  const { supabase, email, avatarUrl, nombre } = await getMemberData();
 
   const { data: sub } = await supabase
     .from("subscriptions")
@@ -35,6 +36,7 @@ async function Cuenta() {
       <h1 className="mb-8 text-3xl font-semibold tracking-tight">Mi cuenta</h1>
 
       <AvatarForm url={avatarUrl} email={email} />
+      <NombreForm nombre={nombre} />
 
       <dl className="mb-8 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface text-sm">
         <div className="flex justify-between gap-4 px-5 py-4">

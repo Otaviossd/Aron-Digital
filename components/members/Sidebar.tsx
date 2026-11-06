@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Avatar from "./Avatar";
+import { useEnVivo } from "@/components/live/LiveProvider";
 
 type Props = {
   brand: string;
@@ -23,6 +24,9 @@ const iconos: Record<string, string> = {
   ayuda: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01",
   whatsapp: "M4 20l1.3-4.2A8 8 0 1 1 8.3 18.8L4 20zM9 9c0 3 3 6 6 6l1.2-1.4-2-1-1 .7c-.8-.4-1.6-1.2-2-2l.7-1-1-2L9 9z",
   instagram: "M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm5 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8z",
+  live: "M3 7h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3V7zm14 3l4-2v8l-4-2",
+  comunidad: "M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm11 10v-2a4 4 0 0 0-3-3.9M16 2.1a4 4 0 0 1 0 7.8",
+  certificado: "M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm-3.5-.5L7 22l5-3 5 3-1.5-7.5",
   admin: "M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z",
   salir: "M10 3H5a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h5M16 17l5-5-5-5M21 12H9",
 };
@@ -37,6 +41,7 @@ function Icono({ d }: { d: string }) {
 
 export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno, avatarUrl, instagramUrl, whatsappUrl }: Props) {
   const pathname = usePathname();
+  const { enVivo } = useEnVivo();
   // Menú móvil sin depender de JavaScript para abrir: un checkbox oculto + CSS (abre al instante, incluso antes de hidratar).
   const casilla = useRef<HTMLInputElement>(null);
   const cerrar = () => {
@@ -51,6 +56,9 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
 
   const items: { href: string; label: string; icono: string; externo?: boolean; recarga?: boolean }[] = [
     { href: "/aulas", label: "Inicio", icono: "inicio" },
+    { href: "/aulas/live", label: "Clases en vivo", icono: "live" },
+    { href: "/aulas/comunidad", label: "Comunidad", icono: "comunidad" },
+    { href: "/aulas/certificado", label: "Certificado", icono: "certificado" },
     { href: "/aulas/cuenta", label: "Mi cuenta", icono: "cuenta" },
     { href: "/aulas/ayuda", label: "Preguntas frecuentes", icono: "ayuda" },
     { href: "/aulas/soporte", label: "Soporte", icono: "soporte" },
@@ -107,6 +115,11 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
           ) : (
             <Link key={it.label} href={it.href} onClick={() => cerrar()} className={clase}>
               <Icono d={iconos[it.icono]} /> {it.label}
+              {it.icono === "live" && enVivo && (
+                <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#ff3d71] px-2 py-px text-[10px] font-bold uppercase text-white">
+                  <span className="h-1.5 w-1.5 animate-ping rounded-full bg-white" /> Vivo
+                </span>
+              )}
             </Link>
           );
         })}
@@ -123,12 +136,12 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
   return (
     <>
       <input ref={casilla} id="menu-movil" type="checkbox" className="peer sr-only" tabIndex={-1} aria-hidden="true" />
-      <label htmlFor="menu-movil" role="button" aria-label="Abrir menú" className="fixed left-3 top-2.5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-line-strong bg-bg/90 backdrop-blur lg:hidden cursor-pointer">
+      <label htmlFor="menu-movil" role="button" aria-label="Abrir menú" className="fixed left-3 top-2.5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-line-strong bg-bg/95 lg:hidden cursor-pointer">
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
           <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
       </label>
-      <aside className="fixed inset-y-0 left-0 z-10 hidden w-60 border-r border-line bg-bg/80 backdrop-blur-xl lg:block">{contenido}</aside>
+      <aside className="fixed inset-y-0 left-0 z-10 hidden w-60 border-r border-line bg-bg/95 lg:block">{contenido}</aside>
       <label htmlFor="menu-movil" aria-label="Cerrar menú" className="fixed inset-0 z-40 hidden bg-black/70 peer-checked:block lg:!hidden" />
       <aside className="invisible fixed inset-y-0 left-0 z-50 w-[17rem] max-w-[85vw] -translate-x-full border-r border-line bg-bg shadow-2xl transition-[transform,visibility] duration-200 peer-checked:visible peer-checked:translate-x-0 lg:hidden">
         {contenido}

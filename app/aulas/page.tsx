@@ -6,17 +6,18 @@ import Portada from "@/components/members/Portada";
 import { aulasDelModulo, diasRestantes, getMemberData, siguienteAula } from "@/lib/members";
 import { ui } from "@/lib/ui";
 import { EXTRA } from "@/lib/config";
+import Atajos from "@/components/members/Atajos";
 
 export default function AulasPage() {
   return (
-    <Suspense fallback={<div className="h-96" />}>
+    <Suspense fallback={<div className="esqueleto h-96" />}>
       <Inicio />
     </Suspense>
   );
 }
 
 async function Inicio() {
-  const { modulos, aulas, completadas, email } = await getMemberData();
+  const { modulos, aulas, completadas, email, porcentaje } = await getMemberData();
 
   // Sem compra vigente para este e-mail
   if (modulos.length === 0) {
@@ -39,14 +40,15 @@ async function Inicio() {
     const hechas = lista.filter((x) => completadas.has(x.id)).length;
     return {
       m,
-      numero: m.is_bonus ? 0 : modulos.filter((x, i) => !x.is_bonus && i <= idx).length,
+      numero: m.is_bonus || m.is_live ? 0 : modulos.filter((x, i) => !x.is_bonus && !x.is_live && i <= idx).length,
       total: lista.length,
       progreso: lista.length === 0 ? 0 : Math.round((hechas / lista.length) * 100),
     };
   });
 
-  const principales = datos.filter((d) => !d.m.is_bonus);
+  const principales = datos.filter((d) => !d.m.is_bonus && !d.m.is_live);
   const bonos = datos.filter((d) => d.m.is_bonus);
+  const grabaciones = datos.filter((d) => d.m.is_live && d.total > 0);
   const enProgreso = principales.filter((d) => d.m.is_unlocked && d.progreso > 0 && d.progreso < 100);
   const siguiente = siguienteAula(modulos, aulas, completadas);
   const proximoBono = bonos.find((d) => !d.m.is_unlocked && d.m.unlock_at);
@@ -61,6 +63,8 @@ async function Inicio() {
         aviso={proximoBono?.m.unlock_at ? `${proximoBono.m.title} se libera ${diasRestantes(proximoBono.m.unlock_at)}` : undefined}
       />
 
+      <Atajos porcentaje={porcentaje} />
+
       {enProgreso.length > 0 && (
         <Row titulo="Seguí con estos módulos" subtitulo="Los que ya empezaste">
           {enProgreso.map((d) => (
@@ -74,6 +78,14 @@ async function Inicio() {
           <CoverCard key={d.m.id} modulo={d.m} numero={d.numero} progreso={d.progreso} totalAulas={d.total} />
         ))}
       </Row>
+
+      {grabaciones.length > 0 && (
+        <Row titulo="Clases en vivo grabadas" subtitulo="Cada live de Aaron queda acá completa, para verla cuando quieras">
+          {grabaciones.map((d) => (
+            <CoverCard key={d.m.id} modulo={d.m} numero={1} progreso={d.progreso} totalAulas={d.total} />
+          ))}
+        </Row>
+      )}
 
       {bonos.length > 0 && (
         <Row titulo="Bonos" subtitulo="Regalos de lanzamiento: se abren a los 7 días de tu acceso">

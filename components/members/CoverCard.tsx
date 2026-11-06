@@ -45,7 +45,7 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
       {bloqueado && <div className="absolute inset-0 bg-black/55" />}
 
       <span className="absolute left-2.5 top-2.5 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-ink/90 backdrop-blur">
-        {modulo.is_bonus ? "Bono" : `Módulo ${numero}`}
+        {modulo.is_live ? "En vivo" : modulo.is_bonus ? "Bono" : `Módulo ${numero}`}
       </span>
 
       {bloqueado && (

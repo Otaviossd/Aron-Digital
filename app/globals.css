@@ -89,8 +89,8 @@ body {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Foto que se funde con el fondo (cara completa, borde inferior suave) */
@@ -142,7 +142,43 @@ body {
   }
 }
 
+/* ---------- Fluidez del área de alumnos ---------- */
+@keyframes entra {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes esqueleto {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+/* Cada pantalla nueva entra con un fundido corto */
+.entra { animation: entra 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+/* Los hijos entran en cascada */
+.escalonado > * { animation: entra 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.escalonado > *:nth-child(2) { animation-delay: 70ms; }
+.escalonado > *:nth-child(3) { animation-delay: 140ms; }
+.escalonado > *:nth-child(4) { animation-delay: 210ms; }
+.escalonado > *:nth-child(5) { animation-delay: 280ms; }
+.escalonado > *:nth-child(n + 6) { animation-delay: 340ms; }
+/* Esqueleto de carga: se ve al instante mientras llega el contenido */
+.esqueleto {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.035) 30%, rgba(255, 255, 255, 0.085) 50%, rgba(255, 255, 255, 0.035) 70%);
+  background-size: 300% 100%;
+  animation: esqueleto 1.6s ease-in-out infinite;
+  border-radius: 1rem;
+}
+/* Luces de fondo baratas: degradado radial en vez de filtros de desenfoque animados (no traban en el celular) */
+.luz {
+  background: radial-gradient(closest-side, var(--luz, rgba(57, 255, 126, 0.2)), transparent);
+  will-change: opacity;
+}
+/* Botones: respuesta táctil inmediata */
+button, a, summary { -webkit-tap-highlight-color: transparent; }
+.neon { transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.25s ease; }
+.neon:active { transform: scale(0.97); }
+
 @media (prefers-reduced-motion: reduce) {
+  .entra, .escalonado > *, .esqueleto, .animate-ping, .animate-pulse { animation: none !important; }
   .flotar, .flotar-lento, .respirar, .cinta, .texto-luz { animation: none; }
   .aparece { opacity: 1 !important; transform: none !important; transition: none !important; }
 }

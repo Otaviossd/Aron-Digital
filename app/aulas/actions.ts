@@ -66,3 +66,45 @@ export async function quitarAvatar() {
   await supabase.auth.updateUser({ data: { avatar_url: null } });
   revalidatePath("/aulas", "layout");
 }
+
+// Nombre que ven los demás en comentarios, comunidad y chat (y que se sugiere en el certificado).
+export async function guardarNombre(_prev: { error?: string; ok?: boolean }, formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Tenés que iniciar sesión." };
+
+  const nombre = String(formData.get("nombre") ?? "").replace(/\s+/g, " ").trim();
+  if (nombre.length < 2) return { error: "Escribí tu nombre." };
+  if (nombre.length > 60) return { error: "El nombre es demasiado largo." };
+
+  const { error } = await supabase.auth.updateUser({ data: { full_name: nombre } });
+  if (error) return { error: "No pudimos guardar el nombre. Intentá de nuevo." };
+
+  revalidatePath("/aulas", "layout");
+  return { ok: true };
+}
+
+// Emite el certificado (o corrige el nombre) de quien terminó el 100 % del curso. La validación real está en la base.
+export async function emitirCertificado(_prev: { error?: string; ok?: boolean }, formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Tenés que iniciar sesión." };
+
+  const nombre = String(formData.get("nombre") ?? "").replace(/\s+/g, " ").trim();
+  if (nombre.length < 5 || !nombre.includes(" ")) return { error: "Escribí tu nombre completo, con nombre y apellido." };
+  if (nombre.length > 80) return { error: "El nombre es demasiado largo." };
+
+  const { error } = await supabase.rpc("emitir_certificado", { p_nombre: nombre });
+  if (error) {
+    if (error.message.includes("curso_incompleto")) return { error: "Todavía te faltan clases por completar." };
+    return { error: "No pudimos emitir el certificado. Intentá de nuevo." };
+  }
+
+  revalidatePath("/aulas/certificado");
+  revalidatePath("/aulas", "layout");
+  return { ok: true };
+}

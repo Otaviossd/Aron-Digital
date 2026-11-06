@@ -4,18 +4,22 @@ import { notFound } from "next/navigation";
 import { aulasDelModulo, diasRestantes, getMemberData } from "@/lib/members";
 import { toggleCompletada } from "../actions";
 import RegistrarVista from "@/components/members/RegistrarVista";
+import Pestanas from "@/components/members/Pestanas";
+import ComentariosCargados from "@/components/members/ComentariosCargados";
+import { aEmbed, esArchivoDeVideo } from "@/lib/video";
 import { ui } from "@/lib/ui";
 
 export default function AulaPage(props: PageProps<"/aulas/[id]">) {
   return (
-    <Suspense fallback={<div className="h-96" />}>
-      <AulaContenido params={props.params} />
+    <Suspense fallback={<div className="esqueleto h-96" />}>
+      <AulaContenido params={props.params} searchParams={props.searchParams} />
     </Suspense>
   );
 }
 
-async function AulaContenido({ params }: { params: Promise<{ id: string }> }) {
+async function AulaContenido({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string }> }) {
   const { id } = await params;
+  const { tab } = await searchParams;
   const { supabase, modulos, aulas, completadas } = await getMemberData();
 
   // RLS: si el módulo todavía no se liberó (o la clase no se publicó), no aparece en `aulas`.
@@ -25,8 +29,9 @@ async function AulaContenido({ params }: { params: Promise<{ id: string }> }) {
   if (!modulo) notFound();
 
   const { data: v } = await supabase.from("lessons").select("video_url").eq("id", id).maybeSingle();
-  const url = (v?.video_url as string | null) ?? null;
-  const esArchivo = url ? /\.(mp4|webm|mov)(\?|$)/i.test(url) : false;
+  const urlCruda = (v?.video_url as string | null) ?? null;
+  const url = aEmbed(urlCruda) ?? urlCruda;
+  const esArchivo = esArchivoDeVideo(url);
 
   const lista = aulasDelModulo(aulas, modulo.id);
   const abiertas = lista.filter((a) => a.is_unlocked !== false);
@@ -74,7 +79,21 @@ async function AulaContenido({ params }: { params: Promise<{ id: string }> }) {
           )}
         </div>
 
-        {aula.description && <p className="mt-8 max-w-2xl leading-relaxed text-muted">{aula.description}</p>}
+        <Pestanas
+          inicial={tab === "comentarios" ? "comentarios" : "clase"}
+          clase={
+            aula.description ? (
+              <p className="max-w-2xl leading-relaxed text-muted">{aula.description}</p>
+            ) : (
+              <p className="text-sm text-faint">Mirá el video y marcá la clase como completada para avanzar en tu progreso.</p>
+            )
+          }
+          comentarios={
+            <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-white/[0.03]" />}>
+              <ComentariosCargados tipo="aula" lessonId={id} placeholder="Escribí tu pregunta sobre esta clase…" vacio="Todavía nadie preguntó nada. Hacé la primera pregunta: Aaron responde por acá." />
+            </Suspense>
+          }
+        />
       </div>
 
       <aside className="h-fit overflow-hidden rounded-2xl border border-line bg-surface">
