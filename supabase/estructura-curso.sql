@@ -33,10 +33,12 @@ join (values
   ('Módulo 1: Bienvenida', 'Bienvenida', 'Aaron te da la bienvenida a La Nueva Ola Academy.', 1, 3),
   ('Módulo 1: Bienvenida', 'Qué esperar de este curso', 'Cómo está armado el curso y qué vas a lograr al terminarlo.', 2, 4),
   ('Módulo 1: Bienvenida', 'Cómo funciona la plataforma', 'Módulos, clases, progreso, comentarios y comunidad.', 3, 4),
-  ('Módulo 1: Bienvenida', 'Cómo acceder desde cualquier dispositivo', 'Entrá desde el celular o la computadora y guardá tu acceso.', 4, 3),
-  ('Módulo 1: Bienvenida', 'Soporte, clases en vivo y comunidad', 'Dónde preguntar, cómo funcionan las lives y cómo pedir ayuda.', 5, 4),
-  ('Módulo 1: Bienvenida', 'Cómo sacarle el máximo al curso', 'Ritmo de estudio, práctica y cómo conseguir tu certificado.', 6, 4),
-  ('Módulo 1: Bienvenida', 'Próximos pasos', 'Qué hacer ahora y cómo seguir al Módulo 2.', 7, 3),
+  ('Módulo 1: Bienvenida', 'Cómo entrar a tu cuenta', 'Entrá con tu Gmail, recibí tu acceso y guardalo en tu celular.', 4, 4),
+  ('Módulo 1: Bienvenida', 'Clases bloqueadas y módulos bonus', 'Por qué algunas clases se abren con los días y dónde están los bonos.', 5, 4),
+  ('Módulo 1: Bienvenida', 'Soporte, clases en vivo y comunidad', 'Dónde preguntar, cómo funcionan las lives y cómo pedir ayuda.', 6, 4),
+  ('Módulo 1: Bienvenida', 'Cómo sacarle el máximo al curso', 'Ritmo de estudio, práctica y cómo conseguir tu certificado.', 7, 4),
+  ('Módulo 1: Bienvenida', 'Clase extra: cómo crecer en redes sociales', 'Cómo acceder a la clase extra y por qué te ayuda a conseguir más clientes.', 8, 4),
+  ('Módulo 1: Bienvenida', 'Próximos pasos', 'Qué hacer ahora y cómo seguir al Módulo 2.', 9, 3),
 
   -- Módulo 2: fundamentos
   ('Módulo 2: Fundamentos de la barbería', 'Herramientas y equipamiento', 'Qué necesitás para empezar y cómo cuidarlo.', 1, 10),
@@ -78,3 +80,28 @@ join (values
   ('Módulo 5: Corte 3 · (a definir)', 'Acabado y errores comunes', 'El toque final y lo que más se repite.', 9, 8)
 ) as l(modulo, titulo, descripcion, pos, minutos) on l.modulo = m.title
 where not exists (select 1 from public.lessons x where x.module_id = m.id);
+
+-- 4) Si el Módulo 1 ya tenía la versión anterior (7 clases), suma las nuevas y reordena sin tocar videos cargados
+insert into public.lessons (module_id, title, description, position, duration_minutes, unlock_after_days)
+select m.id, v.t, v.d, v.p, 4, 0
+from public.modules m
+join (values
+  ('Cómo entrar a tu cuenta', 'Entrá con tu Gmail, recibí tu acceso y guardalo en tu celular.', 4),
+  ('Clases bloqueadas y módulos bonus', 'Por qué algunas clases se abren con los días y dónde están los bonos.', 5),
+  ('Clase extra: cómo crecer en redes sociales', 'Cómo acceder a la clase extra y por qué te ayuda a conseguir más clientes.', 8)
+) as v(t, d, p) on true
+where m.title = 'Módulo 1: Bienvenida'
+and not exists (select 1 from public.lessons x where x.module_id = m.id and x.title = v.t);
+
+update public.lessons l set position = v.p
+from public.modules m, (values
+  ('Bienvenida', 1), ('Qué esperar de este curso', 2), ('Cómo funciona la plataforma', 3),
+  ('Cómo entrar a tu cuenta', 4), ('Clases bloqueadas y módulos bonus', 5),
+  ('Soporte, clases en vivo y comunidad', 6), ('Cómo sacarle el máximo al curso', 7),
+  ('Clase extra: cómo crecer en redes sociales', 8), ('Próximos pasos', 9)
+) as v(t, p)
+where m.title = 'Módulo 1: Bienvenida' and l.module_id = m.id and l.title = v.t;
+
+delete from public.lessons l using public.modules m
+where m.title = 'Módulo 1: Bienvenida' and l.module_id = m.id
+and l.title = 'Cómo acceder desde cualquier dispositivo' and l.video_url is null;
