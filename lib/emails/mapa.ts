@@ -618,13 +618,14 @@ export function construirMapa(ctx: Ctx) {
   // Fila 0 · captura
   nodo({ id: "captura", col: 1, row: 0, tipo: "pagina", titulo: "Página de captura", sub: "/captura · 5 al 10 de noviembre", detalle: "Lista de espera del 5 al 10 de noviembre. El 11 a las 9:00 el sitio pasa solo a la página de ventas. La persona deja su email y entra al grupo de WhatsApp. Pasada la apertura, el tráfico va directo a la página de ventas." });
   nodo({ id: "lead", col: 2, row: 0, tipo: "accion", titulo: "Lead en la lista", sub: "Calendario hasta la apertura", detalle: "La secuencia se cuenta contra la fecha de apertura, no contra el día en que se anotó. Si entra 8 días después de empezar la captura, recibe el email de bienvenida y solo los emails que faltan hasta la apertura." });
-  const cap = ["W0", "K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10", "L1", "L2", "L3", "L4"];
+  const cap = ["W0", "K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10", "C1", "R1", "R2", "L1", "L2", "L3", "L4"];
   fila(cap, {
     W0: ["Estás en la lista", "Al instante"], K1: ["Quién es Aaron", "6 nov · 09:00"], K2: ["Imaginate en 3 meses", "6 nov · 19:00"],
     K3: ["El curso por dentro", "7 nov · 09:00"], K4: ["5 errores del barbero", "7 nov · 19:00"], K5: ["Lo que vas a recibir", "8 nov · 09:00"],
     K6: ["El año se termina", "8 nov · 19:00"], K7: ["Detrás de escena", "9 nov · 09:00"], K8: ["Tu lugar entre los 50", "9 nov · 19:00"],
-    K9: ["Mañana abrimos", "10 nov · 09:00"], K10: ["Mañana a las 9:00", "10 nov · 19:00"], L1: ["¡Abrimos! 50% OFF", "11 nov · 09:00"],
-    L2: ["Primer día", "11 nov · 19:00"], L3: ["Último día de la oferta", "13 nov · 09:00"], L4: ["Cierra esta noche", "13 nov · 19:00"],
+    K9: ["Mañana abrimos", "10 nov · 09:00"], K10: ["Mañana a las 9:00", "10 nov · 19:00"], C1: ["Cambio de fecha", "11 nov · 09:55"],
+    R1: ["Mañana abrimos", "13 nov · 09:00"], R2: ["Mañana a las 9:00", "13 nov · 19:00"], L1: ["¡Abrimos! 50% OFF", "14 nov · 09:00"],
+    L2: ["Primer día", "14 nov · 19:00"], L3: ["Último día de la oferta", "16 nov · 09:00"], L4: ["Cierra esta noche", "16 nov · 19:00"],
   }, 3, 0);
   nodo({ id: "aVentas", col: 19, row: 0, tipo: "mal", titulo: "Apertura: pasan a ventas", sub: "Si no compran: se unen a 'Vio la oferta y no compró'", detalle: "Los emails de apertura llevan a la página de ventas. Después de la apertura, quienes estaban en la lista y todavía no compraron se unen al mismo grupo que los visitantes que vieron la oferta y no avanzaron (fila de abajo, 'Vio la oferta y no compró'), y reciben exactamente los mismos emails hasta que compren." });
 
