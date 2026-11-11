@@ -1,4 +1,4 @@
-// Calendario de la secuencia de la lista de espera: captura del 5 al 10 de noviembre, apertura el 11 (09:00, Paraguay).
+// Calendario de la secuencia de la lista de espera: captura del 5 al 13 de noviembre, apertura el 11 (09:00, Paraguay).
 // Cada email tiene una hora fija (2 por día: 09:00 y 19:00). Quien se anota tarde recibe solo los que todavía no salieron.
 // Sin dependencias del framework: se prueba con node --test.
 

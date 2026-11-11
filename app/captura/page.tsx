@@ -9,7 +9,7 @@ import Aparece from "@/components/Aparece";
 export const metadata: Metadata = {
   title: "Los primeros 50 pagan la mitad y entran para siempre | Plataforma de Aaron Dalla Rosa",
   description:
-    "Aaron Dalla Rosa abre su plataforma de barbería el 11 de noviembre. Anotate y entrá al grupo de WhatsApp: los primeros 50 pagan la mitad del plan anual, acceso vitalicio y bonos exclusivos. Cuando se agotan los cupos, se termina.",
+    "Aaron Dalla Rosa abre su plataforma de barbería el sábado 14 de noviembre. Anotate y entrá al grupo de WhatsApp: los primeros 50 pagan la mitad del plan anual, acceso vitalicio y bonos exclusivos. Cuando se agotan los cupos, se termina.",
 };
 
 // Contenido editable de la página (cambiá los textos acá, sin tocar el diseño).
@@ -40,7 +40,7 @@ const INCLUYE = [
 
 const PASOS = [
   { t: "Dejás tu email y entrás al grupo", d: "Son los dos pasos. El grupo de WhatsApp es donde avisamos primero y donde te enterás de los bonos exclusivos." },
-  { t: "El 11 de noviembre, a las 9:00, abrimos", d: "Hora de Paraguay. Quienes están en la lista y en el grupo reciben el aviso antes que nadie." },
+  { t: "El sábado 14 de noviembre, a las 9:00, abrimos", d: "Hora de Paraguay. Quienes están en la lista y en el grupo reciben el aviso antes que nadie." },
   { t: `Los primeros ${PRECOS.promo.vagas} entran con precio de lanzamiento`, d: "Pagás una sola vez, entrás para siempre y recibís los bonos exclusivos. Cuando se llenan los cupos, se termina." },
 ];
 
@@ -126,7 +126,7 @@ export default function CapturaPage() {
             </div>
 
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-center">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-accent">Abrimos el 11 de noviembre · 9:00 (hora de Paraguay)</p>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-accent">Abrimos el sábado 14 de noviembre · 9:00 (hora de Paraguay)</p>
               <CuentaRegresiva fin={LANZAMIENTO_APERTURA} />
             </div>
 
