@@ -17,15 +17,17 @@ export const PASOS_CAPTURA: readonly PasoCaptura[] = [
   { step: 8, id: "K8", sendAt: hora("09", "19:00"), fase: "pre" },
   { step: 9, id: "K9", sendAt: hora("10", "09:00"), fase: "pre" },
   { step: 10, id: "K10", sendAt: hora("10", "19:00"), fase: "pre" },
-  // La apertura se movió del 11 al sábado 14. Los pasos 11 a 14 (apertura vieja) quedan retirados: no se vuelven a usar
-  // para que quien ya recibió alguno reciba igual los nuevos (cada paso se envía una sola vez por persona).
-  { step: 15, id: "C1", sendAt: hora("11", "09:55"), fase: "pre" }, // aviso del cambio de fecha
+  // La apertura se movió del 11 al 14 y por último al martes 17 a las 17:00. Los pasos 11 a 14 y 17 a 21 quedan retirados:
+  // no se reutilizan para que quien ya recibió alguno reciba igual los nuevos (cada paso se envía una sola vez por persona).
+  { step: 15, id: "C1", sendAt: hora("11", "09:55"), fase: "pre" }, // aviso del primer cambio (sábado 14)
   { step: 16, id: "R1", sendAt: hora("13", "09:00"), fase: "pre" },
-  { step: 17, id: "R2", sendAt: hora("13", "19:00"), fase: "pre" },
-  { step: 18, id: "L1", sendAt: hora("14", "09:00"), fase: "lanzamiento" },
-  { step: 19, id: "L2", sendAt: hora("14", "19:00"), fase: "lanzamiento" },
-  { step: 20, id: "L3", sendAt: hora("16", "09:00"), fase: "lanzamiento" },
-  { step: 21, id: "L4", sendAt: hora("16", "19:00"), fase: "lanzamiento" },
+  { step: 22, id: "C2", sendAt: hora("13", "12:55"), fase: "pre" }, // aviso del segundo cambio (martes 17, 17:00)
+  { step: 23, id: "R3", sendAt: hora("16", "09:00"), fase: "pre" },
+  { step: 24, id: "R4", sendAt: hora("17", "09:00"), fase: "pre" },
+  { step: 25, id: "L1", sendAt: hora("17", "17:00"), fase: "lanzamiento" },
+  { step: 26, id: "L2", sendAt: hora("17", "21:00"), fase: "lanzamiento" },
+  { step: 27, id: "L3", sendAt: hora("19", "09:00"), fase: "lanzamiento" },
+  { step: 28, id: "L4", sendAt: hora("19", "19:00"), fase: "lanzamiento" },
 ];
 
 // Si el agendador se atrasa, un email sigue "vigente" este tiempo; pasado eso se salta (nunca sale un email viejo).

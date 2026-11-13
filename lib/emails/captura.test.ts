@@ -5,8 +5,8 @@ import { PASOS_CAPTURA } from "../sequence-captura.ts";
 
 const ctx = { siteUrl: "https://www.lanuevaolaacademy.com", email: "a@b.com", nombre: "Ana López", bajaUrl: "https://x/baja?t=1", marca: "LNO" };
 
-test("los 17 emails de captura se arman con baja y sin valores rotos", () => {
-  assert.equal(fichasCaptura().length, 17);
+test("los 19 emails de captura se arman con baja y sin valores rotos", () => {
+  assert.equal(fichasCaptura().length, 19);
   for (const p of PASOS_CAPTURA) {
     const { asunto, html } = plantillaCaptura(p.id, ctx);
     assert.ok(asunto.length > 8, p.id);
