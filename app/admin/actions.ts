@@ -73,6 +73,7 @@ export async function guardarAula(formData: FormData) {
   const supabase = await exigirAdmin();
   const id = texto(formData, "id");
   const publicada = texto(formData, "published_at");
+  const ahora = formData.get("publicar_ahora") === "on";
 
   const fila = {
     module_id: texto(formData, "module_id"),
@@ -82,7 +83,7 @@ export async function guardarAula(formData: FormData) {
     video_url: texto(formData, "video_url") || null,
     unlock_after_days: Math.max(0, entero(formData, "unlock_after_days")),
     // datetime-local vem sem fuso; interpretamos como horário de Assunção (UTC-03:00).
-    published_at: publicada ? new Date(`${publicada}:00-03:00`).toISOString() : new Date().toISOString(),
+    published_at: !ahora && publicada ? new Date(`${publicada}:00-03:00`).toISOString() : new Date().toISOString(),
   };
   if (!fila.title || !fila.module_id) throw new Error("La clase necesita título y módulo");
 

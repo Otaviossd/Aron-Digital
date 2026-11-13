@@ -197,7 +197,7 @@ function FormAula({ moduloId, aula }: { moduloId: string; aula?: Aula }) {
           <input name="title" defaultValue={aula?.title} required className={ui.campo} />
         </div>
         <div className="sm:col-span-2">
-          <label className={ui.rotulo}>Descripción</label>
+          <label className={ui.rotulo}>Descripción (opcional: podés dejarla vacía)</label>
           <textarea name="description" defaultValue={aula?.description ?? ""} rows={2} className={ui.campo} />
         </div>
         <div className="sm:col-span-2">
@@ -213,7 +213,11 @@ function FormAula({ moduloId, aula }: { moduloId: string; aula?: Aula }) {
           <input name="unlock_after_days" type="number" min={0} defaultValue={aula?.unlock_after_days ?? 0} className={ui.campo} />
         </div>
         <div className="sm:col-span-2">
-          <label className={ui.rotulo}>Publicar el (vacío = publicar ahora; usalo para el video de cada lunes)</label>
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input name="publicar_ahora" type="checkbox" defaultChecked={!aula} className="h-4 w-4 accent-[#39ff7e]" />
+            Publicar ahora
+          </label>
+          <label className={`${ui.rotulo} mt-3`}>O programar para una fecha (se usa solo si “Publicar ahora” está desmarcado; sirve para el video de cada lunes)</label>
           <input name="published_at" type="datetime-local" defaultValue={aula ? paraInput(aula.published_at) : ""} className={ui.campo} />
         </div>
         <div className="sm:col-span-2">
