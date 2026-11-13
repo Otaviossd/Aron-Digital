@@ -76,7 +76,6 @@ async function ModuloContenido({ params }: { params: Promise<{ id: string }> }) 
                     {completadas.has(a.id) ? "✓" : i + 1}
                   </span>
                   <span className="flex-1 text-[15px] font-medium">{a.title}</span>
-                  {a.duration_minutes && <span className="text-xs text-faint">{a.duration_minutes} min</span>}
                 </Link>
               </li>
             ),

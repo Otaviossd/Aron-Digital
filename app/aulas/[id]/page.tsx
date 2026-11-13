@@ -122,7 +122,6 @@ async function AulaContenido({ params, searchParams }: { params: Promise<{ id: s
                     {completadas.has(a.id) ? "✓" : ""}
                   </span>
                   <span className="flex-1">{a.title}</span>
-                  {a.duration_minutes && <span className="text-xs text-faint">{a.duration_minutes}′</span>}
                 </Link>
               </li>
             ),

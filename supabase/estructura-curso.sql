@@ -104,4 +104,9 @@ where m.title = 'Módulo 1: Bienvenida' and l.module_id = m.id and l.title = v.t
 
 delete from public.lessons l using public.modules m
 where m.title = 'Módulo 1: Bienvenida' and l.module_id = m.id
-and l.title = 'Cómo acceder desde cualquier dispositivo' and l.video_url is null;
+and l.title = 'Cómo acceder desde cualquier dispositivo';
+
+-- 5) Las duraciones ya no se muestran ni se cargan: se limpian las estimadas para que el certificado no cuente horas inventadas
+update public.lessons l set duration_minutes = null
+from public.modules m
+where l.module_id = m.id and coalesce(m.is_live, false) = false;

@@ -81,7 +81,6 @@ export async function guardarAula(formData: FormData) {
     position: entero(formData, "position"),
     video_url: texto(formData, "video_url") || null,
     unlock_after_days: Math.max(0, entero(formData, "unlock_after_days")),
-    duration_minutes: texto(formData, "duration_minutes") ? entero(formData, "duration_minutes") : null,
     // datetime-local vem sem fuso; interpretamos como horário de Assunção (UTC-03:00).
     published_at: publicada ? new Date(`${publicada}:00-03:00`).toISOString() : new Date().toISOString(),
   };

@@ -112,7 +112,7 @@ export async function generarCertificadoPdf(datos: DatosCertificado): Promise<Ui
   // Texto
   const lineas = [
     `completó el 100 % de las clases del curso de barbería digital La Nueva Ola Academy,`,
-    `dictado por Aaron Dalla Rosa, con una carga de formación de ${textoHoras(datos.horas)}`,
+    datos.horas > 0 ? `dictado por Aaron Dalla Rosa, con una carga de formación de ${textoHoras(datos.horas)}` : `dictado por Aaron Dalla Rosa,`,
     `en ${datos.clases} ${datos.clases === 1 ? "clase" : "clases"} en video.`,
   ];
   lineas.forEach((l, i) => centrado(page, textoSeguro(l, normal), normal, 13, cx, 322 - i * 20, TINTA));

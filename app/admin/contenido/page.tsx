@@ -212,10 +212,6 @@ function FormAula({ moduloId, aula }: { moduloId: string; aula?: Aula }) {
           <label className={ui.rotulo}>Se libera el día (0 = con el módulo)</label>
           <input name="unlock_after_days" type="number" min={0} defaultValue={aula?.unlock_after_days ?? 0} className={ui.campo} />
         </div>
-        <div>
-          <label className={ui.rotulo}>Duración (min)</label>
-          <input name="duration_minutes" type="number" defaultValue={aula?.duration_minutes ?? ""} className={ui.campo} />
-        </div>
         <div className="sm:col-span-2">
           <label className={ui.rotulo}>Publicar el (vacío = publicar ahora; usalo para el video de cada lunes)</label>
           <input name="published_at" type="datetime-local" defaultValue={aula ? paraInput(aula.published_at) : ""} className={ui.campo} />

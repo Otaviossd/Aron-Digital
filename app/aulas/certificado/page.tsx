@@ -49,7 +49,7 @@ async function Certificado() {
           <p className="mt-8 text-sm text-muted">Se certifica que</p>
           <p className="mt-2 font-serif text-4xl font-bold italic leading-tight sm:text-5xl">{cert.nombre_completo}</p>
           <p className="mx-auto mt-6 max-w-lg text-sm leading-relaxed text-muted">
-            completó el 100 % de las clases del curso de barbería digital La Nueva Ola Academy, dictado por Aaron Dalla Rosa, con una carga de formación de {textoHoras(Number(cert.horas))} en {cert.clases} clases en video.
+            completó el 100 % de las clases del curso de barbería digital La Nueva Ola Academy, dictado por Aaron Dalla Rosa, {Number(cert.horas) > 0 ? `con una carga de formación de ${textoHoras(Number(cert.horas))} ` : ""}en {cert.clases} clases en video.
           </p>
           <p className="mt-6 text-xs text-faint">
             Emitido el {fechaLarga(cert.emitido_at)} · Código <span className="font-mono text-accent">{cert.codigo}</span>
