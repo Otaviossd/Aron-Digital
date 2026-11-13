@@ -77,6 +77,7 @@ export async function guardarAula(formData: FormData) {
   const fila = {
     module_id: texto(formData, "module_id"),
     title: texto(formData, "title"),
+    description: texto(formData, "description") || null,
     position: entero(formData, "position"),
     video_url: texto(formData, "video_url") || null,
     unlock_after_days: Math.max(0, entero(formData, "unlock_after_days")),
