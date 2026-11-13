@@ -110,3 +110,8 @@ and l.title = 'Cómo acceder desde cualquier dispositivo';
 update public.lessons l set duration_minutes = null
 from public.modules m
 where l.module_id = m.id and coalesce(m.is_live, false) = false;
+
+-- 6) Las clases ya no llevan descripción (solo título): se borran las de ejemplo
+update public.lessons l set description = null
+from public.modules m
+where l.module_id = m.id and coalesce(m.is_live, false) = false;

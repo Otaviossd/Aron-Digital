@@ -197,10 +197,6 @@ function FormAula({ moduloId, aula }: { moduloId: string; aula?: Aula }) {
           <input name="title" defaultValue={aula?.title} required className={ui.campo} />
         </div>
         <div className="sm:col-span-2">
-          <label className={ui.rotulo}>Descripción</label>
-          <textarea name="description" defaultValue={aula?.description ?? ""} rows={2} className={ui.campo} />
-        </div>
-        <div className="sm:col-span-2">
           <label className={ui.rotulo}>Video (archivo .mp4 o enlace de incrustación/embed)</label>
           <input name="video_url" defaultValue={aula?.video_url ?? ""} className={ui.campo} />
         </div>
