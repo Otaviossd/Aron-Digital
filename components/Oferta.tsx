@@ -43,7 +43,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
             valor: PRECOS.promo.valor,
             tachado: PRECOS.vitalicio.valor,
             etiqueta: "Cupos limitados",
-            incluye: ["Acceso para siempre", "Todas las actualizaciones y clases nuevas", "Los 2 bonos incluidos", "Pagás una sola vez"],
+            incluye: ["Acceso para siempre", "Todas las actualizaciones y clases nuevas", "Los 2 bonos incluidos", "Pagas una sola vez"],
           },
         ]
       : []),
@@ -53,14 +53,14 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
       sub: "El curso para siempre",
       valor: PRECOS.vitalicio.valor,
       etiqueta: promo ? undefined : "Recomendado",
-      incluye: ["Acceso para siempre", "Todas las actualizaciones y clases nuevas", "Los 2 bonos incluidos", "Pagás una sola vez"],
+      incluye: ["Acceso para siempre", "Todas las actualizaciones y clases nuevas", "Los 2 bonos incluidos", "Pagas una sola vez"],
     },
     {
       id: "anual" as const,
       nombre: "Acceso de 1 año",
       sub: "12 meses desde tu compra",
       valor: PRECOS.anual.valor,
-      incluye: ["Acceso por 12 meses", "Clases nuevas durante ese año", "Los 2 bonos incluidos", "Pagás una sola vez"],
+      incluye: ["Acceso por 12 meses", "Clases nuevas durante ese año", "Los 2 bonos incluidos", "Pagas una sola vez"],
     },
   ];
   const [eleccion, setEleccion] = useState<Tipo>(promo ? "promo" : "vitalicio");
@@ -96,9 +96,9 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
   async function continuar(ev: React.FormEvent) {
     ev.preventDefault();
     setError("");
-    if (nombre.trim().length < 2) return setError("Escribí tu nombre.");
-    if (!emailValido) return setError("Revisá tu email.");
-    if (!telefonoValido) return setError("Revisá tu WhatsApp: tiene que llevar el código de país, por ejemplo +595 981 123 456.");
+    if (nombre.trim().length < 2) return setError("Escribe tu nombre.");
+    if (!emailValido) return setError("Revisa tu email.");
+    if (!telefonoValido) return setError("Revisa tu WhatsApp: tiene que llevar el código de país, por ejemplo +595 981 123 456.");
     setEnviando(true);
     try {
       await fetch("/api/leads", {
@@ -139,9 +139,9 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
       {paso === "datos" ? (
         <form onSubmit={continuar} noValidate>
           <p className="mb-2 text-sm font-medium text-accent">Paso 1 de 2</p>
-          <h3 className="mb-2 text-2xl font-semibold tracking-tight">Dejanos tus datos y mirá la oferta</h3>
+          <h3 className="mb-2 text-2xl font-semibold tracking-tight">Déjanos tus datos y mira la oferta</h3>
           <p className="mb-6 text-sm leading-relaxed text-muted">
-            Te mostramos los precios y te mandamos el acceso por email apenas pagás.
+            Te mostramos los precios y te mandamos el acceso por email apenas pagas.
           </p>
 
           <label htmlFor="of-nombre" className="mb-1.5 block text-xs font-medium text-muted">
@@ -160,7 +160,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
           <input id="of-tel" type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} autoComplete="tel" placeholder="+595 981 000 000" className={`${ui.campo} mb-3`} />
 
           <p className="mb-5 text-[11px] leading-relaxed text-faint">
-            Al continuar aceptás que usemos tu email y tu WhatsApp para enviarte el acceso, avisos y novedades del curso. Podés darte de baja cuando quieras.
+            Al continuar aceptas que usemos tu email y tu WhatsApp para enviarte el acceso, avisos y novedades del curso. Puedes darte de baja cuando quieras.
           </p>
           {error && <p className="mb-4 text-sm text-red-300">{error}</p>}
           <button disabled={enviando} className={`${ui.boton} w-full disabled:opacity-60`}>
@@ -170,7 +170,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
       ) : (
         <div>
           <p className="mb-2 text-sm font-medium text-accent">Paso 2 de 2</p>
-          <h3 className="mb-2 text-2xl font-semibold tracking-tight">{nombre ? `${nombre.split(" ")[0]}, elegí cómo entrar` : "Elegí cómo entrar"}</h3>
+          <h3 className="mb-2 text-2xl font-semibold tracking-tight">{nombre ? `${nombre.split(" ")[0]}, elige cómo entrar` : "Elige cómo entrar"}</h3>
           {promo && (
             <div className="mb-6 rounded-2xl border border-accent/40 bg-accent/[0.07] p-4 text-center">
               <p className="text-sm font-semibold text-accent">Oferta de lanzamiento: 3 días o hasta agotar los {PRECOS.promo.vagas} cupos</p>
@@ -203,7 +203,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
             </button>
           </p>
 
-          <div role="radiogroup" aria-label="Elegí tu acceso" className="space-y-3">
+          <div role="radiogroup" aria-label="Elige tu acceso" className="space-y-3">
             {opciones.map((o) => {
               const activa = eleccion === o.id;
               return (
@@ -251,7 +251,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
           </div>
 
           <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs leading-relaxed text-muted">
-            Por solo <strong className="text-ink">US${diferencia} más</strong> que el acceso de 1 año, tenés el curso para siempre: no volvés a pagar y recibís todas las clases y módulos que Aaron sume en el futuro.
+            Por solo <strong className="text-ink">US${diferencia} más</strong> que el acceso de 1 año, tienes el curso para siempre: no vuelves a pagar y recibes todas las clases y módulos que Aaron sume en el futuro.
           </p>
 
           <div className="mt-5">
@@ -265,7 +265,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
           </div>
 
           <p className="mt-5 text-xs leading-relaxed text-faint">
-            Recibís el acceso por email al instante. Reembolso disponible durante los primeros 7 días.
+            Recibes el acceso por email al instante. Reembolso disponible durante los primeros 7 días.
           </p>
         </div>
       )}
