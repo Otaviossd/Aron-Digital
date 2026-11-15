@@ -177,7 +177,35 @@ button, a, summary { -webkit-tap-highlight-color: transparent; }
 .neon { transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.25s ease; }
 .neon:active { transform: scale(0.97); }
 
+/* ---------- Inicio de la página de ventas: entrada en cascada, anillo y recorrido ---------- */
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+.hero-in { animation: hero-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0ms); }
+@keyframes hero-foto {
+  from { opacity: 0; transform: scale(1.045) translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.hero-foto { animation: hero-foto 1.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 150ms; }
+/* Un arco de luz recorre despacio el anillo detrás del retrato */
+@keyframes anillo-giro {
+  to { transform: rotate(360deg); }
+}
+.anillo-giro { transform-box: fill-box; transform-origin: center; animation: anillo-giro 18s linear infinite; }
+@keyframes onda-play {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.onda-play { animation: onda-play 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) infinite; }
+@keyframes barra-recorrido {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.barra-recorrido { animation: barra-recorrido linear both; }
+
 @media (prefers-reduced-motion: reduce) {
+  .hero-in, .hero-foto, .anillo-giro, .onda-play, .barra-recorrido { animation: none !important; }
   .entra, .escalonado > *, .esqueleto, .animate-ping, .animate-pulse { animation: none !important; }
   .flotar, .flotar-lento, .respirar, .cinta, .texto-luz { animation: none; }
   .aparece { opacity: 1 !important; transform: none !important; transition: none !important; }

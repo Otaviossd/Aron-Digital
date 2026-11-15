@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Curso de Barbería | Aaron Dalla Rosa",
-  description: "Aprendé barbería con clases nuevas cada semana. Acceso inmediato.",
+  description: "Aprendé barbería con Aaron Dalla Rosa: clases en video, clases en vivo y comunidad. Acceso inmediato.",
 };
 
 // Sin zoom accidental: el celular no amplía la página al tocar o con dos dedos.

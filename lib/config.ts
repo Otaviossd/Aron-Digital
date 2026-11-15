@@ -28,7 +28,7 @@ export const PROMO_FIN = process.env.NEXT_PUBLIC_PROMO_FIN || "2026-11-19T23:59:
 
 export const DIAS_REEMBOLSO = 7;
 
-export const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME ?? "Barbería Aaron";
+export const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME ?? "La Nueva Ola Academy";
 
 // Grupo de WhatsApp da lista de espera (link de convite sem os parâmetros de rastreio do compartilhamento).
 // Para trocar sem mexer no código, defina NEXT_PUBLIC_WHATSAPP_GROUP_URL na Vercel.
