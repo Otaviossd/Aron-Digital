@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Salidas de los scripts de PDF (se generan, no se versionan)
+scripts/guia-pdf/salida/
+scripts/guia-pdf/**/__pycache__/
