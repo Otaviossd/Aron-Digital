@@ -24,6 +24,8 @@ type Aula = {
   duration_minutes: number | null;
   published_at: string;
   unlock_after_days: number;
+  attachment_url: string | null;
+  attachment_name: string | null;
 };
 
 // datetime-local en horario de Asunción (UTC-03:00)
@@ -189,7 +191,7 @@ async function Contenido() {
 function FormAula({ moduloId, aula }: { moduloId: string; aula?: Aula }) {
   return (
     <div className="space-y-3 border-t border-line p-4">
-      <form action={guardarAula} className="grid gap-4 sm:grid-cols-2">
+      <form action={guardarAula} encType="multipart/form-data" className="grid gap-4 sm:grid-cols-2">
         {aula && <input type="hidden" name="id" value={aula.id} />}
         <input type="hidden" name="module_id" value={moduloId} />
         <div className="sm:col-span-2">
@@ -203,6 +205,24 @@ function FormAula({ moduloId, aula }: { moduloId: string; aula?: Aula }) {
         <div className="sm:col-span-2">
           <label className={ui.rotulo}>Video (archivo .mp4 o enlace de incrustación/embed)</label>
           <input name="video_url" defaultValue={aula?.video_url ?? ""} className={ui.campo} />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={ui.rotulo}>PDF adjunto (guía descargable; opcional)</label>
+          {aula?.attachment_url && (
+            <p className="mb-1 text-xs text-muted">
+              Actual:{" "}
+              <a href={aula.attachment_url} target="_blank" className="text-accent underline">
+                {aula.attachment_name ?? "ver archivo"}
+              </a>
+            </p>
+          )}
+          <input name="attachment_file" type="file" accept="application/pdf" className="text-xs text-muted" />
+          {aula?.attachment_url && (
+            <label className="mt-2 flex items-center gap-2 text-xs text-muted">
+              <input name="borrar_adjunto" type="checkbox" className="h-4 w-4 accent-[#39ff7e]" />
+              Quitar el PDF actual
+            </label>
+          )}
         </div>
         <div>
           <label className={ui.rotulo}>Orden</label>

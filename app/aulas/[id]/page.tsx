@@ -28,8 +28,10 @@ async function AulaContenido({ params, searchParams }: { params: Promise<{ id: s
   const modulo = modulos.find((m) => m.id === aula.module_id);
   if (!modulo) notFound();
 
-  const { data: v } = await supabase.from("lessons").select("video_url").eq("id", id).maybeSingle();
+  const { data: v } = await supabase.from("lessons").select("video_url, attachment_url, attachment_name").eq("id", id).maybeSingle();
   const urlCruda = (v?.video_url as string | null) ?? null;
+  const adjuntoUrl = (v?.attachment_url as string | null) ?? null;
+  const adjuntoNombre = (v?.attachment_name as string | null) ?? null;
   const url = aEmbed(urlCruda) ?? urlCruda;
   const esArchivo = esArchivoDeVideo(url);
 
@@ -76,6 +78,16 @@ async function AulaContenido({ params, searchParams }: { params: Promise<{ id: s
             <Link href={`/aulas/${siguiente.id}`} className="px-3 py-3 text-sm font-medium text-accent transition hover:text-ink">
               Siguiente →
             </Link>
+          )}
+          {adjuntoUrl && (
+            <a
+              href={adjuntoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto flex items-center gap-2 rounded-xl border border-line-strong px-4 py-3 text-sm font-medium text-ink transition hover:border-accent hover:text-accent"
+            >
+              📄 Descargar guía{adjuntoNombre ? "" : " en PDF"}
+            </a>
           )}
         </div>
 

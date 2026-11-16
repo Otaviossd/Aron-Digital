@@ -74,8 +74,27 @@ export async function guardarAula(formData: FormData) {
   const id = texto(formData, "id");
   const publicada = texto(formData, "published_at");
   const ahora = formData.get("publicar_ahora") === "on";
+  const borrarAdjunto = formData.get("borrar_adjunto") === "on";
 
-  const fila = {
+  let attachment_url: string | null | undefined = undefined;
+  let attachment_name: string | null | undefined = undefined;
+
+  const archivo = formData.get("attachment_file");
+  if (archivo instanceof File && archivo.size > 0) {
+    const ext = (archivo.name.split(".").pop() ?? "pdf").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const caminho = `${crypto.randomUUID()}.${ext || "pdf"}`;
+    const { error } = await supabase.storage.from("materiales").upload(caminho, archivo, {
+      contentType: archivo.type || "application/pdf",
+    });
+    if (error) throw new Error(`No se pudo subir el PDF: ${error.message}`);
+    attachment_url = supabase.storage.from("materiales").getPublicUrl(caminho).data.publicUrl;
+    attachment_name = archivo.name;
+  } else if (borrarAdjunto) {
+    attachment_url = null;
+    attachment_name = null;
+  }
+
+  const fila: Record<string, unknown> = {
     module_id: texto(formData, "module_id"),
     title: texto(formData, "title"),
     description: texto(formData, "description") || null,
@@ -85,6 +104,8 @@ export async function guardarAula(formData: FormData) {
     // datetime-local vem sem fuso; interpretamos como horário de Assunção (UTC-03:00).
     published_at: !ahora && publicada ? new Date(`${publicada}:00-03:00`).toISOString() : new Date().toISOString(),
   };
+  if (attachment_url !== undefined) fila.attachment_url = attachment_url;
+  if (attachment_name !== undefined) fila.attachment_name = attachment_name;
   if (!fila.title || !fila.module_id) throw new Error("La clase necesita título y módulo");
 
   const { error } = id
