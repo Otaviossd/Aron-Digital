@@ -168,6 +168,64 @@ def pagina_paso(numero, total, titulo, lineas_texto, imagen_path, logo_path, not
 </div>"""
 
 
+def pagina_checklist(numero, total, titulo, intro, items, logo_path):
+    """Página sin captura de teléfono: una idea por tarjeta, con número e ícono.
+    items: lista de (icono_emoji, titulo_corto, texto)."""
+    tarjetas = "".join(f'''
+    <div class="cristal" style="padding:6mm 7mm; margin-top:4mm; display:flex; gap:4mm; align-items:flex-start;">
+      <span style="font-size:20px; line-height:1;">{icono}</span>
+      <div>
+        <div style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:1.5mm;">{t}</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.6;">{txt}</div>
+      </div>
+    </div>''' for icono, t, txt in items)
+    intro_html = f'<div style="font-size:13px; color:var(--muted); line-height:1.65; max-width:160mm; margin-top:3mm;">{intro}</div>' if intro else ""
+    return f"""
+<div class="pagina">
+  <div class="barra-top"></div>
+  <div style="position:absolute; top:20mm; left:18mm; right:18mm;">
+    <div style="display:flex; gap:5mm; align-items:flex-start;">
+      <div class="chip-numero">{numero}</div>
+      <div style="flex:1;">
+        <div style="font-size:11px; color:var(--faint); font-weight:600; letter-spacing:.04em; margin-bottom:1.5mm;">{numero} DE {total}</div>
+        <div style="font-size:21px; font-weight:800; color:var(--ink); line-height:1.2;">{titulo}</div>
+        {intro_html}
+      </div>
+    </div>
+    {tarjetas}
+  </div>
+  <div class="pie"><span class="marca"><img src="{{{{LOGO}}}}" /> La Nueva Ola Academy</span><span>{numero} de {total}</span></div>
+</div>"""
+
+
+def pagina_imagen_simple(numero, total, titulo, lineas_texto, imagen_path, logo_path, nota=None):
+    """Como pagina_paso, pero la imagen entra completa sin moldura de teléfono
+    (útil para portadas de clase, infografías horizontales, etc.)."""
+    texto_html = "".join(f'<p style="font-size:13px; color:var(--muted); line-height:1.65; margin-top:2.2mm;">{l}</p>' for l in lineas_texto)
+    nota_html = f'''<div class="cristal" style="margin-top:8mm; padding:5mm 6mm; display:flex; gap:3mm; align-items:flex-start;">
+      <span style="color:var(--accent); font-size:14px;">💡</span>
+      <span style="font-size:12px; color:var(--muted); line-height:1.6;">{nota}</span>
+    </div>''' if nota else ""
+    img_b64 = _img_b64(imagen_path)
+    return f"""
+<div class="pagina">
+  <div class="barra-top"></div>
+  <div style="position:absolute; top:20mm; left:18mm; right:18mm; display:flex; gap:5mm; align-items:flex-start;">
+    <div class="chip-numero">{numero}</div>
+    <div style="flex:1;">
+      <div style="font-size:11px; color:var(--faint); font-weight:600; letter-spacing:.04em; margin-bottom:1.5mm;">PASO {numero} DE {total}</div>
+      <div style="font-size:21px; font-weight:800; color:var(--ink); line-height:1.2;">{titulo}</div>
+      {texto_html}
+      {nota_html}
+    </div>
+  </div>
+  <div style="position:absolute; top:90mm; left:0; right:0; text-align:center;">
+    <img src="{img_b64}" style="max-height:160mm; max-width:170mm; border-radius:6mm; border:1px solid var(--line-strong);" />
+  </div>
+  <div class="pie"><span class="marca"><img src="{{{{LOGO}}}}" /> La Nueva Ola Academy</span><span>Paso {numero} de {total}</span></div>
+</div>"""
+
+
 def pagina_cierre(titulo, texto, logo_path):
     return f"""
 <div class="pagina">
