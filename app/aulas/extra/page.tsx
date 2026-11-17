@@ -41,14 +41,27 @@ async function Extra() {
       <p className="mt-3 max-w-xl leading-relaxed text-muted">{EXTRA.descripcion}</p>
 
       {tiene ? (
-        <div className="mt-8">
-          {EXTRA.videoUrl ? (
-            <div className="aspect-video overflow-hidden rounded-2xl border border-line bg-black">
-              <iframe src={EXTRA.videoUrl} title={EXTRA.titulo} allow="fullscreen; picture-in-picture" allowFullScreen className="h-full w-full" />
-            </div>
-          ) : (
-            <p className="rounded-2xl border border-line bg-surface p-6 text-sm text-muted">El módulo se publica muy pronto. Vas a verlo acá mismo.</p>
-          )}
+        <div className="mt-8 space-y-3">
+          {EXTRA.lecciones.map((l, i) => (
+            <details key={i} className="group overflow-hidden rounded-2xl border border-line bg-surface open:border-accent/40">
+              <summary className="flex cursor-pointer list-none items-center gap-3 px-5 py-4">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line-strong text-xs font-medium text-muted">{i + 1}</span>
+                <span className="flex-1 font-medium tracking-tight">{l.titulo}</span>
+                <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-faint transition group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </summary>
+              <div className="border-t border-line px-5 py-5">
+                {l.videoUrl ? (
+                  <div className="aspect-video overflow-hidden rounded-xl border border-line bg-black">
+                    <iframe src={l.videoUrl} title={l.titulo} allow="fullscreen; picture-in-picture" allowFullScreen className="h-full w-full" />
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted">Esta clase se publica muy pronto. Vas a verla acá mismo.</p>
+                )}
+              </div>
+            </details>
+          ))}
         </div>
       ) : (
         <div className="relative mt-8 overflow-hidden rounded-2xl border border-line bg-surface p-8 text-center">

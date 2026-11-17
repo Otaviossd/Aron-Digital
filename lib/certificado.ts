@@ -10,6 +10,8 @@ export type DatosCertificado = {
   urlVerificacion: string;
   // PNG con fondo transparente de la firma de Aaron (opcional: sin ella se usa el nombre en cursiva)
   firmaPng?: Uint8Array | null;
+  // Logo de la marca (public/logo-lno.png); opcional, sin él se usa solo el texto.
+  logoPng?: Uint8Array | null;
 };
 
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
@@ -80,78 +82,94 @@ export async function generarCertificadoPdf(datos: DatosCertificado): Promise<Ui
   const page = doc.addPage([W, H]);
   const normal = await doc.embedFont(StandardFonts.Helvetica);
   const negrita = await doc.embedFont(StandardFonts.HelveticaBold);
-  const cursiva = await doc.embedFont(StandardFonts.TimesRomanBoldItalic);
   const cx = W / 2;
+  const margen = 56;
 
-  // Fondo y luces suaves
+  // Fondo liso, sin marco: un único resplandor suave en la esquina superior para dar profundidad.
   page.drawRectangle({ x: 0, y: 0, width: W, height: H, color: NEGRO });
-  for (let i = 0; i < 9; i++) {
-    page.drawCircle({ x: W - 70, y: H - 30, size: 260 - i * 26, color: ACENTO, opacity: 0.012 });
-    page.drawCircle({ x: 40, y: 20, size: 200 - i * 20, color: ACENTO, opacity: 0.008 });
+  for (let i = 0; i < 10; i++) {
+    page.drawCircle({ x: W - 40, y: H + 10, size: 320 - i * 28, color: ACENTO, opacity: 0.01 });
   }
 
-  // Marco doble
-  page.drawRectangle({ x: 22, y: 22, width: W - 44, height: H - 44, borderColor: ACENTO, borderWidth: 0.9, borderOpacity: 0.55 });
-  page.drawRectangle({ x: 31, y: 31, width: W - 62, height: H - 62, borderColor: TINTA, borderWidth: 0.4, borderOpacity: 0.14 });
+  // Logo + wordmark, alineados a la izquierda (nada de marco ni todo centrado tipo diploma).
+  let logoImg = null;
+  if (datos.logoPng) {
+    try {
+      logoImg = await doc.embedPng(datos.logoPng);
+    } catch {
+      logoImg = null;
+    }
+  }
+  const topY = H - margen - 20;
+  if (logoImg) {
+    const s = 26 / logoImg.height;
+    page.drawImage(logoImg, { x: margen, y: topY, width: logoImg.width * s, height: logoImg.height * s });
+    page.drawText("LA NUEVA OLA ACADEMY", { x: margen + logoImg.width * s + 12, y: topY + 8, size: 10.5, font: negrita, color: TINTA });
+  } else {
+    page.drawText("LA NUEVA OLA ACADEMY", { x: margen, y: topY + 8, size: 10.5, font: negrita, color: TINTA });
+  }
+  const numeroTxt = `Nº ${datos.codigo}`;
+  page.drawText(numeroTxt, { x: W - margen - negrita.widthOfTextAtSize(numeroTxt, 9), y: topY + 9, size: 9, font: negrita, color: APAGADO });
 
-  // Encabezado
-  centrado(page, "LA NUEVA OLA ACADEMY", negrita, 11, cx, 520, ACENTO, 5);
-  centrado(page, "CERTIFICADO DE CONCLUSIÓN", negrita, 29, cx, 468, TINTA, 3.2);
-  page.drawLine({ start: { x: cx - 36, y: 448 }, end: { x: cx + 36, y: 448 }, thickness: 1.2, color: ACENTO });
+  // Eyebrow + título, minimalista: sin caja, con una sola línea de acento debajo.
+  const eyebrowY = H - 150;
+  centrado(page, "CERTIFICADO DE FINALIZACIÓN", negrita, 10, cx, eyebrowY, ACENTO, 4.2);
+  page.drawLine({ start: { x: cx - 18, y: eyebrowY - 14 }, end: { x: cx + 18, y: eyebrowY - 14 }, thickness: 1, color: ACENTO, opacity: 0.6 });
 
-  centrado(page, "Se certifica que", normal, 12.5, cx, 416, APAGADO);
+  // Nombre: tipografía limpia (sin cursiva de diploma clásico), grande y directa.
+  const nombre = textoSeguro(datos.nombre, negrita) || "—";
+  let tamano = 42;
+  while (tamano > 22 && negrita.widthOfTextAtSize(nombre, tamano) > W - 220) tamano -= 1;
+  centrado(page, nombre, negrita, tamano, cx, eyebrowY - 58, TINTA);
 
-  // Nombre: se achica hasta que entre en el marco
-  const nombre = textoSeguro(datos.nombre, cursiva) || "—";
-  let tamano = 46;
-  while (tamano > 20 && cursiva.widthOfTextAtSize(nombre, tamano) > W - 190) tamano -= 1;
-  centrado(page, nombre, cursiva, tamano, cx, 366, TINTA);
-  const anchoNombre = Math.min(W - 190, cursiva.widthOfTextAtSize(nombre, tamano) + 40);
-  page.drawLine({ start: { x: cx - anchoNombre / 2, y: 352 }, end: { x: cx + anchoNombre / 2, y: 352 }, thickness: 0.6, color: ACENTO, opacity: 0.6 });
-
-  // Texto
+  // Texto, en un solo bloque corto y liviano.
   const lineas = [
-    `completó el 100 % de las clases del curso de barbería digital La Nueva Ola Academy,`,
-    datos.horas > 0 ? `dictado por Aaron Dalla Rosa, con una carga de formación de ${textoHoras(datos.horas)}` : `dictado por Aaron Dalla Rosa,`,
-    `en ${datos.clases} ${datos.clases === 1 ? "clase" : "clases"} en video.`,
+    `completó el 100 % del curso de barbería digital de La Nueva Ola Academy,`,
+    datos.horas > 0 ? `dictado por Aaron Dalla Rosa — ${textoHoras(datos.horas)} en ${datos.clases} ${datos.clases === 1 ? "clase" : "clases"} en video.` : `dictado por Aaron Dalla Rosa.`,
   ];
-  lineas.forEach((l, i) => centrado(page, textoSeguro(l, normal), normal, 13, cx, 322 - i * 20, TINTA));
-  centrado(page, `Emitido el ${fechaLarga(datos.emitidoAt)}`, normal, 11, cx, 246, APAGADO);
+  lineas.forEach((l, i) => centrado(page, textoSeguro(l, normal), normal, 12.5, cx, eyebrowY - 104 - i * 19, APAGADO));
+  centrado(page, `Emitido el ${fechaLarga(datos.emitidoAt)}`, normal, 10, cx, eyebrowY - 150, APAGADO, 0.4);
 
-  // Firma (izquierda)
-  const fx = 190;
+  // Pie: una sola línea hairline, sin caja. Firma (izquierda) · logo chico (centro) · QR (derecha).
+  const pieY = 96;
+  page.drawLine({ start: { x: margen, y: pieY + 54 }, end: { x: W - margen, y: pieY + 54 }, thickness: 0.6, color: TINTA, opacity: 0.1 });
+
+  // Firma (izquierda): con imagen de la firma, o solo el nombre en grande si no hay.
+  let firmaImg = null;
   if (datos.firmaPng) {
     try {
-      const img = await doc.embedPng(datos.firmaPng);
-      const escala = Math.min(190 / img.width, 70 / img.height);
-      page.drawImage(img, { x: fx - (img.width * escala) / 2, y: 140, width: img.width * escala, height: img.height * escala });
+      firmaImg = await doc.embedPng(datos.firmaPng);
     } catch {
-      centrado(page, "Aaron Dalla Rosa", cursiva, 24, fx, 146, TINTA);
+      firmaImg = null;
     }
-  } else {
-    centrado(page, "Aaron Dalla Rosa", cursiva, 24, fx, 146, TINTA);
   }
-  page.drawLine({ start: { x: fx - 95, y: 136 }, end: { x: fx + 95, y: 136 }, thickness: 0.6, color: TINTA, opacity: 0.5 });
-  centrado(page, "Aaron Dalla Rosa", negrita, 11, fx, 120, TINTA);
-  centrado(page, "Instructor · La Nueva Ola Academy", normal, 8.5, fx, 106, APAGADO);
+  if (firmaImg) {
+    const escala = Math.min(150 / firmaImg.width, 48 / firmaImg.height);
+    page.drawImage(firmaImg, { x: margen, y: pieY + 10, width: firmaImg.width * escala, height: firmaImg.height * escala });
+  } else {
+    page.drawText("Aaron Dalla Rosa", { x: margen, y: pieY + 18, size: 15, font: negrita, color: TINTA });
+  }
+  page.drawLine({ start: { x: margen, y: pieY + 4 }, end: { x: margen + 150, y: pieY + 4 }, thickness: 0.6, color: TINTA, opacity: 0.25 });
+  page.drawText("Aaron Dalla Rosa", { x: margen, y: pieY - 10, size: 9.5, font: negrita, color: TINTA });
+  page.drawText("Instructor · La Nueva Ola Academy", { x: margen, y: pieY - 22, size: 8, font: normal, color: APAGADO });
 
-  // Sello (centro)
-  const sy = 140;
-  page.drawCircle({ x: cx, y: sy, size: 44, borderColor: ACENTO, borderWidth: 1.4, borderOpacity: 0.9 });
-  page.drawCircle({ x: cx, y: sy, size: 38, borderColor: ACENTO, borderWidth: 0.4, borderOpacity: 0.5 });
-  centrado(page, "LNO", negrita, 17, cx, sy - 2, ACENTO, 1.5);
-  centrado(page, "ACADEMY", negrita, 5.6, cx, sy - 14, APAGADO, 1.6);
-  centrado(page, "CERTIFICADO", negrita, 5.6, cx, sy + 13, APAGADO, 1.6);
+  // Marca chica (centro), en vez del sello circular tipo diploma.
+  if (logoImg) {
+    const s2 = 30 / logoImg.height;
+    page.drawImage(logoImg, { x: cx - (logoImg.width * s2) / 2, y: pieY + 4, width: logoImg.width * s2, height: logoImg.height * s2, opacity: 0.9 });
+  }
+  centrado(page, "VERIFICADO DIGITALMENTE", negrita, 7, cx, pieY - 18, APAGADO, 1.4);
 
   // QR de verificación (derecha)
-  const rx = W - 190;
+  const rx = W - margen - 64;
   const qr = await QRCode.toBuffer(datos.urlVerificacion, { margin: 1, width: 360, color: { dark: "#07090aff", light: "#f4f4f2ff" } });
   const qrImg = await doc.embedPng(qr);
-  page.drawRectangle({ x: rx - 38, y: 108, width: 76, height: 76, color: TINTA });
-  page.drawImage(qrImg, { x: rx - 36, y: 110, width: 72, height: 72 });
-  centrado(page, datos.codigo, negrita, 10.5, rx, 94, ACENTO, 1);
-  centrado(page, "Verificá este certificado en", normal, 7.5, rx, 82, APAGADO);
-  centrado(page, datos.urlVerificacion.replace(/^https?:\/\//, "").replace(/\/verificar\/.*$/, "/verificar"), normal, 7.5, rx, 72, APAGADO);
+  page.drawImage(qrImg, { x: rx, y: pieY, width: 54, height: 54 });
+  const vx = rx - 10;
+  page.drawText(datos.codigo, { x: vx - negrita.widthOfTextAtSize(datos.codigo, 9.5), y: pieY + 36, size: 9.5, font: negrita, color: ACENTO });
+  const verif = datos.urlVerificacion.replace(/^https?:\/\//, "").replace(/\/verificar\/.*$/, "/verificar");
+  page.drawText("Verificá este certificado en", { x: vx - normal.widthOfTextAtSize("Verificá este certificado en", 7.5), y: pieY + 24, size: 7.5, font: normal, color: APAGADO });
+  page.drawText(verif, { x: vx - normal.widthOfTextAtSize(verif, 7.5), y: pieY + 14, size: 7.5, font: normal, color: APAGADO });
 
   return doc.save();
 }

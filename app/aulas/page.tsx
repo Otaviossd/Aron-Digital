@@ -102,7 +102,7 @@ async function Inicio() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={EXTRA.portadaChica} alt="" width={64} height={64} loading="lazy" className="h-16 w-16 shrink-0 rounded-xl border border-accent/40 object-cover" />
         <span className="min-w-0 flex-1">
-          <span className="block text-xs font-medium text-accent">Clase extra</span>
+          <span className="block text-xs font-medium text-accent">Módulo extra</span>
           <span className="block truncate font-medium tracking-tight">{EXTRA.titulo}</span>
         </span>
         <span className="text-sm text-muted transition group-hover:text-ink">Ver →</span>

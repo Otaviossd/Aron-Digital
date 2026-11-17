@@ -72,7 +72,16 @@ export const EXTRA = {
   checkoutUrl: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA, // oferta de US$10 (precio de alumno)
   // Link del precio normal (US$20). Si no se define, se usa el mismo link sin el parámetro "off" (la oferta base del producto).
   checkoutUrlNormal: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA_NORMAL,
-  videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...)
+  videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...) — ya no se usa, queda por compatibilidad
+  // Las 6 clases del módulo (provisorio: títulos a definir, se editan acá cuando estén los videos reales).
+  lecciones: [
+    { titulo: "Clase 1 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_1 },
+    { titulo: "Clase 2 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_2 },
+    { titulo: "Clase 3 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_3 },
+    { titulo: "Clase 4 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_4 },
+    { titulo: "Clase 5 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_5 },
+    { titulo: "Clase 6 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_6 },
+  ],
 } as const;
 
 // Cupones de recuperación (se crean en la Hotmart, con fecha de vencimiento real). Los emails solo muestran el código.

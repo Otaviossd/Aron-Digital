@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generarCertificadoPdf } from "@/lib/certificado";
-import { cargarFirma } from "@/lib/firma";
+import { cargarFirma, cargarLogo } from "@/lib/firma";
 import { siteUrl } from "@/lib/site";
 
 // Descarga el certificado en PDF. Solo se entrega a quien lo emitió (la política de la base lo garantiza).
@@ -30,10 +30,12 @@ export async function GET(request: NextRequest) {
   }
   if (!datos) return NextResponse.redirect(new URL("/aulas/certificado", request.url));
 
+  const [firmaPng, logoPng] = await Promise.all([cargarFirma(), cargarLogo()]);
   const pdf = await generarCertificadoPdf({
     ...datos,
     urlVerificacion: `${siteUrl()}/verificar/${datos.codigo}`,
-    firmaPng: await cargarFirma(),
+    firmaPng,
+    logoPng,
   });
 
   const archivo = `Certificado-La-Nueva-Ola-${datos.nombre.normalize("NFD").replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-")}.pdf`;
