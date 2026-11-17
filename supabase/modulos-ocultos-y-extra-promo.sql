@@ -11,6 +11,11 @@
 -- ============================================================
 alter table public.modules add column if not exists oculto boolean not null default false;
 
+-- my_modules() devuelve siempre el título/portada/descripción reales, más la columna "oculto"
+-- tal cual está en la tabla (sin condicionar por admin). El front (lib/members.ts) es quien decide
+-- si hay que mostrar el genérico: para un alumno de verdad siempre, y para el admin solo cuando
+-- está en "ver como alumno" (la cookie vista_alumno). Así la vista previa del admin también
+-- enmascara los módulos sin grabar, y el admin viendo el panel normal sigue viendo todo real.
 drop function if exists public.my_modules();
 create or replace function public.my_modules()
 returns table (
@@ -25,7 +30,7 @@ returns table (
   is_unlocked boolean,
   is_bonus boolean,
   is_live boolean,
-  sin_info boolean
+  oculto boolean
 )
 language sql
 stable
@@ -34,17 +39,17 @@ set search_path = public
 as $$
   select
     m.id,
-    case when m.oculto and not public.is_admin() then 'Próximamente' else m.title end,
-    case when m.oculto and not public.is_admin() then null else m.description end,
+    m.title,
+    m.description,
     m.position,
     m.unlock_after_days,
-    case when m.oculto and not public.is_admin() then null else m.cover_url end,
+    m.cover_url,
     m.accent,
     public.module_unlock_at(m.id) as unlock_at,
     coalesce(public.module_unlock_at(m.id) <= now(), false) as is_unlocked,
     m.is_bonus,
     m.is_live,
-    (m.oculto and not public.is_admin()) as sin_info
+    m.oculto
   from public.modules m
   where public.tiene_acceso()
   order by m.position

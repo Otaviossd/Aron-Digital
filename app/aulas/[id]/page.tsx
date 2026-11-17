@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { aulasDelModulo, diasRestantes, getMemberData } from "@/lib/members";
 import { toggleCompletada } from "../actions";
 import RegistrarVista from "@/components/members/RegistrarVista";
+import BotonDetenerYNavegar from "@/components/members/NavegacionClase";
 import Pestanas from "@/components/members/Pestanas";
 import ComentariosCargados from "@/components/members/ComentariosCargados";
 import { aEmbed, esArchivoDeVideo } from "@/lib/video";
@@ -46,17 +47,17 @@ async function AulaContenido({ params, searchParams }: { params: Promise<{ id: s
     <div className="grid gap-8 xl:grid-cols-[1fr_340px]">
       <RegistrarVista lessonId={id} />
       <div>
-        <Link href={`/aulas/modulo/${modulo.id}`} className="mb-5 inline-block text-sm text-muted transition hover:text-ink">
+        <BotonDetenerYNavegar href={`/aulas/modulo/${modulo.id}`} className="mb-5 inline-block text-sm text-muted transition hover:text-ink">
           ← {modulo.title}
-        </Link>
+        </BotonDetenerYNavegar>
         <h1 className="mb-6 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">{aula.title}</h1>
 
         <div className="aspect-video w-full overflow-hidden rounded-2xl border border-line bg-black">
           {url ? (
             esArchivo ? (
-              <video src={url} controls controlsList="nodownload" className="h-full w-full" />
+              <video id="reproductor-clase" src={url} controls controlsList="nodownload" className="h-full w-full" />
             ) : (
-              <iframe src={url} className="h-full w-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
+              <iframe id="reproductor-clase" src={url} className="h-full w-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
             )
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-faint">
@@ -70,14 +71,14 @@ async function AulaContenido({ params, searchParams }: { params: Promise<{ id: s
             <button className={hecha ? ui.botonSuave : ui.boton}>{hecha ? "✓ Completada" : "Marcar como completada"}</button>
           </form>
           {anterior && (
-            <Link href={`/aulas/${anterior.id}`} className="px-3 py-3 text-sm text-muted transition hover:text-ink">
+            <BotonDetenerYNavegar href={`/aulas/${anterior.id}`} className="px-3 py-3 text-sm text-muted transition hover:text-ink">
               ← Anterior
-            </Link>
+            </BotonDetenerYNavegar>
           )}
           {siguiente && (
-            <Link href={`/aulas/${siguiente.id}`} className="px-3 py-3 text-sm font-medium text-accent transition hover:text-ink">
+            <BotonDetenerYNavegar href={`/aulas/${siguiente.id}`} className="px-3 py-3 text-sm font-medium text-accent transition hover:text-ink">
               Siguiente →
-            </Link>
+            </BotonDetenerYNavegar>
           )}
           {adjuntoUrl && (
             <a

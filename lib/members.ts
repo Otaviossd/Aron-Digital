@@ -19,10 +19,22 @@ export type ModuloEstado = {
   is_bonus: boolean;
   // clases en vivo grabadas (existe después de correr supabase/plataforma-v2.sql)
   is_live?: boolean;
-  // true = todavía no se grabó nada: se ve el módulo y cuándo se libera, pero sin título real, portada ni descripción
+  // true = todavía no se grabó nada: se enmascara el título/portada/descripción
   // (existe después de correr supabase/modulos-ocultos-y-extra-promo.sql)
-  sin_info?: boolean;
+  oculto?: boolean;
 };
+
+// Texto genérico para un módulo marcado "oculto" (sin grabar todavía): da expectativa sin inventar detalles.
+const MODULO_EN_CAMINO = {
+  title: "Corte exclusivo en camino",
+  description: "Un corte completo más, grabado especialmente para esta academia. Se suma apenas esté listo, sin pagar de más.",
+  cover_url: null as string | null,
+};
+
+function enmascarar(m: ModuloEstado): ModuloEstado {
+  if (!m.oculto) return m;
+  return { ...m, title: MODULO_EN_CAMINO.title, description: MODULO_EN_CAMINO.description, cover_url: MODULO_EN_CAMINO.cover_url };
+}
 
 export type Aula = {
   id: string;
@@ -60,6 +72,13 @@ export const getMemberData = cache(async function getMemberData() {
 
   // Vista previa para el equipo: el admin ve todo abierto; con esta cookie ve el curso como un alumno que compró hoy (con candados).
   const vistaAlumno = admin === true && (await cookies()).get("vista_alumno")?.value === "1";
+
+  // Enmascara los módulos "oculto" (sin grabar todavía) para cualquiera que no sea el admin viendo el panel real.
+  // Así la vista previa "como alumno" también muestra el genérico, en vez del título real.
+  if (admin !== true || vistaAlumno) {
+    modulos = modulos.map(enmascarar);
+  }
+
   if (vistaAlumno) {
     const { data: diasAulas } = await supabase.from("lessons").select("id, unlock_after_days");
     const diasAula = new Map(((diasAulas ?? []) as { id: string; unlock_after_days: number }[]).map((x) => [x.id, x.unlock_after_days]));
