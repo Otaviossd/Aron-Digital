@@ -52,6 +52,7 @@ export async function guardarModulo(formData: FormData) {
     cover_url,
     accent,
     is_bonus: formData.get("is_bonus") === "on",
+    oculto: formData.get("oculto") === "on",
   };
   if (!fila.title) throw new Error("El módulo necesita un título");
 

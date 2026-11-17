@@ -36,7 +36,7 @@ async function Extra() {
       </Link>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={EXTRA.portada} alt={EXTRA.titulo} width={1254} height={1254} fetchPriority="high" className="mt-6 aspect-square w-full max-w-sm rounded-2xl border border-accent/30 object-cover" />
-      <p className="mt-6 text-xs font-medium text-accent">Clase extra</p>
+      <p className="mt-6 text-xs font-medium text-accent">Módulo extra</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-tight">{EXTRA.titulo}</h1>
       <p className="mt-3 max-w-xl leading-relaxed text-muted">{EXTRA.descripcion}</p>
 
@@ -47,7 +47,7 @@ async function Extra() {
               <iframe src={EXTRA.videoUrl} title={EXTRA.titulo} allow="fullscreen; picture-in-picture" allowFullScreen className="h-full w-full" />
             </div>
           ) : (
-            <p className="rounded-2xl border border-line bg-surface p-6 text-sm text-muted">La clase se publica muy pronto. Vas a verla acá mismo.</p>
+            <p className="rounded-2xl border border-line bg-surface p-6 text-sm text-muted">El módulo se publica muy pronto. Vas a verlo acá mismo.</p>
           )}
         </div>
       ) : (
@@ -58,7 +58,7 @@ async function Extra() {
               <path d="M8 11V8a4 4 0 0 1 8 0v3" />
             </svg>
           </span>
-          <p className="mt-4 text-lg font-semibold tracking-tight">Desbloqueá esta clase extra</p>
+          <p className="mt-4 text-lg font-semibold tracking-tight">Desbloqueá este módulo extra</p>
           {precio.enOferta ? (
             <>
               <p className="mx-auto mt-3 inline-flex items-baseline gap-2">
@@ -79,19 +79,19 @@ async function Extra() {
             <>
               <p className="mx-auto mt-3 text-4xl font-semibold tracking-tight">US${precio.valor}</p>
               <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted">
-                Pago único. El precio de alumno (US${EXTRA.valor}) duraba {EXTRA.diasPrecio} días desde tu compra y ya terminó, pero la clase sigue disponible para vos.
+                Pago único. El precio de alumno (US${EXTRA.valor}) duraba {EXTRA.diasPrecio} días desde tu compra y ya terminó, pero el módulo sigue disponible para vos.
               </p>
             </>
           )}
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">Se abre acá mismo apenas se confirma el pago.</p>
           {enlace ? (
             <a href={enlace} className={`${ui.boton} mt-6`}>
-              Quiero la clase extra
+              Quiero el módulo extra
             </a>
           ) : (
             <span className={`${ui.boton} mt-6 cursor-not-allowed opacity-50`}>Disponible pronto</span>
           )}
-          <p className="mt-4 text-xs text-faint">Pagá con el mismo email de tu cuenta y la clase se abre sola.</p>
+          <p className="mt-4 text-xs text-faint">Pagá con el mismo email de tu cuenta y el módulo se abre solo.</p>
         </div>
       )}
     </div>

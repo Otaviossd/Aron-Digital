@@ -13,6 +13,7 @@ type Modulo = {
   cover_url: string | null;
   accent: string;
   is_bonus: boolean;
+  oculto: boolean;
 };
 type Aula = {
   id: string;
@@ -66,7 +67,7 @@ async function Contenido() {
                   {mod.title}
                 </span>
                 <span className="text-xs text-faint">
-                  {mod.is_bonus && "bono · "}{lista.length} clases · se abre el día {mod.unlock_after_days}
+                  {mod.oculto && "oculto · "}{mod.is_bonus && "bono · "}{lista.length} clases · se abre el día {mod.unlock_after_days}
                 </span>
               </summary>
 
@@ -105,6 +106,12 @@ async function Contenido() {
                     <label className="flex items-center gap-2 text-sm text-muted">
                       <input name="is_bonus" type="checkbox" defaultChecked={mod.is_bonus} className="h-4 w-4 accent-[#39ff7e]" />
                       Es un bono (aparece en la fila “Bonos”; ponele día 7 para bloquearlo 7 días)
+                    </label>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="flex items-center gap-2 text-sm text-muted">
+                      <input name="oculto" type="checkbox" defaultChecked={mod.oculto} className="h-4 w-4 accent-[#39ff7e]" />
+                      Ocultar por completo (todavía no está grabado: no se ve título, portada ni nada hasta que le saques el tilde)
                     </label>
                   </div>
                   <div className="sm:col-span-2">
@@ -177,6 +184,12 @@ async function Contenido() {
             <label className="flex items-center gap-2 text-sm text-muted">
               <input name="is_bonus" type="checkbox" className="h-4 w-4 accent-[#39ff7e]" />
               Es un bono (aparece en la fila “Bonos”; ponele día 7 para bloquearlo 7 días)
+            </label>
+          </div>
+          <div className="sm:col-span-2">
+            <label className="flex items-center gap-2 text-sm text-muted">
+              <input name="oculto" type="checkbox" className="h-4 w-4 accent-[#39ff7e]" />
+              Ocultar por completo (todavía no está grabado: no se ve título, portada ni nada hasta que le saques el tilde)
             </label>
           </div>
           <div className="sm:col-span-2">

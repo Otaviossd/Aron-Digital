@@ -250,7 +250,7 @@ export function plantillaCaptura(id: string, c: ContextoCaptura): { asunto: stri
         `${titulo("¡Abrimos las inscripciones!")}
          ${parrafo(`${saludo}hoy es el día. La Nueva Ola Academy ya está abierta, y vos estás en la lista: entrás primero.`)}
          ${oferta}
-         ${paso(1, `${fuerte(`US$${PRECOS.promo.valor}`)} por el acceso vitalicio (el acceso de 1 año cuesta US$${PRECOS.anual.valor}).`)}
+         ${paso(1, `${fuerte(`US$${PRECOS.promo.valor}`)} por el acceso vitalicio, de una sola vez.`)}
          ${paso(2, `Solo los primeros ${N} que compren. Se agota el cupo o pasan 3 días (hasta el 19 de noviembre): lo que ocurra primero.`)}
          ${paso(3, `Pago único. ${DIAS_REEMBOLSO} días de garantía.`)}
          ${verOferta("Quiero mi 50% OFF")}

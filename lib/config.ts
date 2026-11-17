@@ -58,10 +58,12 @@ export const PAGINAS = [
   { nombre: "Acceso de alumnos", ruta: "/entrar", detalle: "Login de la área de miembros (link para la Hotmart: área de miembros externa)", lista: true },
 ] as const;
 
-// Clase extra (order bump / venta posterior dentro del área de alumnos). Un solo producto barato en la Hotmart.
+// Módulo extra (order bump / venta posterior dentro del área de alumnos). Un solo producto en la Hotmart.
+// Es un módulo completo (varias clases), no una clase suelta. Gratis para quien compró con el precio de
+// lanzamiento (promo = true en subscriptions); para el resto sigue siendo un upsell pago (ver tiene_extra()).
 export const EXTRA = {
   titulo: "Cómo crecer en redes sociales como barbero",
-  descripcion: "Tu Instagram puede llenarte la agenda. En esta clase Aaron te muestra qué publicar, cómo mostrar tus cortes para que la gente quiera reservar y cómo convertir a tus seguidores en clientes.",
+  descripcion: "Un módulo completo, aparte del curso, donde Aaron te muestra qué publicar, cómo mostrar tus cortes para que la gente quiera reservar y cómo convertir a tus seguidores en clientes.",
   valor: 10,
   valorAntes: 20, // precio "de" tachado
   diasPrecio: 15, // el precio de alumno (US$10) dura 15 días desde la compra del curso; después vuelve a US$20 (lo calcula el sitio)
