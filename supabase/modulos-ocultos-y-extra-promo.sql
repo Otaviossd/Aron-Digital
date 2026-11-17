@@ -1,9 +1,13 @@
 -- ============================================================
--- 1) Módulos ocultos: para los cortes que todavía no se grabaron.
---    A diferencia de un módulo "bloqueado" (que muestra título, portada y
---    candado), un módulo OCULTO no aparece para nada en la plataforma del
---    alumno hasta que vos le saques el tilde en el admin. El admin lo sigue
---    viendo siempre, para poder cargarlo de a poco.
+-- 1) Módulos "sin información todavía": para los cortes que se van a grabar
+--    recién después del lanzamiento (no sabemos todavía cuántas clases van
+--    a tener ni de qué corte van a ser).
+--    El módulo SIGUE apareciendo en la lista (para que el alumno sepa que
+--    va a haber más contenido) y SIGUE mostrando cuándo se libera, pero sin
+--    título real, sin portada y sin descripción: se ve un cartel genérico
+--    "Próximamente" con el candado. El admin siempre ve el título real (para
+--    poder ir completándolo), y apenas le saques el tilde "oculto" en el
+--    admin, el alumno empieza a ver el título y la portada de verdad.
 -- ============================================================
 alter table public.modules add column if not exists oculto boolean not null default false;
 
@@ -20,7 +24,8 @@ returns table (
   unlock_at timestamptz,
   is_unlocked boolean,
   is_bonus boolean,
-  is_live boolean
+  is_live boolean,
+  sin_info boolean
 )
 language sql
 stable
@@ -29,19 +34,19 @@ set search_path = public
 as $$
   select
     m.id,
-    m.title,
-    m.description,
+    case when m.oculto and not public.is_admin() then 'Próximamente' else m.title end,
+    case when m.oculto and not public.is_admin() then null else m.description end,
     m.position,
     m.unlock_after_days,
-    m.cover_url,
+    case when m.oculto and not public.is_admin() then null else m.cover_url end,
     m.accent,
     public.module_unlock_at(m.id) as unlock_at,
     coalesce(public.module_unlock_at(m.id) <= now(), false) as is_unlocked,
     m.is_bonus,
-    m.is_live
+    m.is_live,
+    (m.oculto and not public.is_admin()) as sin_info
   from public.modules m
   where public.tiene_acceso()
-    and (not m.oculto or public.is_admin())
   order by m.position
 $$;
 

@@ -19,6 +19,9 @@ export type ModuloEstado = {
   is_bonus: boolean;
   // clases en vivo grabadas (existe después de correr supabase/plataforma-v2.sql)
   is_live?: boolean;
+  // true = todavía no se grabó nada: se ve el módulo y cuándo se libera, pero sin título real, portada ni descripción
+  // (existe después de correr supabase/modulos-ocultos-y-extra-promo.sql)
+  sin_info?: boolean;
 };
 
 export type Aula = {

@@ -48,7 +48,7 @@ const RUTA = [
 
 const BONOS = [
   { t: "Color", d: "Teoría del color, decoloración, mechas y matizado para barberos." },
-  { t: "Mindset del barbero rico", d: "Hábitos, números y mentalidad para vivir bien de la barbería." },
+  { t: "Mentalidad y motivación", d: "Hábitos, números y mentalidad para vivir bien de la barbería." },
 ];
 
 const INCLUYE = [

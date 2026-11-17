@@ -67,7 +67,7 @@ async function Contenido() {
                   {mod.title}
                 </span>
                 <span className="text-xs text-faint">
-                  {mod.oculto && "oculto · "}{mod.is_bonus && "bono · "}{lista.length} clases · se abre el día {mod.unlock_after_days}
+                  {mod.oculto && "sin información todavía · "}{mod.is_bonus && "bono · "}{lista.length} clases · se abre el día {mod.unlock_after_days}
                 </span>
               </summary>
 
@@ -111,7 +111,7 @@ async function Contenido() {
                   <div className="sm:col-span-2">
                     <label className="flex items-center gap-2 text-sm text-muted">
                       <input name="oculto" type="checkbox" defaultChecked={mod.oculto} className="h-4 w-4 accent-[#39ff7e]" />
-                      Ocultar por completo (todavía no está grabado: no se ve título, portada ni nada hasta que le saques el tilde)
+                      Sin información todavía (se ve el módulo y cuándo se libera, pero sin título real ni portada, hasta que grabes y le saques el tilde)
                     </label>
                   </div>
                   <div className="sm:col-span-2">
@@ -189,7 +189,7 @@ async function Contenido() {
           <div className="sm:col-span-2">
             <label className="flex items-center gap-2 text-sm text-muted">
               <input name="oculto" type="checkbox" className="h-4 w-4 accent-[#39ff7e]" />
-              Ocultar por completo (todavía no está grabado: no se ve título, portada ni nada hasta que le saques el tilde)
+              Sin información todavía (se ve el módulo y cuándo se libera, pero sin título real ni portada, hasta que grabes y le saques el tilde)
             </label>
           </div>
           <div className="sm:col-span-2">
