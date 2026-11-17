@@ -276,13 +276,13 @@ export default function Comentarios({ tipo, lessonId, inicial, yo, esAdmin, plac
   };
 
   const verAcciones = (c: Comentario, principal: boolean) => (
-    <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-faint">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-faint">
       <button
         type="button"
         onClick={() => void alternarLike(c)}
         aria-pressed={c.yo_di_like}
         aria-label={c.yo_di_like ? "Quitar me gusta" : "Me gusta"}
-        className={`-ml-1 inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 transition active:scale-90 ${c.yo_di_like ? "text-[#ff3d71]" : "hover:text-ink"}`}
+        className={`-ml-1.5 inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 transition active:scale-90 ${c.yo_di_like ? "text-[#ff3d71]" : "hover:text-ink"}`}
       >
         <Corazon lleno={c.yo_di_like} />
         {c.likes > 0 && <span className="tabular-nums">{c.likes}</span>}
@@ -316,18 +316,27 @@ export default function Comentarios({ tipo, lessonId, inicial, yo, esAdmin, plac
     </div>
   );
 
+  // Estilo chat: burbuja con el nombre adentro, avatar afuera. El propio mensaje se tiñe apenas de verde.
   const verComentario = (c: Comentario, chico?: boolean) => (
-    <div className={`flex gap-3 ${c.id.startsWith("tmp-") ? "opacity-60" : ""}`}>
-      <Foto nombre={c.autor_nombre} url={c.autor_avatar} size={chico ? 30 : 38} instructor={c.es_instructor} />
+    <div className={`flex min-w-0 gap-2.5 sm:gap-3 ${c.id.startsWith("tmp-") ? "opacity-60" : ""}`}>
+      <Foto nombre={c.autor_nombre} url={c.autor_avatar} size={chico ? 28 : 34} instructor={c.es_instructor} />
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-          <span className="text-sm font-semibold tracking-tight">{c.autor_nombre}</span>
-          {c.es_instructor && <SelloInstructor chico />}
-          {c.fijado && <span className="text-[11px] font-medium text-faint">📌 Fijado</span>}
-          <Tiempo fecha={c.created_at} />
+        <div
+          className={`min-w-0 rounded-2xl rounded-tl-sm px-3.5 py-2.5 ${
+            c.es_instructor ? "bg-accent/[0.09]" : c.es_mio ? "bg-accent/[0.06]" : "bg-white/[0.045]"
+          }`}
+        >
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+            <span className="text-[13px] font-semibold tracking-tight">{c.autor_nombre}</span>
+            {c.es_instructor && <SelloInstructor chico />}
+            {c.fijado && <span className="text-[11px] font-medium text-faint">📌</span>}
+          </div>
+          <p className="mt-0.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-ink/90">{c.cuerpo}</p>
         </div>
-        <p className="mt-0.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-ink/90">{c.cuerpo}</p>
-        {verAcciones(c, !c.parent_id)}
+        <div className="mt-1 flex items-center gap-x-3 pl-1">
+          <Tiempo fecha={c.created_at} />
+          {verAcciones(c, !c.parent_id)}
+        </div>
       </div>
     </div>
   );
@@ -351,21 +360,21 @@ export default function Comentarios({ tipo, lessonId, inicial, yo, esAdmin, plac
         <span>
           {total === 0 ? "Sin comentarios todavía" : `${hilos.length} ${hilos.length === 1 ? "conversación" : "conversaciones"}`}
         </span>
-        <span>Se actualiza solo</span>
+        <span className="hidden sm:inline">Se actualiza solo</span>
       </div>
 
       {hilos.length === 0 ? (
         <p className="py-14 text-center text-sm text-faint">{vacio ?? "Sé la primera persona en comentar."}</p>
       ) : (
-        <ul className="divide-y divide-line">
+        <ul className="space-y-5 pt-5">
           {hilos.map((h) => {
             const abierto = expandidos.has(h.id) || h.respuestas.length <= 2;
             const visibles = abierto ? h.respuestas : h.respuestas.slice(-1);
             return (
-              <li key={h.id} className={`py-5 ${h.es_instructor ? "-mx-3 rounded-2xl bg-accent/[0.04] px-3" : ""}`}>
+              <li key={h.id}>
                 {verComentario(h)}
                 {(h.respuestas.length > 0 || respondiendo === h.id) && (
-                  <div className="ml-[50px] mt-4 space-y-4 border-l border-line pl-4">
+                  <div className="ml-9 mt-3 space-y-3 border-l border-line pl-2.5 sm:ml-[42px] sm:pl-4">
                     {!abierto && (
                       <button type="button" onClick={() => setExpandidos((s) => new Set(s).add(h.id))} className="text-xs font-medium text-muted transition hover:text-ink">
                         Ver las {h.respuestas.length - visibles.length} respuestas anteriores
