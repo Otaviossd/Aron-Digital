@@ -226,15 +226,63 @@ def pagina_imagen_simple(numero, total, titulo, lineas_texto, imagen_path, logo_
 </div>"""
 
 
-def pagina_cierre(titulo, texto, logo_path):
+def pagina_cierre(titulo, texto, logo_path, boton=None, boton_url=None, icono="✅"):
+    """boton/boton_url opcionales: agrega un botón-enlace real (clickeable en el PDF)."""
+    boton_html = (
+        f'<a href="{boton_url}" style="display:inline-block; margin-top:10mm; background:linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); '
+        f'color:#07090a; font-weight:800; font-size:14px; padding:5mm 10mm; border-radius:999px; text-decoration:none;">{boton} →</a>'
+        if boton and boton_url
+        else ""
+    )
     return f"""
 <div class="pagina">
   <div class="barra-top"></div>
   <div class="glow" style="width:360px;height:360px;background:#39ff7e;top:40%;left:50%;transform:translate(-50%,-50%);"></div>
   <div style="position:absolute; top:50%; left:18mm; right:18mm; transform:translateY(-50%); text-align:center;">
-    <div style="font-size:30px;">✅</div>
+    <div style="font-size:30px;">{icono}</div>
     <div style="font-size:28px; font-weight:800; margin-top:6mm; color:var(--accent);">{titulo}</div>
     <div style="font-size:14px; color:var(--muted); margin-top:6mm; max-width:120mm; margin-left:auto; margin-right:auto; line-height:1.6;">{texto}</div>
+    {boton_html}
   </div>
   <div class="pie"><span class="marca"><img src="{{{{LOGO}}}}" /> La Nueva Ola Academy</span><span>lanuevaolaacademy.com</span></div>
+</div>"""
+
+
+def pagina_texto(numero, total, titulo, bloques, logo_path, boton=None, boton_url=None):
+    """Página solo de texto (sin captura): título + varios bloques (cada uno con encabezado y
+    cuerpo, o solo cuerpo), para explicaciones, condiciones o una oferta. Opcionalmente, un botón-
+    enlace real al final (clickeable en el PDF)."""
+    partes = []
+    for b in bloques:
+        if isinstance(b, tuple):
+            cab, cuerpo = b
+            partes.append(
+                f'<div class="cristal" style="padding:6mm 7mm; margin-top:4mm;">'
+                f'<div style="font-size:14px; font-weight:700; color:var(--accent); margin-bottom:2mm;">{cab}</div>'
+                f'<div style="font-size:13px; color:var(--muted); line-height:1.7;">{cuerpo}</div></div>'
+            )
+        else:
+            partes.append(f'<p style="font-size:14px; color:var(--muted); line-height:1.75; margin-top:4mm;">{b}</p>')
+    bloques_html = "".join(partes)
+    boton_html = (
+        f'<a href="{boton_url}" style="display:inline-block; margin-top:7mm; background:linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); '
+        f'color:#07090a; font-weight:800; font-size:14px; padding:5mm 10mm; border-radius:999px; text-decoration:none;">{boton} →</a>'
+        if boton and boton_url
+        else ""
+    )
+    return f"""
+<div class="pagina">
+  <div class="barra-top"></div>
+  <div style="position:absolute; top:20mm; left:18mm; right:18mm;">
+    <div style="display:flex; gap:5mm; align-items:flex-start;">
+      <div class="chip-numero">{numero}</div>
+      <div style="flex:1;">
+        <div style="font-size:11px; color:var(--faint); font-weight:600; letter-spacing:.04em; margin-bottom:1.5mm;">{numero} DE {total}</div>
+        <div style="font-size:22px; font-weight:800; color:var(--ink); line-height:1.2;">{titulo}</div>
+      </div>
+    </div>
+    {bloques_html}
+    {boton_html}
+  </div>
+  <div class="pie"><span class="marca"><img src="{{{{LOGO}}}}" /> La Nueva Ola Academy</span><span>{numero} de {total}</span></div>
 </div>"""
