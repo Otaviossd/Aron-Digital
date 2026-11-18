@@ -5,10 +5,10 @@ import { PASOS_CAPTURA, hayPasoVigente, pasoCapturaDebido } from "./sequence-cap
 const t = (s: string) => new Date(s);
 const base = { enviados: [] as number[], compro: false, baja: false };
 
-test("calendario: 10 emails de captura, avisos de cambio, recordatorios y 4 del lanzamiento (miércoles 18)", () => {
-  assert.equal(PASOS_CAPTURA.filter((p) => p.fase === "pre").length, 17);
+test("calendario: 10 emails de captura, avisos de cambio, recordatorios y 4 del lanzamiento (jueves 19)", () => {
+  assert.equal(PASOS_CAPTURA.filter((p) => p.fase === "pre").length, 19);
   assert.equal(PASOS_CAPTURA.filter((p) => p.fase === "lanzamiento").length, 4);
-  assert.equal(PASOS_CAPTURA.find((p) => p.id === "L1")?.sendAt, "2026-11-18T17:00:00-03:00");
+  assert.equal(PASOS_CAPTURA.find((p) => p.id === "L1")?.sendAt, "2026-11-19T17:00:00-03:00");
   assert.equal(new Set(PASOS_CAPTURA.map((p) => p.step)).size, PASOS_CAPTURA.length);
   const orden = PASOS_CAPTURA.map((p) => new Date(p.sendAt).getTime());
   assert.deepEqual(orden, [...orden].sort((a, b) => a - b));

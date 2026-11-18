@@ -1,7 +1,7 @@
-// Emails de la lista de espera (español, voseo): K1 a K10 (del 6 al 10 de noviembre), avisos de cambio de fecha (C1, C2, C3),
+// Emails de la lista de espera (español, voseo): K1 a K10 (del 6 al 10 de noviembre), avisos de cambio de fecha (C1, C2, C3, C4),
 // recordatorios (R1, R3, R4) y 4 del lanzamiento.
-// La apertura es el miércoles 18 de noviembre a las 17:00 (hora de Paraguay). La oferta: 50% OFF + acceso vitalicio para los
-// primeros 50 que compren, durante 3 días (hasta el 20 de noviembre) o hasta agotar los cupos, lo que ocurra primero.
+// La apertura es el jueves 19 de noviembre a las 17:00 (hora de Paraguay). La oferta: 50% OFF + acceso vitalicio para los
+// primeros 50 que compren, durante 3 días (hasta el 21 de noviembre) o hasta agotar los cupos, lo que ocurra primero.
 import { DIAS_BONO, DIAS_REEMBOLSO, PRECOS, WHATSAPP_GRUPO_URL } from "../config.ts";
 import { PASOS_CAPTURA } from "../sequence-captura.ts";
 import { bloque, boton, layoutEmail, paso, parrafo, subtitulo, titulo } from "./layout.ts";
@@ -37,6 +37,7 @@ const FICHAS: Record<string, { asunto: string; objetivo: string }> = {
   R3: { asunto: "Mañana abrimos: martes 17, 17:00", objetivo: "Víspera: mismo email, medio de pago a mano y grupo de WhatsApp." },
   R4: { asunto: "Hoy a las 17:00 abrimos las inscripciones", objetivo: "Expectativa el mismo día de la apertura." },
   C3: { asunto: "Último cambio: abrimos mañana miércoles 18, 17:00", objetivo: "Avisar el tercer cambio de fecha (un día más) con claridad y sin perder el 50% OFF." },
+  C4: { asunto: "Último ajuste: abrimos mañana jueves 19, 17:00", objetivo: "Avisar el cuarto cambio de fecha (un día más, por un contratiempo técnico) con claridad y sin perder el 50% OFF." },
   L1: { asunto: `¡Abrimos! 50% OFF + acceso vitalicio para los primeros ${N}`, objetivo: "El anuncio fuerte: llevar a la lista caliente a la página de ventas." },
   L2: { asunto: "Primer día: tu 50% OFF sigue disponible", objetivo: "Segundo toque del día, con el plazo real de la oferta." },
   L3: { asunto: "Último día de la oferta de lanzamiento", objetivo: "Cierre real: la oferta termina hoy." },
@@ -260,13 +261,26 @@ export function plantillaCaptura(id: string, c: ContextoCaptura): { asunto: stri
          ${parrafo("Gracias por la paciencia y perdón por el cambio.")}`,
         "Abrimos mañana miércoles 18, a las 17:00.",
       );
+    case "C4":
+      return envolver(
+        `${titulo("Último ajuste y abrimos")}
+         ${parrafo(`${saludo}hoy tuvimos un contratiempo de último momento con la plataforma y preferimos resolverlo antes de abrirte la puerta, en vez de abrir algo a medio terminar. Si recibiste un aviso antes diciendo que ya estaba abierto, fue antes de que tomáramos esta decisión: todavía no abrimos. ${fuerte("Abrimos mañana jueves 19 de noviembre, a las 17:00")} (hora de Paraguay).`)}
+         ${parrafo("Lo que no cambia: seguís en la lista, tu lugar está asegurado y sigue valiendo el 50% OFF con acceso vitalicio para los primeros " + N + ", más los bonos exclusivos.")}
+         ${oferta}
+         ${paso(1, "Mañana jueves 19 de noviembre, 17:00: abrimos las inscripciones.")}
+         ${paso(2, "A esa hora te llega un email con el enlace directo a la oferta.")}
+         ${paso(3, "Si todavía no estás en el grupo de WhatsApp, entrá hoy: es donde avisamos primero.")}
+         ${grupo}
+         ${parrafo("Gracias por la paciencia y disculpá el ida y vuelta con la fecha.")}`,
+        "Abrimos mañana jueves 19, a las 17:00.",
+      );
     case "L1":
       return envolver(
         `${titulo("¡Abrimos las inscripciones!")}
          ${parrafo(`${saludo}hoy es el día. La Nueva Ola Academy ya está abierta, y vos estás en la lista: entrás primero.`)}
          ${oferta}
          ${paso(1, `${fuerte(`US$${PRECOS.promo.valor}`)} por el acceso vitalicio, de una sola vez.`)}
-         ${paso(2, `Solo los primeros ${N} que compren. Se agota el cupo o pasan 3 días (hasta el 20 de noviembre): lo que ocurra primero.`)}
+         ${paso(2, `Solo los primeros ${N} que compren. Se agota el cupo o pasan 3 días (hasta el 21 de noviembre): lo que ocurra primero.`)}
          ${paso(3, `Pago único. ${DIAS_REEMBOLSO} días de garantía.`)}
          ${verOferta("Quiero mi 50% OFF")}
          ${parrafo("Entrá con este mismo email y completá tus datos: el acceso te llega al instante.")}`,
@@ -277,7 +291,7 @@ export function plantillaCaptura(id: string, c: ContextoCaptura): { asunto: stri
         `${titulo("Hoy fue el primer día")}
          ${parrafo("Muchos barberos de la lista ya están entrando. Si todavía no viste la oferta, tenés tiempo, pero no para siempre.")}
          ${oferta}
-         ${parrafo("La oferta de lanzamiento termina el 20 de noviembre a las 23:59, o antes si se agotan los cupos.")}
+         ${parrafo("La oferta de lanzamiento termina el 21 de noviembre a las 23:59, o antes si se agotan los cupos.")}
          ${verOferta("Ver la oferta de lanzamiento")}`,
         "Tu 50% OFF sigue disponible, por poco tiempo.",
       );
