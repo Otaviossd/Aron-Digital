@@ -22,9 +22,9 @@ export const OFERTAS_HOTMART = { promo: "zpu4tvlu", anual: "snaqp8m9", vitalicio
 // Pon NEXT_PUBLIC_PROMO_ACTIVA=0 en la Vercel para cerrar la promo de lanzamiento a mano.
 export const PROMO_ACTIVA = process.env.NEXT_PUBLIC_PROMO_ACTIVA !== "0";
 
-// La promo de lanzamiento dura 3 días (23 a 25 de noviembre) o hasta agotar los cupos, lo que ocurra primero.
+// La promo de lanzamiento dura 3 días (24 a 26 de noviembre) o hasta agotar los cupos, lo que ocurra primero.
 // Pasada esta fecha (hora de Paraguay) la oferta de lanzamiento desaparece sola del sitio. Se puede cambiar con NEXT_PUBLIC_PROMO_FIN.
-export const PROMO_FIN = process.env.NEXT_PUBLIC_PROMO_FIN || "2026-11-25T23:59:59-03:00";
+export const PROMO_FIN = process.env.NEXT_PUBLIC_PROMO_FIN || "2026-11-26T23:59:59-03:00";
 
 export const DIAS_REEMBOLSO = 7;
 
@@ -95,10 +95,10 @@ export const CUPONES = {
 // Fijo en el código (no depende de una variable de la Vercel, para que un valor viejo no lo cambie).
 // La captura va del 5 al 10 de noviembre. La apertura se movió del 11 al 14, después al martes 17,
 // después al miércoles 18 a las 17:00, después al jueves 19 a las 17:00, después al sábado 21 a las
-// 12:00, y por último al lunes 23 a las 8:00 (hora de Paraguay).
+// 12:00, después al lunes 23 a las 8:00, y por último al martes 24 a las 12:00 (hora de Paraguay).
 export const CAPTURA_INICIO = "2026-11-05";
-export const FECHA_LANZAMIENTO = "2026-11-23";
-export const LANZAMIENTO_APERTURA = `${FECHA_LANZAMIENTO}T08:00:00-03:00`;
+export const FECHA_LANZAMIENTO = "2026-11-24";
+export const LANZAMIENTO_APERTURA = `${FECHA_LANZAMIENTO}T12:00:00-03:00`;
 
 // Costos para el panel de Finanzas. Cuando la Hotmart informa la tarifa real de una venta (webhook) se usa esa;
 // estos valores solo estiman las ventas donde no vino. Confirmalos en tu cuenta de Hotmart y ajustalos acá.

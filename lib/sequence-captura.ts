@@ -18,12 +18,12 @@ export const PASOS_CAPTURA: readonly PasoCaptura[] = [
   { step: 9, id: "K9", sendAt: hora("10", "09:00"), fase: "pre" },
   { step: 10, id: "K10", sendAt: hora("10", "19:00"), fase: "pre" },
   // La apertura se movió del 11 al 14, después al martes 17 a las 17:00, después al miércoles 18 a las 17:00,
-  // después al jueves 19 a las 17:00, después al sábado 21 a las 12:00, y por último al lunes 23 a las 8:00
-  // (hora de Paraguay). Los pasos 11 a 14, 17 a 21, 27 a 30, 33 a 36 y 39 a 42 (L1 a L4 de fechas ya descartadas)
-  // quedan retirados: no se reutilizan para que quien ya recibió alguno reciba igual los nuevos (cada paso
-  // se envía una sola vez por persona, y el paso 39 ya salió para toda la lista a las 12:07 del sábado 21,
-  // antes de este sexto cambio — por eso el nuevo L1 reutiliza el id pero con un step más alto, para que le
-  // llegue también a quien ya había recibido el anuncio viejo).
+  // después al jueves 19 a las 17:00, después al sábado 21 a las 12:00, después al lunes 23 a las 8:00, y
+  // por último al martes 24 a las 12:00 (hora de Paraguay). Los pasos 11 a 14, 17 a 21, 27 a 30, 33 a 36,
+  // 39 a 42 y 45 a 48 (L1 a L4 de fechas ya descartadas) quedan retirados: no se reutilizan para que quien ya
+  // recibió alguno reciba igual los nuevos (cada paso se envía una sola vez por persona, y el paso 45 ya salió
+  // para toda la lista a las 8:07 del lunes 23, antes de este séptimo cambio — por eso el nuevo L1 reutiliza
+  // el id pero con un step más alto, para que le llegue también a quien ya había recibido el anuncio viejo).
   { step: 15, id: "C1", sendAt: hora("11", "09:55"), fase: "pre" }, // aviso del primer cambio (sábado 14)
   { step: 16, id: "R1", sendAt: hora("13", "09:00"), fase: "pre" },
   { step: 22, id: "C2", sendAt: hora("13", "12:55"), fase: "pre" }, // aviso del segundo cambio (martes 17, 17:00)
@@ -37,10 +37,12 @@ export const PASOS_CAPTURA: readonly PasoCaptura[] = [
   { step: 38, id: "R5", sendAt: hora("21", "09:00"), fase: "pre" },
   { step: 43, id: "C6", sendAt: hora("21", "13:30"), fase: "pre" }, // aviso del sexto cambio (lunes 23, 8:00)
   { step: 44, id: "R6", sendAt: hora("22", "20:00"), fase: "pre" }, // la víspera a la noche: la apertura es temprano
-  { step: 45, id: "L1", sendAt: hora("23", "08:00"), fase: "lanzamiento" },
-  { step: 46, id: "L2", sendAt: hora("23", "12:00"), fase: "lanzamiento" },
-  { step: 47, id: "L3", sendAt: hora("25", "09:00"), fase: "lanzamiento" },
-  { step: 48, id: "L4", sendAt: hora("25", "19:00"), fase: "lanzamiento" },
+  { step: 49, id: "C7", sendAt: hora("23", "09:45"), fase: "pre" }, // aviso del séptimo cambio (martes 24, 12:00)
+  { step: 50, id: "R5", sendAt: hora("24", "09:00"), fase: "pre" }, // reutiliza R5: mismo texto ("Hoy a las 12:00 abrimos")
+  { step: 51, id: "L1", sendAt: hora("24", "12:00"), fase: "lanzamiento" },
+  { step: 52, id: "L2", sendAt: hora("24", "16:00"), fase: "lanzamiento" },
+  { step: 53, id: "L3", sendAt: hora("26", "09:00"), fase: "lanzamiento" },
+  { step: 54, id: "L4", sendAt: hora("26", "19:00"), fase: "lanzamiento" },
 ];
 
 // Si el agendador se atrasa, un email sigue "vigente" este tiempo; pasado eso se salta (nunca sale un email viejo).

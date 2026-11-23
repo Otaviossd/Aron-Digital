@@ -162,7 +162,7 @@ export async function Seguimiento() {
         </p>
       </Seccion>
 
-      <Seccion titulo="Clase extra" sub="Emails a quienes compraron el curso y no la clase extra. Se activan el 23/11 con EXTRA_EMAILS_ACTIVAS=1.">
+      <Seccion titulo="Clase extra" sub="Emails a quienes compraron el curso y no la clase extra. Se activan el 24/11 con EXTRA_EMAILS_ACTIVAS=1.">
         <Tabla cabeceras={["Paso", "Ventana", "Enviados"]}>
           {PASOS_EXTRA.map((p, i) => (
             <tr key={p.step}>
