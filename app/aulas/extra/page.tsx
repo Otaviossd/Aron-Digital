@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getMemberData } from "@/lib/members";
+import { diasRestantes, getMemberData } from "@/lib/members";
 import { EXTRA } from "@/lib/config";
 import { enlaceExtra, precioExtra, textoRestante, URLS_EXTRA } from "@/lib/extra";
 import { ui } from "@/lib/ui";
@@ -15,8 +15,11 @@ export default function ExtraPage() {
 
 async function Extra() {
   const { supabase, email } = await getMemberData();
-  const { data } = await supabase.rpc("tiene_extra");
-  const tiene = data === true;
+  const { data: estado } = await supabase.rpc("estado_extra");
+  const tieneAcceso = estado?.tiene_acceso === true;
+  const liberado = estado?.liberado === true;
+  const liberaEn = typeof estado?.libera_en === "string" ? estado.libera_en : null;
+  const tiene = tieneAcceso && liberado;
 
   // US$10 durante los primeros 15 días desde la compra del curso; después US$20.
   const { data: compras } = await supabase
@@ -62,6 +65,18 @@ async function Extra() {
               </div>
             </details>
           ))}
+        </div>
+      ) : tieneAcceso ? (
+        <div className="relative mt-8 overflow-hidden rounded-2xl border border-accent/30 bg-accent/[0.05] p-8 text-center">
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-accent/30 bg-black/40">
+            <svg viewBox="0 0 24 24" className="h-6 w-6 text-accent" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          </span>
+          <p className="mt-4 text-lg font-semibold tracking-tight">Ya tenés este módulo</p>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted">
+            Tu compra ya está confirmada. Las clases se abren {liberaEn ? diasRestantes(liberaEn) : "muy pronto"}, para que puedas aprovecharlas mejor una vez que ya avanzaste con el curso.
+          </p>
         </div>
       ) : (
         <div className="relative mt-8 overflow-hidden rounded-2xl border border-line bg-surface p-8 text-center">

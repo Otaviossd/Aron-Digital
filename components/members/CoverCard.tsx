@@ -14,6 +14,9 @@ type Props = {
 // teñida con el color del módulo.
 export default function CoverCard({ modulo, numero, progreso, totalAulas }: Props) {
   const bloqueado = !modulo.is_unlocked;
+  // Módulo "oculto" (sin grabar todavía, o que no queremos adelantar): bloqueado, sin ninguna foto,
+  // solo el texto genérico ("Corte exclusivo…") y cuándo se libera.
+  const sinFoto = bloqueado && modulo.oculto;
   const accent = /^#[0-9a-fA-F]{6}$/.test(modulo.accent) ? modulo.accent : "#39ff7e";
   const foto = FOTOS_PORTADA[(numero - 1) % FOTOS_PORTADA.length];
 
@@ -23,7 +26,9 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
         bloqueado ? "" : "hover:-translate-y-1.5 hover:border-accent/50 hover:shadow-[0_20px_60px_-12px_rgba(57,255,126,.5)]"
       }`}
     >
-      {modulo.cover_url ? (
+      {sinFoto ? (
+        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-black/40" />
+      ) : modulo.cover_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={modulo.cover_url}
@@ -40,7 +45,7 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
       )}
 
       {/* Tinte del color del módulo + degradado para legibilidad */}
-      {!modulo.cover_url && <div className="absolute inset-0 mix-blend-soft-light" style={{ background: `linear-gradient(160deg, ${accent}aa, transparent 70%)` }} />}
+      {!modulo.cover_url && !sinFoto && <div className="absolute inset-0 mix-blend-soft-light" style={{ background: `linear-gradient(160deg, ${accent}aa, transparent 70%)` }} />}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10" />
       {bloqueado && <div className="absolute inset-0 bg-black/55" />}
 
