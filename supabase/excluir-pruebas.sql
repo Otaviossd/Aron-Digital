@@ -9,8 +9,11 @@ create table if not exists public.emails_excluidos (
 );
 alter table public.emails_excluidos enable row level security;
 drop policy if exists "emails_excluidos_admin_select" on public.emails_excluidos;
-create policy "emails_excluidos_admin_select" on public.emails_excluidos
-  for select to authenticated using (public.is_admin());
+drop policy if exists "emails_excluidos_admin_all" on public.emails_excluidos;
+create policy "emails_excluidos_admin_all" on public.emails_excluidos
+  for all to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
 insert into public.emails_excluidos (email) values
   ('otavio.gabriel.0256@gmail.com'),
   ('tape.agency.py@gmail.com')
