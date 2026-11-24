@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { aulasDelModulo, diasRestantes, getMemberData } from "@/lib/members";
 import { toggleCompletada } from "../actions";
@@ -121,7 +120,7 @@ async function AulaContenido({ params, searchParams }: { params: Promise<{ id: s
               </li>
             ) : (
               <li key={a.id}>
-                <Link
+                <BotonDetenerYNavegar
                   href={`/aulas/${a.id}`}
                   className={`flex items-center gap-3 px-5 py-3 text-sm transition hover:bg-white/[0.03] ${
                     a.id === id ? "bg-white/[0.05] font-medium text-ink" : "text-muted"
@@ -135,7 +134,7 @@ async function AulaContenido({ params, searchParams }: { params: Promise<{ id: s
                     {completadas.has(a.id) ? "✓" : ""}
                   </span>
                   <span className="flex-1">{a.title}</span>
-                </Link>
+                </BotonDetenerYNavegar>
               </li>
             ),
           )}
