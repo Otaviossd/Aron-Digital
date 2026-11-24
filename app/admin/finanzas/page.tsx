@@ -74,6 +74,10 @@ async function Contenido({ searchParams }: { searchParams: Promise<Params> }) {
         }
       />
 
+      <Link href="/admin/finanzas/pruebas" className="mb-8 inline-block text-xs font-medium text-faint underline-offset-4 transition hover:text-ink hover:underline">
+        ¿Alguna venta de acá es tuya o de Aaron, solo de prueba? Marcala en Compras de prueba →
+      </Link>
+
       {f.estimadas > 0 && (
         <div className="mb-8 rounded-2xl border border-amber-400/20 bg-amber-400/[0.04] p-5 text-sm">
           <p className="font-medium text-amber-200">{f.estimadas === cuentas ? "Todos los números de ventas son estimados" : `${f.estimadas} de ${cuentas} ventas tienen algún número estimado`}</p>

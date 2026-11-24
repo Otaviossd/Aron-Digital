@@ -29,10 +29,13 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
   const [hayMas, setHayMas] = useState(inicial.length >= POR_PAGINA);
   const [cargandoMas, setCargandoMas] = useState(false);
   const [nuevos, setNuevos] = useState(0);
+  const [foto, setFoto] = useState<{ archivo: File; previa: string } | null>(null);
+  const [subiendoFoto, setSubiendoFoto] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
   const alFondo = useRef(true);
   const pendientes = useRef(0);
   const caja = useRef<HTMLTextAreaElement>(null);
+  const inputFoto = useRef<HTMLInputElement>(null);
 
   const traer = useCallback(async () => {
     const { data, error: e } = await supabase.rpc("listar_comentarios", {
@@ -94,12 +97,49 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
     el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
   };
 
+  const elegirFoto = (archivo: File | undefined) => {
+    if (!archivo) return;
+    if (!archivo.type.startsWith("image/")) {
+      setError("Eso no es una imagen.");
+      return;
+    }
+    if (archivo.size > 8 * 1024 * 1024) {
+      setError("La foto es muy pesada (máximo 8 MB).");
+      return;
+    }
+    setError(null);
+    setFoto({ archivo, previa: URL.createObjectURL(archivo) });
+  };
+
+  const quitarFoto = () => {
+    if (foto) URL.revokeObjectURL(foto.previa);
+    setFoto(null);
+    if (inputFoto.current) inputFoto.current.value = "";
+  };
+
   const enviar = async () => {
     const limpio = texto.trim();
-    if (!limpio || enviando) return;
+    if ((!limpio && !foto) || enviando || subiendoFoto) return;
     setError(null);
     setEnviando(true);
     pendientes.current += 1;
+
+    let imagenUrl: string | null = null;
+    if (foto) {
+      setSubiendoFoto(true);
+      const ext = foto.archivo.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const ruta = `${yo.nombre.replace(/[^a-z0-9]/gi, "_").toLowerCase() || "alumno"}/${Date.now()}.${ext}`;
+      const { error: eSubida } = await supabase.storage.from("comunidad").upload(ruta, foto.archivo, { contentType: foto.archivo.type });
+      setSubiendoFoto(false);
+      if (eSubida) {
+        pendientes.current -= 1;
+        setEnviando(false);
+        setError("No se pudo subir la foto. Probá de nuevo.");
+        return;
+      }
+      imagenUrl = supabase.storage.from("comunidad").getPublicUrl(ruta).data.publicUrl;
+    }
+
     const tmp: Comentario = {
       id: `tmp-${Date.now()}`,
       parent_id: null,
@@ -108,6 +148,7 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
       es_instructor: false,
       es_mio: true,
       cuerpo: limpio,
+      imagen_url: imagenUrl,
       fijado: false,
       created_at: new Date().toISOString(),
       likes: 0,
@@ -115,6 +156,7 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
     };
     alFondo.current = true;
     setLista((l) => [...l, tmp]);
+    quitarFoto();
     const { error: e } = await supabase.rpc("publicar_comentario", {
       p_tipo: "comunidad",
       p_lesson_id: null,
@@ -122,6 +164,7 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
       p_cuerpo: limpio,
       p_nombre: yo.nombre,
       p_avatar: yo.avatar,
+      p_imagen_url: imagenUrl,
     });
     pendientes.current -= 1;
     setEnviando(false);
@@ -216,13 +259,29 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
           <div key={c.id} className={`group flex min-w-0 gap-2.5 sm:gap-3 ${c.id.startsWith("tmp-") ? "opacity-60" : ""}`}>
             <Foto nombre={c.autor_nombre} url={c.autor_avatar} size={36} instructor={c.es_instructor} />
             <div className="min-w-0 flex-1">
-              <div className={`min-w-0 rounded-2xl rounded-tl-sm px-4 py-2.5 ${c.es_instructor ? "bg-accent/[0.1] ring-1 ring-accent/25" : c.es_mio ? "bg-accent/[0.07]" : "bg-white/[0.05]"}`}>
+              {c.es_instructor && (
+                <p className="mb-1 pl-1 text-[11px] font-semibold uppercase tracking-wide text-accent">↳ Responde el instructor</p>
+              )}
+              <div
+                className={`min-w-0 overflow-hidden rounded-2xl rounded-tl-sm px-4 py-2.5 ${
+                  c.es_instructor ? "border border-accent/40 bg-accent/[0.14] shadow-[0_0_0_1px_rgba(0,0,0,0.02)]" : c.es_mio ? "bg-accent/[0.07]" : "bg-white/[0.05]"
+                }`}
+              >
                 <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                   <span className={`text-sm font-semibold tracking-tight ${c.es_instructor ? "text-accent" : ""}`}>{c.autor_nombre}</span>
-                  {c.es_instructor && <SelloInstructor chico />}
+                  {c.es_instructor && <SelloInstructor />}
                   {c.fijado && <span className="text-[11px] font-medium text-faint">📌</span>}
                 </div>
-                <p className="mt-0.5 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-ink/90">{c.cuerpo}</p>
+                {c.cuerpo && <p className="mt-0.5 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-ink/90">{c.cuerpo}</p>}
+                {c.imagen_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={c.imagen_url}
+                    alt="Foto enviada en la comunidad"
+                    className={`max-h-80 w-full max-w-xs cursor-zoom-in rounded-xl object-cover ${c.cuerpo ? "mt-2" : "mt-0.5"}`}
+                    onClick={() => window.open(c.imagen_url!, "_blank", "noopener,noreferrer")}
+                  />
+                )}
               </div>
               <div className="mt-1 flex items-center gap-x-3 pl-1 text-xs text-faint">
                 <Tiempo fecha={c.created_at} />
@@ -277,14 +336,44 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
             {error}
           </p>
         )}
+        {foto && (
+          <div className="mb-2 flex items-center gap-2.5 rounded-xl border border-line bg-white/[0.03] p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={foto.previa} alt="" className="h-12 w-12 rounded-lg object-cover" />
+            <p className="flex-1 truncate text-xs text-faint">{subiendoFoto ? "Subiendo foto…" : foto.archivo.name}</p>
+            <button type="button" onClick={quitarFoto} className="px-1 text-xs font-medium text-faint hover:text-red-300">
+              Quitar
+            </button>
+          </div>
+        )}
         <div className="flex items-end gap-2.5">
           <Foto nombre={yo.nombre} url={yo.avatar} size={34} />
+          <input
+            ref={inputFoto}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => elegirFoto(e.target.files?.[0])}
+          />
+          <button
+            type="button"
+            onClick={() => inputFoto.current?.click()}
+            aria-label="Adjuntar foto de corte"
+            title="Mandar una foto de corte"
+            className="mb-[3px] flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line-strong text-faint transition hover:border-accent/50 hover:text-accent"
+          >
+            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="15" rx="2.5" />
+              <circle cx="8.5" cy="10.5" r="1.6" fill="currentColor" stroke="none" />
+              <path d="m4 17 5-5 4 4 3-3 4 4" />
+            </svg>
+          </button>
           <textarea
             ref={caja}
             value={texto}
             rows={1}
             maxLength={2000}
-            placeholder={placeholder ?? "Escribí algo para la comunidad…"}
+            placeholder={placeholder ?? "Escribí algo, o mandá una foto de tu corte…"}
             aria-label="Mensaje para la comunidad"
             onChange={(e) => {
               setTexto(e.target.value);
@@ -301,7 +390,7 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
           <button
             type="button"
             onClick={() => void enviar()}
-            disabled={!texto.trim() || enviando}
+            disabled={(!texto.trim() && !foto) || enviando || subiendoFoto}
             aria-label="Enviar mensaje"
             className="neon flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -310,7 +399,7 @@ export default function ComunidadChat({ inicial, yo, esAdmin, placeholder, vacio
             </svg>
           </button>
         </div>
-        <p className="mt-2 pl-1 text-[11px] text-faint">Enter para enviar · Shift+Enter para salto de línea</p>
+        <p className="mt-2 pl-1 text-[11px] text-faint">Enter para enviar · Shift+Enter para salto de línea · 📷 para mandar una foto</p>
       </div>
     </div>
   );

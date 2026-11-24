@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { armarHilos, hace, iniciales, type Comentario } from "./comentarios.ts";
 
-const base = { autor_nombre: "x", autor_avatar: null, es_instructor: false, es_mio: false, fijado: false, likes: 0, yo_di_like: false, cuerpo: "c" };
+const base = { autor_nombre: "x", autor_avatar: null, es_instructor: false, es_mio: false, fijado: false, likes: 0, yo_di_like: false, cuerpo: "c", imagen_url: null };
 const c = (id: string, parent_id: string | null, created_at: string, extra: Partial<Comentario> = {}): Comentario => ({ ...base, id, parent_id, created_at, ...extra });
 
 test("agrupa respuestas bajo su comentario y ordena", () => {

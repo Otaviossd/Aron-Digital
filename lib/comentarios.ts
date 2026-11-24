@@ -8,6 +8,7 @@ export type Comentario = {
   es_instructor: boolean;
   es_mio: boolean;
   cuerpo: string;
+  imagen_url: string | null;
   fijado: boolean;
   created_at: string;
   likes: number;
@@ -56,5 +57,6 @@ export function mensajeDeError(msg: string | undefined) {
   if (msg.includes("sin_acceso")) return "Necesitás tener acceso al curso para participar.";
   if (msg.includes("clase_cerrada")) return "Esta clase todavía no está abierta para comentar.";
   if (msg.includes("live_cerrada")) return "La clase en vivo ya terminó.";
+  if (msg.includes("imagen_invalida")) return "Esa foto no se pudo adjuntar. Probá subirla de nuevo.";
   return "No se pudo enviar. Probá de nuevo.";
 }

@@ -207,6 +207,7 @@ export default function Comentarios({ tipo, lessonId, inicial, yo, esAdmin, plac
       es_instructor: false,
       es_mio: true,
       cuerpo,
+      imagen_url: null,
       fijado: false,
       created_at: new Date().toISOString(),
       likes: 0,

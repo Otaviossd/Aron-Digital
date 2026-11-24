@@ -41,7 +41,7 @@ export const WHATSAPP_ALUMNOS_URL =
   process.env.NEXT_PUBLIC_WHATSAPP_ALUMNOS_URL || "https://chat.whatsapp.com/HXl5PCWAVzUKxLkN8ZiaN8";
 
 // Soporte al alumno. Para cambiar el email sin tocar el código: NEXT_PUBLIC_SUPPORT_EMAIL en Vercel.
-export const SOPORTE_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "lanuevaolaacademy.soporte@gmail.com";
+export const SOPORTE_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "soportelnoacademy@gmail.com";
 
 // Días que los bonos (y algunas clases) quedan bloqueados después de la compra.
 export const DIAS_BONO = 7;
