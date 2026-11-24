@@ -17,8 +17,10 @@ function autorizado(request: NextRequest) {
 }
 
 // Chamado a cada hora por um agendador externo (ver .github/workflows/cron-abandonados.yml).
+// Para pausar (sem tocar na estrutura, só reativar depois): ABANDONO_EMAILS_PAUSADAS=1 na Vercel.
 export async function GET(request: NextRequest) {
   if (!autorizado(request)) return NextResponse.json({ error: "no autorizado" }, { status: 401 });
+  if (process.env.ABANDONO_EMAILS_PAUSADAS === "1") return NextResponse.json({ abandono: "pausado" });
 
   const admin = createAdminClient();
   const ahora = new Date();
