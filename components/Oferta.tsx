@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CHECKOUT_URLS, PRECOS } from "@/lib/config";
+import { CHECKOUT_URLS, EXTRA, PRECOS } from "@/lib/config";
 import { enviarEvento } from "@/components/Rastreo";
 import { ui } from "@/lib/ui";
 import CuentaRegresiva from "@/components/CuentaRegresiva";
@@ -42,8 +42,14 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
             sub: "Precio especial para los primeros",
             valor: PRECOS.promo.valor,
             tachado: PRECOS.vitalicio.valor,
-            etiqueta: "Cupos limitados",
-            incluye: ["Acceso para siempre", "Todas las actualizaciones y clases nuevas", "Los 2 bonos incluidos", "Pagás una sola vez"],
+            etiqueta: "50% OFF · Cupos limitados",
+            incluye: [
+              "Acceso para siempre",
+              "Todas las actualizaciones y clases nuevas",
+              "Los 2 bonos incluidos",
+              `Regalo: el módulo «${EXTRA.titulo}» (US$${EXTRA.valorAntes}), sin pagar nada más`,
+              "Pagás una sola vez",
+            ],
           },
         ]
       : []),
@@ -140,6 +146,11 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
         <form onSubmit={continuar} noValidate>
           <p className="mb-2 text-sm font-medium text-accent">Paso 1 de 2</p>
           <h3 className="mb-2 text-2xl font-semibold tracking-tight">Dejanos tus datos y mirá la oferta</h3>
+          {promo && (
+            <p className="mb-4 rounded-xl border border-accent/30 bg-accent/[0.07] px-4 py-3 text-sm font-medium text-ink">
+              Precio de lanzamiento activo: 50% OFF en el acceso vitalicio + el módulo <span className="text-accent">«{EXTRA.titulo}»</span> de regalo, solo para los primeros {PRECOS.promo.vagas} alumnos.
+            </p>
+          )}
           <p className="mb-6 text-sm leading-relaxed text-muted">
             Te mostramos los precios y te mandamos el acceso por email apenas pagás.
           </p>
@@ -173,8 +184,11 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
           <h3 className="mb-2 text-2xl font-semibold tracking-tight">{nombre ? `${nombre.split(" ")[0]}, elegí cómo entrar` : "Elegí cómo entrar"}</h3>
           {promo && (
             <div className="mb-6 rounded-2xl border border-accent/40 bg-accent/[0.07] p-4 text-center">
-              <p className="text-sm font-semibold text-accent">Oferta de lanzamiento: 3 días o hasta agotar los {PRECOS.promo.vagas} cupos</p>
-              <p className="mt-1 text-xs text-muted">Lo que ocurra primero. Después vuelve al precio normal.</p>
+              <p className="text-base font-semibold text-ink">
+                50% OFF en el acceso vitalicio + el módulo <span className="text-accent">«{EXTRA.titulo}»</span> de regalo
+              </p>
+              <p className="mt-1 text-sm font-semibold text-accent">Solo para los primeros {PRECOS.promo.vagas} alumnos</p>
+              <p className="mt-1 text-xs text-muted">3 días o hasta agotar los cupos, lo que ocurra primero. Después vuelve al precio normal y el módulo extra se cobra aparte.</p>
               <div className="mt-3">
                 <CuentaRegresiva fin={promoFin} />
               </div>

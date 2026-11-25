@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export type Escena = { id: string; titulo: string; texto: string };
+// dimsD: ancho/alto reales de la captura de computadora, si son distintos del tamaño estándar (1800x1125).
+export type Escena = { id: string; titulo: string; texto: string; dimsD?: [number, number] };
 
 const SEGUNDOS = 6;
 
@@ -93,7 +94,14 @@ export default function Recorrido({ escenas }: { escenas: Escena[] }) {
                       <span className="h-2 w-2 rounded-full bg-white/15" />
                     </div>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`/curso/${e.id}-d.webp`} alt={`${e.titulo}: la plataforma en la computadora`} width={1800} height={1125} loading="lazy" className="block h-auto w-full" />
+                    <img
+                      src={`/curso/${e.id}-d.webp`}
+                      alt={`${e.titulo}: la plataforma en la computadora`}
+                      width={e.dimsD?.[0] ?? 1800}
+                      height={e.dimsD?.[1] ?? 1125}
+                      loading="lazy"
+                      className="block h-auto w-full"
+                    />
                   </div>
                   {/* Celular */}
                   <div

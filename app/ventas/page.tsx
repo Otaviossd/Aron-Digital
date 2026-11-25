@@ -26,24 +26,26 @@ const CINTA = ["Pago único", "Acceso inmediato", "Clases en vivo", "Comunidad d
 const NUMEROS = [
   { valor: 2500, prefijo: "+", sufijo: "", t: "barberos formados" },
   { valor: 6, prefijo: "", sufijo: " países", t: "con cursos presenciales" },
-  { valor: 3, prefijo: "", sufijo: " cortes", t: "completos, paso a paso" },
+  { valor: 5, prefijo: "", sufijo: " cortes", t: "completos, paso a paso" },
   { valor: 1, prefijo: "", sufijo: " pago", t: "sin mensualidades" },
 ];
 
 // "El curso por dentro": capturas reales de la plataforma, vista del alumno (imágenes en /public/curso).
 const ESCENAS: Escena[] = [
   { id: "inicio", titulo: "Tu inicio", texto: "Entrás y seguís donde te quedaste. Tu progreso, las clases en vivo, la comunidad y tu certificado, a un toque." },
-  { id: "modulos", titulo: "Módulos y bonos", texto: "Todo el curso ordenado por módulos. Los bonos y algunas clases se abren solos con los días de tu compra." },
+  { id: "modulos", titulo: "Módulos y bonos", texto: "Todo el curso ordenado por módulos. Los bonos y algunas clases se abren solos con los días de tu compra.", dimsD: [1800, 1265] },
   { id: "clase", titulo: "La clase", texto: "El video, la lista de clases del módulo y los comentarios para dejar tus dudas. Marcás la clase como completada y avanzás." },
   { id: "certificado", titulo: "Tu certificado", texto: "Al completar el 100 % descargás tu certificado en PDF, con un código que cualquiera puede verificar." },
 ];
 
 const RUTA = [
   { t: "Bienvenida", d: "Cómo entrar, cómo funciona la plataforma y cómo aprovechar el curso desde el primer día." },
-  { t: "Fundamentos de la barbería", d: "Herramientas, higiene, tipos de cabello, mapa de la cabeza, postura y consulta con el cliente." },
+  { t: "Fundamentos de la barbería", d: "Anatomía del cráneo, planos, grados y elevaciones, tipos de cabello, formas y texturas: la base técnica antes de tomar la tijera." },
   { t: "Corte completo 1", d: "Cómo es el corte, qué herramientas usar y el paso a paso en partes, hasta el acabado." },
   { t: "Corte completo 2", d: "Otro corte de principio a fin, en partes cortas para pausar, repetir y practicar." },
   { t: "Corte completo 3", d: "El tercer corte, con el mismo método y los errores más comunes." },
+  { t: "Corte completo 4", d: "Un corte más, de principio a fin y en partes, para sumar un estilo nuevo a tu repertorio." },
+  { t: "Corte completo 5", d: "El quinto corte de la ruta, con el mismo método paso a paso — y la lista sigue creciendo con cada actualización." },
 ];
 
 const BONOS = [
@@ -93,6 +95,24 @@ const Check = () => (
   </svg>
 );
 
+const PILDORA = "hero-in mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1.5 text-xs font-medium text-accent";
+const PUNTO = (
+  <span className="relative flex h-2 w-2">
+    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+    <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+  </span>
+);
+
+async function PildoraHero() {
+  const restantes = await vagasPromoRestantes();
+  return (
+    <p className={PILDORA} style={{ ["--d" as string]: "200ms" }}>
+      {PUNTO}
+      {restantes > 0 ? `Precio de lanzamiento: 50% OFF + regalo · últimos ${restantes} cupos` : "Curso online de barbería · Inscripciones abiertas"}
+    </p>
+  );
+}
+
 async function SeccionOferta() {
   const restantes = await vagasPromoRestantes();
   return <Oferta vagasRestantes={restantes} promoFin={PROMO_FIN} />;
@@ -126,13 +146,16 @@ export default function VentasPage() {
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.05fr_.95fr] lg:pb-24 lg:pt-10">
           <div className="hero-in cristal relative overflow-hidden rounded-3xl p-7 sm:p-10" style={{ ["--d" as string]: "80ms" }}>
             <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
-            <p className="hero-in mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1.5 text-xs font-medium text-accent" style={{ ["--d" as string]: "200ms" }}>
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-              </span>
-              Curso online de barbería · Inscripciones abiertas
-            </p>
+            <Suspense
+              fallback={
+                <p className={PILDORA} style={{ ["--d" as string]: "200ms" }}>
+                  {PUNTO}
+                  Curso online de barbería · Inscripciones abiertas
+                </p>
+              }
+            >
+              <PildoraHero />
+            </Suspense>
             <h1 className="hero-in text-[clamp(2.1rem,4.8vw,3.6rem)] font-semibold leading-[1.04] tracking-[-0.03em]" style={{ ["--d" as string]: "280ms" }}>
               Aprendé barbería <span className="texto-luz">de verdad,</span> paso a paso.
             </h1>
