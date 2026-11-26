@@ -77,14 +77,15 @@ export const EXTRA = {
   // Link del precio normal (US$20). Si no se define, se usa el mismo link sin el parámetro "off" (la oferta base del producto).
   checkoutUrlNormal: process.env.NEXT_PUBLIC_HOTMART_URL_EXTRA_NORMAL,
   videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL, // enlace "embed" (YouTube no listado, Vimeo, Drive...) — ya no se usa, queda por compatibilidad
-  // Las 6 clases del módulo (provisorio: títulos a definir, se editan acá cuando estén los videos reales).
+  // Las 6 clases del módulo (provisorio: títulos genéricos "Clase N" hasta tener los nombres reales;
+  // se editan acá cuando estén definidos, sin mostrarle al alumno que faltan).
   lecciones: [
-    { titulo: "Clase 1 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_1 },
-    { titulo: "Clase 2 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_2 },
-    { titulo: "Clase 3 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_3 },
-    { titulo: "Clase 4 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_4 },
-    { titulo: "Clase 5 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_5 },
-    { titulo: "Clase 6 (a definir)", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_6 },
+    { titulo: "Clase 1", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_1 },
+    { titulo: "Clase 2", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_2 },
+    { titulo: "Clase 3", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_3 },
+    { titulo: "Clase 4", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_4 },
+    { titulo: "Clase 5", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_5 },
+    { titulo: "Clase 6", videoUrl: process.env.NEXT_PUBLIC_EXTRA_VIDEO_URL_6 },
   ],
 } as const;
 
