@@ -203,52 +203,57 @@ async function Email() {
         )}
       </Seccion>
 
-      {/* Leads */}
-      <Seccion
-        titulo="Últimos contactos"
-        sub="Personas que dejaron su email en la página de captura o en el checkout. A quien está en carrito abandonado le podés mandar a mano una de las 3 copys de último llamado, o escribirle por WhatsApp si dejó su número."
-      >
-        {!leads || leads.length === 0 ? (
-          <Vacio>Todavía no hay leads. Se guardan cuando alguien termina de escribir su email en el checkout.</Vacio>
-        ) : (
-          <Tabla cabeceras={["Email", "WhatsApp", "Llegó", "Origen", "Estado", "Último llamado"]}>
-            {leads.map((l) => {
-              const abandonado = !l.unsubscribed_at && !l.converted_at && !!l.checkout_at;
-              const soloNumero = l.phone ? l.phone.replace(/\D/g, "") : null;
-              return (
-                <tr key={l.id}>
-                  <td className="px-4 py-3">{l.email}</td>
-                  <td className="px-4 py-3">
-                    {soloNumero ? (
-                      <a href={`https://wa.me/${soloNumero}`} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                        {l.phone}
-                      </a>
-                    ) : (
-                      <span className="text-faint">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-muted">{hace(l.created_at)}</td>
-                  <td className="px-4 py-3 text-muted">{l.source === "captura" ? "Captura" : "Checkout"}</td>
-                  <td className="px-4 py-3">
-                    {l.unsubscribed_at ? (
-                      <Pildora tono="neutro">Se dio de baja</Pildora>
-                    ) : l.converted_at ? (
-                      <Pildora tono="ok">Compró</Pildora>
-                    ) : l.checkout_at ? (
-                      <Pildora tono="aviso">Carrito abandonado</Pildora>
-                    ) : (
-                      <Pildora tono="neutro">En la lista</Pildora>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {abandonado ? <EnviarUrgenteFila leadId={l.id} enviados={urgentePorLead.get(l.id) ?? []} /> : <span className="text-faint">—</span>}
-                  </td>
-                </tr>
-              );
-            })}
-          </Tabla>
-        )}
-      </Seccion>
+      {/* Carrito abandonado: la lista de acción, bien directa */}
+      {(() => {
+        const abandonados = (leads ?? []).filter((l) => !l.unsubscribed_at && !l.converted_at && !!l.checkout_at);
+        return (
+          <Seccion titulo="Carrito abandonado — a quién escribirle ahora" sub="Llegaron al checkout y no compraron. Elegís la copy y se la mandás, uno por uno.">
+            {abandonados.length === 0 ? (
+              <Vacio>Nadie pendiente ahora mismo.</Vacio>
+            ) : (
+              <ul className="space-y-3">
+                {abandonados.map((l) => (
+                  <li key={l.id} className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-surface p-4">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{l.email}</p>
+                      <p className="mt-0.5 text-xs text-faint">Llegó {hace(l.checkout_at ?? l.created_at)}</p>
+                    </div>
+                    <EnviarUrgenteFila leadId={l.id} enviados={urgentePorLead.get(l.id) ?? []} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Seccion>
+        );
+      })()}
+
+      {/* WhatsApp: solo quien dejó número, para escribirle directo */}
+      {(() => {
+        const conTelefono = (leads ?? []).filter((l) => !!l.phone);
+        return (
+          <Seccion titulo="WhatsApp de los contactos" sub="Quien dejó su número al llegar al checkout. Tocá el número para abrir la conversación.">
+            {conTelefono.length === 0 ? (
+              <Vacio>Todavía nadie dejó su WhatsApp.</Vacio>
+            ) : (
+              <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
+                {conTelefono.map((l) => (
+                  <li key={l.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 text-sm">
+                    <span className="truncate text-muted">{l.email}</span>
+                    <a
+                      href={`https://wa.me/${l.phone!.replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="whitespace-nowrap rounded-full bg-accent/10 px-3 py-1.5 font-medium text-accent transition hover:bg-accent/20"
+                    >
+                      {l.phone} ↗
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Seccion>
+        );
+      })()}
 
       {/* Vista previa */}
       <Seccion titulo="Cómo se ven los emails" sub="Vista previa con datos de ejemplo. Los textos se editan en lib/emails.">
