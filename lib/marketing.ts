@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { plantilla } from "@/lib/emails/abandono";
 import { plantillaExtra } from "@/lib/emails/extra";
 import { plantillaCaptura } from "@/lib/emails/captura";
+import { plantillaUrgente } from "@/lib/emails/urgente";
 import { siteUrl } from "@/lib/site";
 
 const SITE_URL = siteUrl;
@@ -26,6 +27,33 @@ export async function enviarPasoAbandono(params: { email: string; step: number; 
     html,
     headers: {
       // Descadastro de um clique (exigido por Gmail/Yahoo para envios em volume)
+      "List-Unsubscribe": `<${SITE_URL()}/api/baja?t=${params.token}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+  });
+  if (error) throw new Error(`Resend error: ${error.message}`);
+  return data?.id ?? null;
+}
+
+// Envío manual (único, no automático) de la "copy matadora" a quien llegó al checkout y no compró.
+// Ver app/admin/email/actions.ts: se dispara a mano desde /admin/email, usa su propia `sequence`
+// ("urgente") en email_sends para no mezclarse con la secuencia automática de carrito abandonado.
+export async function enviarEmailUrgente(params: { email: string; token: string }) {
+  const bajaUrl = `${SITE_URL()}/baja?t=${params.token}`;
+  const { asunto, html } = plantillaUrgente({
+    siteUrl: SITE_URL(),
+    email: params.email,
+    bajaUrl,
+    marca: process.env.NEXT_PUBLIC_BRAND_NAME ?? "Barbería Aaron",
+  });
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const { data, error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM_MARKETING ?? process.env.EMAIL_FROM!,
+    to: params.email,
+    subject: asunto,
+    html,
+    headers: {
       "List-Unsubscribe": `<${SITE_URL()}/api/baja?t=${params.token}>`,
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },

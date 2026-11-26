@@ -12,6 +12,8 @@ import { Pildora, Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
 import { siteUrl } from "@/lib/site";
 import { cargarExcluidos, enLista } from "@/lib/excluidos";
 import { Seguimiento } from "./Seguimiento";
+import BotonEnviarUrgente from "@/components/admin/BotonEnviarUrgente";
+import { plantillaUrgente } from "@/lib/emails/urgente";
 
 type Stats = {
   leads: number;
@@ -63,7 +65,12 @@ async function Email() {
       return {
         cuando: s.sent_at as string,
         para: (lead?.email as string | undefined) ?? "—",
-        tipo: s.sequence === "captura" ? `Captura y lanzamiento · email ${s.step}` : `Carrito abandonado · email ${s.step}`,
+        tipo:
+          s.sequence === "captura"
+            ? `Captura y lanzamiento · email ${s.step}`
+            : s.sequence === "urgente"
+              ? "Último llamado (envío manual)"
+              : `Carrito abandonado · email ${s.step}`,
         estado: "enviado" as const,
       };
     }),
@@ -148,6 +155,16 @@ async function Email() {
             ]}
           />
           <Tarjeta
+            titulo="Último llamado (envío manual)"
+            estado={resendOk ? <Pildora tono="ok">Listo</Pildora> : <Pildora tono="aviso">Falta Resend</Pildora>}
+            texto="Un email aparte (con el descuento real y la plataforma por dentro) para quien llegó al checkout y no compró. No sale solo: lo mandás vos, una vez, cuando quieras apurar el cierre. No se manda dos veces a la misma persona."
+            datos={[["Pendientes ahora", String(stats.pendientes)]]}
+          >
+            <div className="mt-4">
+              <BotonEnviarUrgente />
+            </div>
+          </Tarjeta>
+          <Tarjeta
             titulo="Referidos"
             estado={<Pildora>Próximamente</Pildora>}
             texto="Una promoción para que quien ya compró invite a otras personas."
@@ -223,13 +240,29 @@ async function Email() {
             const t = plantilla(p.step, ctx);
             return <Previa key={p.step} titulo={`Carrito abandonado · email ${p.step} (${pasoTexto(p.afterHours)})`} asunto={t.asunto} html={t.html} />;
           })}
+          {(() => {
+            const t = plantillaUrgente(ctx);
+            return <Previa titulo="Último llamado (envío manual)" asunto={t.asunto} html={t.html} />;
+          })()}
         </div>
       </Seccion>
     </>
   );
 }
 
-function Tarjeta({ titulo, estado, texto, datos }: { titulo: string; estado: React.ReactNode; texto: string; datos?: [string, string][] }) {
+function Tarjeta({
+  titulo,
+  estado,
+  texto,
+  datos,
+  children,
+}: {
+  titulo: string;
+  estado: React.ReactNode;
+  texto: string;
+  datos?: [string, string][];
+  children?: React.ReactNode;
+}) {
   return (
     <div className="rounded-2xl border border-line bg-surface p-5">
       <div className="mb-2 flex items-center justify-between gap-3">
@@ -247,6 +280,7 @@ function Tarjeta({ titulo, estado, texto, datos }: { titulo: string; estado: Rea
           ))}
         </dl>
       )}
+      {children}
     </div>
   );
 }
