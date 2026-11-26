@@ -12,7 +12,7 @@ import { Pildora, Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
 import { siteUrl } from "@/lib/site";
 import { cargarExcluidos, enLista } from "@/lib/excluidos";
 import { Seguimiento } from "./Seguimiento";
-import BotonEnviarUrgente from "@/components/admin/BotonEnviarUrgente";
+import EnviarUrgenteFila from "@/components/admin/EnviarUrgenteFila";
 import { plantillaUrgente } from "@/lib/emails/urgente";
 
 type Stats = {
@@ -37,14 +37,18 @@ export default function EmailPage() {
 async function Email() {
   const supabase = await createClient();
   const L = enLista(await cargarExcluidos(supabase));
-  const [{ data: es }, { data: sends }, { data: log }, { data: leads }, { count: compras }, { count: bienvenidas }] = await Promise.all([
+  const [{ data: es }, { data: sends }, { data: log }, { data: leads }, { count: compras }, { count: bienvenidas }, { data: enviosUrgente }] = await Promise.all([
     supabase.rpc("email_stats"),
     supabase.from("email_sends").select("sequence, step, sent_at, leads!inner(email)").not("leads.email", "in", L).order("sent_at", { ascending: false }).limit(40),
     supabase.from("email_log").select("to_email, kind, status, created_at").not("to_email", "in", L).order("created_at", { ascending: false }).limit(40),
-    supabase.from("leads").select("email, created_at, source, checkout_at, converted_at, unsubscribed_at").not("email", "in", L).order("created_at", { ascending: false }).limit(15),
+    supabase.from("leads").select("id, email, created_at, source, checkout_at, converted_at, unsubscribed_at").not("email", "in", L).order("created_at", { ascending: false }).limit(15),
     supabase.from("email_log").select("id", { count: "exact", head: true }).not("to_email", "in", L).eq("kind", "compra").eq("status", "sent"),
     supabase.from("email_log").select("id", { count: "exact", head: true }).not("to_email", "in", L).eq("kind", "lista").eq("status", "sent"),
+    // Qué variante del "último llamado" (urgente) ya se mandó a cada lead, para no ofrecer mandarla de nuevo.
+    supabase.from("email_sends").select("lead_id, step").eq("sequence", "urgente"),
   ]);
+  const urgentePorLead = new Map<string, number[]>();
+  for (const e of enviosUrgente ?? []) urgentePorLead.set(e.lead_id, [...(urgentePorLead.get(e.lead_id) ?? []), e.step]);
 
   const stats = (es ?? { leads: 0, pendientes: 0, bajas: 0, enviados: {}, recuperados: 0 }) as Stats;
   const config = estadoConfig();
@@ -69,7 +73,7 @@ async function Email() {
           s.sequence === "captura"
             ? `Captura y lanzamiento · email ${s.step}`
             : s.sequence === "urgente"
-              ? "Último llamado (envío manual)"
+              ? `Último llamado · email ${s.step} (manual)`
               : `Carrito abandonado · email ${s.step}`,
         estado: "enviado" as const,
       };
@@ -157,13 +161,9 @@ async function Email() {
           <Tarjeta
             titulo="Último llamado (envío manual)"
             estado={resendOk ? <Pildora tono="ok">Listo</Pildora> : <Pildora tono="aviso">Falta Resend</Pildora>}
-            texto="Un email aparte (con el descuento real y la plataforma por dentro) para quien llegó al checkout y no compró. No sale solo: lo mandás vos, una vez, cuando quieras apurar el cierre. No se manda dos veces a la misma persona."
+            texto="3 copys distintas (descuento real, la cuenta en dólares, el recorrido completo) para quien llegó al checkout y no compró. No sale solo: elegís vos, contacto por contacto, cuál mandarle, en la tabla de Últimos contactos, más abajo. No se manda la misma variante dos veces a la misma persona."
             datos={[["Pendientes ahora", String(stats.pendientes)]]}
-          >
-            <div className="mt-4">
-              <BotonEnviarUrgente />
-            </div>
-          </Tarjeta>
+          />
           <Tarjeta
             titulo="Referidos"
             estado={<Pildora>Próximamente</Pildora>}
@@ -204,29 +204,35 @@ async function Email() {
       </Seccion>
 
       {/* Leads */}
-      <Seccion titulo="Últimos contactos" sub="Personas que dejaron su email en la página de captura o en el checkout.">
+      <Seccion titulo="Últimos contactos" sub="Personas que dejaron su email en la página de captura o en el checkout. A quien está en carrito abandonado le podés mandar a mano una de las 3 copys de último llamado.">
         {!leads || leads.length === 0 ? (
           <Vacio>Todavía no hay leads. Se guardan cuando alguien termina de escribir su email en el checkout.</Vacio>
         ) : (
-          <Tabla cabeceras={["Email", "Llegó", "Origen", "Estado"]}>
-            {leads.map((l) => (
-              <tr key={l.email}>
-                <td className="px-4 py-3">{l.email}</td>
-                <td className="px-4 py-3 text-muted">{hace(l.created_at)}</td>
-                <td className="px-4 py-3 text-muted">{l.source === "captura" ? "Captura" : "Checkout"}</td>
-                <td className="px-4 py-3">
-                  {l.unsubscribed_at ? (
-                    <Pildora tono="neutro">Se dio de baja</Pildora>
-                  ) : l.converted_at ? (
-                    <Pildora tono="ok">Compró</Pildora>
-                  ) : l.checkout_at ? (
-                    <Pildora tono="aviso">Carrito abandonado</Pildora>
-                  ) : (
-                    <Pildora tono="neutro">En la lista</Pildora>
-                  )}
-                </td>
-              </tr>
-            ))}
+          <Tabla cabeceras={["Email", "Llegó", "Origen", "Estado", "Último llamado"]}>
+            {leads.map((l) => {
+              const abandonado = !l.unsubscribed_at && !l.converted_at && !!l.checkout_at;
+              return (
+                <tr key={l.id}>
+                  <td className="px-4 py-3">{l.email}</td>
+                  <td className="px-4 py-3 text-muted">{hace(l.created_at)}</td>
+                  <td className="px-4 py-3 text-muted">{l.source === "captura" ? "Captura" : "Checkout"}</td>
+                  <td className="px-4 py-3">
+                    {l.unsubscribed_at ? (
+                      <Pildora tono="neutro">Se dio de baja</Pildora>
+                    ) : l.converted_at ? (
+                      <Pildora tono="ok">Compró</Pildora>
+                    ) : l.checkout_at ? (
+                      <Pildora tono="aviso">Carrito abandonado</Pildora>
+                    ) : (
+                      <Pildora tono="neutro">En la lista</Pildora>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {abandonado ? <EnviarUrgenteFila leadId={l.id} enviados={urgentePorLead.get(l.id) ?? []} /> : <span className="text-faint">—</span>}
+                  </td>
+                </tr>
+              );
+            })}
           </Tabla>
         )}
       </Seccion>
@@ -240,10 +246,10 @@ async function Email() {
             const t = plantilla(p.step, ctx);
             return <Previa key={p.step} titulo={`Carrito abandonado · email ${p.step} (${pasoTexto(p.afterHours)})`} asunto={t.asunto} html={t.html} />;
           })}
-          {(() => {
-            const t = plantillaUrgente(ctx);
-            return <Previa titulo="Último llamado (envío manual)" asunto={t.asunto} html={t.html} />;
-          })()}
+          {([1, 2, 3] as const).map((v) => {
+            const t = plantillaUrgente(v, ctx);
+            return <Previa key={v} titulo={`Último llamado · email ${v} (envío manual)`} asunto={t.asunto} html={t.html} />;
+          })}
         </div>
       </Seccion>
     </>

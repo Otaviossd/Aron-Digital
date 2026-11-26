@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import { plantilla } from "@/lib/emails/abandono";
 import { plantillaExtra } from "@/lib/emails/extra";
 import { plantillaCaptura } from "@/lib/emails/captura";
-import { plantillaUrgente } from "@/lib/emails/urgente";
+import { plantillaUrgente, type VarianteUrgente } from "@/lib/emails/urgente";
 import { siteUrl } from "@/lib/site";
 
 const SITE_URL = siteUrl;
@@ -36,11 +36,13 @@ export async function enviarPasoAbandono(params: { email: string; step: number; 
 }
 
 // Envío manual (único, no automático) de la "copy matadora" a quien llegó al checkout y no compró.
-// Ver app/admin/email/actions.ts: se dispara a mano desde /admin/email, usa su propia `sequence`
-// ("urgente") en email_sends para no mezclarse con la secuencia automática de carrito abandonado.
-export async function enviarEmailUrgente(params: { email: string; token: string }) {
+// Hay 3 variantes (ver lib/emails/urgente.ts); Aaron elige cuál mandarle a cada contacto desde
+// /admin/email. Usa su propia `sequence` ("urgente", con el número de variante como `step`) en
+// email_sends para no mezclarse con la secuencia automática de carrito abandonado, y para no
+// mandarle la misma variante dos veces a la misma persona.
+export async function enviarEmailUrgente(params: { email: string; token: string; variante: VarianteUrgente }) {
   const bajaUrl = `${SITE_URL()}/baja?t=${params.token}`;
-  const { asunto, html } = plantillaUrgente({
+  const { asunto, html } = plantillaUrgente(params.variante, {
     siteUrl: SITE_URL(),
     email: params.email,
     bajaUrl,
