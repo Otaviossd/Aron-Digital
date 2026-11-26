@@ -17,7 +17,9 @@ export default function AulasPage() {
 }
 
 async function Inicio() {
-  const { modulos, aulas, completadas, email, porcentaje } = await getMemberData();
+  const { modulos, aulas, completadas, email, porcentaje, supabase } = await getMemberData();
+  const { data: estadoExtra } = await supabase.rpc("estado_extra");
+  const extraLiberaEn = typeof estadoExtra?.libera_en === "string" && estadoExtra?.liberado !== true ? estadoExtra.libera_en : null;
 
   // Sem compra vigente para este e-mail
   if (modulos.length === 0) {
@@ -104,6 +106,7 @@ async function Inicio() {
         <span className="min-w-0 flex-1">
           <span className="block text-xs font-medium text-accent">Módulo extra</span>
           <span className="block truncate font-medium tracking-tight">{EXTRA.titulo}</span>
+          {extraLiberaEn && <span className="mt-0.5 block text-xs font-medium text-ink/70">Se libera {diasRestantes(extraLiberaEn)}</span>}
         </span>
         <span className="text-sm text-muted transition group-hover:text-ink">Ver →</span>
       </Link>
