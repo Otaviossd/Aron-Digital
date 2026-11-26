@@ -30,6 +30,10 @@ export const DIAS_REEMBOLSO = 7;
 
 export const BRAND = process.env.NEXT_PUBLIC_BRAND_NAME ?? "La Nueva Ola Academy";
 
+// Pixel de Meta (Facebook/Instagram Ads), para que el tráfico pago pueda optimizar por Lead/compra.
+// Para cambiarlo sin tocar el código: NEXT_PUBLIC_META_PIXEL_ID en la Vercel.
+export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1145021861611170";
+
 // Grupo de WhatsApp da lista de espera (link de convite sem os parâmetros de rastreio do compartilhamento).
 // Para trocar sem mexer no código, defina NEXT_PUBLIC_WHATSAPP_GROUP_URL na Vercel.
 export const WHATSAPP_GRUPO_URL =

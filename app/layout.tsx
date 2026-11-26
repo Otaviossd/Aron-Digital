@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,7 +18,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-bg font-sans text-ink">{children}</body>
+      <body className="flex min-h-full flex-col bg-bg font-sans text-ink">
+        <MetaPixel />
+        {children}
+      </body>
     </html>
   );
 }

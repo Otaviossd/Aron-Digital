@@ -6,6 +6,7 @@ import { enviarEvento } from "@/components/Rastreo";
 import { ui } from "@/lib/ui";
 import CuentaRegresiva from "@/components/CuentaRegresiva";
 import { normalizarTelefono, telefonoValido as validarTelefono } from "@/lib/telefono";
+import { fbTrack } from "@/lib/metaPixel";
 
 const CLAVE = "lno_oferta_datos";
 
@@ -121,6 +122,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
       /* ignorar */
     }
     enviarEvento("/ventas", "checkout");
+    fbTrack("Lead");
     setEnviando(false);
     setPaso("oferta");
   }
@@ -270,7 +272,11 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
 
           <div className="mt-5">
             {hrefElegido ? (
-              <a href={hrefElegido} className={`${ui.boton} w-full py-3.5`}>
+              <a
+                href={hrefElegido}
+                onClick={() => fbTrack("InitiateCheckout", { value: elegida.valor, currency: "USD", content_name: elegida.nombre })}
+                className={`${ui.boton} w-full py-3.5`}
+              >
                 Continuar al pago · US${elegida.valor}
               </a>
             ) : (
