@@ -8,8 +8,9 @@ import BarraMovil from "@/components/BarraMovil";
 import VideoHero from "@/components/ventas/VideoHero";
 import Recorrido, { type Escena } from "@/components/ventas/Recorrido";
 import Contador from "@/components/ventas/Contador";
+import CuentaCorta from "@/components/ventas/CuentaCorta";
 import { vagasPromoRestantes } from "@/lib/promo";
-import { BRAND, DIAS_BONO, DIAS_REEMBOLSO, PROMO_FIN } from "@/lib/config";
+import { BRAND, DIAS_BONO, DIAS_REEMBOLSO, EXTRA, PRECOS, PROMO_FIN } from "@/lib/config";
 import { FOTOS } from "@/lib/fotos";
 import { ui } from "@/lib/ui";
 
@@ -105,11 +106,34 @@ const PUNTO = (
 
 async function PildoraHero() {
   const restantes = await vagasPromoRestantes();
+  if (restantes <= 0) {
+    return (
+      <p className={PILDORA} style={{ ["--d" as string]: "200ms" }}>
+        {PUNTO}
+        Curso online de barbería · Inscripciones abiertas
+      </p>
+    );
+  }
+
+  const ahorroCurso = PRECOS.vitalicio.valor - PRECOS.promo.valor;
+  const ahorroTotal = ahorroCurso + EXTRA.valorAntes;
+
   return (
-    <p className={PILDORA} style={{ ["--d" as string]: "200ms" }}>
-      {PUNTO}
-      {restantes > 0 ? `Precio de lanzamiento: 50% OFF + regalo · últimos ${restantes} cupos` : "Curso online de barbería · Inscripciones abiertas"}
-    </p>
+    <div
+      className="hero-in relative mb-6 inline-flex flex-col gap-2 overflow-hidden rounded-2xl border border-accent/70 bg-gradient-to-br from-accent/25 via-accent/10 to-transparent px-5 py-4 shadow-[0_0_90px_-18px_rgba(57,255,126,.85)] sm:px-6 sm:py-5"
+      style={{ ["--d" as string]: "200ms" }}
+    >
+      <span className="flex items-start gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent sm:text-xs">
+        <span className="mt-[3px] shrink-0">{PUNTO}</span>
+        <span>
+          Oferta de lanzamiento · termina en <CuentaCorta fin={PROMO_FIN} />
+        </span>
+      </span>
+      <span className="text-[17px] font-bold leading-snug tracking-tight text-ink sm:text-xl">
+        50% OFF + regalo de US${EXTRA.valorAntes}
+        <span className="mt-0.5 block text-accent">Más de US${ahorroTotal} en beneficios, hoy</span>
+      </span>
+    </div>
   );
 }
 
