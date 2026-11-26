@@ -41,7 +41,7 @@ async function Email() {
     supabase.rpc("email_stats"),
     supabase.from("email_sends").select("sequence, step, sent_at, leads!inner(email)").not("leads.email", "in", L).order("sent_at", { ascending: false }).limit(40),
     supabase.from("email_log").select("to_email, kind, status, created_at").not("to_email", "in", L).order("created_at", { ascending: false }).limit(40),
-    supabase.from("leads").select("id, email, created_at, source, checkout_at, converted_at, unsubscribed_at").not("email", "in", L).order("created_at", { ascending: false }).limit(15),
+    supabase.from("leads").select("id, email, phone, created_at, source, checkout_at, converted_at, unsubscribed_at").not("email", "in", L).order("created_at", { ascending: false }).limit(15),
     supabase.from("email_log").select("id", { count: "exact", head: true }).not("to_email", "in", L).eq("kind", "compra").eq("status", "sent"),
     supabase.from("email_log").select("id", { count: "exact", head: true }).not("to_email", "in", L).eq("kind", "lista").eq("status", "sent"),
     // Qué variante del "último llamado" (urgente) ya se mandó a cada lead, para no ofrecer mandarla de nuevo.
@@ -204,16 +204,29 @@ async function Email() {
       </Seccion>
 
       {/* Leads */}
-      <Seccion titulo="Últimos contactos" sub="Personas que dejaron su email en la página de captura o en el checkout. A quien está en carrito abandonado le podés mandar a mano una de las 3 copys de último llamado.">
+      <Seccion
+        titulo="Últimos contactos"
+        sub="Personas que dejaron su email en la página de captura o en el checkout. A quien está en carrito abandonado le podés mandar a mano una de las 3 copys de último llamado, o escribirle por WhatsApp si dejó su número."
+      >
         {!leads || leads.length === 0 ? (
           <Vacio>Todavía no hay leads. Se guardan cuando alguien termina de escribir su email en el checkout.</Vacio>
         ) : (
-          <Tabla cabeceras={["Email", "Llegó", "Origen", "Estado", "Último llamado"]}>
+          <Tabla cabeceras={["Email", "WhatsApp", "Llegó", "Origen", "Estado", "Último llamado"]}>
             {leads.map((l) => {
               const abandonado = !l.unsubscribed_at && !l.converted_at && !!l.checkout_at;
+              const soloNumero = l.phone ? l.phone.replace(/\D/g, "") : null;
               return (
                 <tr key={l.id}>
                   <td className="px-4 py-3">{l.email}</td>
+                  <td className="px-4 py-3">
+                    {soloNumero ? (
+                      <a href={`https://wa.me/${soloNumero}`} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                        {l.phone}
+                      </a>
+                    ) : (
+                      <span className="text-faint">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-muted">{hace(l.created_at)}</td>
                   <td className="px-4 py-3 text-muted">{l.source === "captura" ? "Captura" : "Checkout"}</td>
                   <td className="px-4 py-3">
