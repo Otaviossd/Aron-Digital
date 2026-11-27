@@ -69,6 +69,14 @@ const PARA_QUIEN = [
   "Querés aprender de alguien que enseña lo que hace todos los días.",
 ];
 
+// Sección de agitación del problema, antes de mostrar la plataforma: nombra el dolor real
+// (aprender suelto, sin orden, estancado) para que la persona sienta que esto es justo lo que le falta.
+const PROBLEMAS = [
+  "Mirás tutoriales sueltos en YouTube y cada uno te enseña algo distinto, sin una base real detrás.",
+  "Un corte te sale bien una vez, pero no podés repetirlo con seguridad ni explicar por qué funcionó.",
+  "Sentís que estás estancado: los mismos cortes, los mismos precios, los mismos clientes de siempre.",
+];
+
 const PREGUNTAS = [
   { q: "¿Cuándo recibo el acceso?", r: "Apenas se confirma el pago te llega un email con un botón para entrar. Entrás con ese mismo email: tocás el botón del email y entrás directo." },
   { q: "¿Puedo comprar desde mi país?", r: "Sí. El curso es 100 % online y está en español. El precio está en dólares y en la página de pago ves los medios disponibles en tu país." },
@@ -184,7 +192,7 @@ export default function VentasPage() {
               Aprendé barbería <span className="texto-luz">de verdad,</span> paso a paso.
             </h1>
             <p className="hero-in mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg" style={{ ["--d" as string]: "380ms" }}>
-              Con Aaron Dalla Rosa, barbero educador internacional que ya formó a más de 2.500 barberos. Cortes completos en video, clases en vivo, comunidad y certificado, directo en tu celular.
+              No es un curso más de YouTube. Es la ruta completa que usó Aaron Dalla Rosa, barbero educador internacional, para formar a más de 2.500 barberos en 6 países: cortes completos en video, clases en vivo, comunidad y certificado, directo en tu celular.
             </p>
             <div className="hero-in mt-8 flex flex-wrap items-center gap-4" style={{ ["--d" as string]: "480ms" }}>
               <a href="#comprar" className={`${ui.boton} w-full sm:w-auto sm:px-8 sm:py-3.5`}>
@@ -204,6 +212,9 @@ export default function VentasPage() {
                 </li>
               ))}
             </ul>
+            <p className="hero-in mt-4 max-w-md text-xs italic leading-relaxed text-faint" style={{ ["--d" as string]: "640ms" }}>
+              Cada mes que pasás cortando a prueba y error es un mes en el que un cliente elige a otro barbero mejor formado que vos.
+            </p>
           </div>
 
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
@@ -253,6 +264,28 @@ export default function VentasPage() {
             </Aparece>
           ))}
         </div>
+      </section>
+
+      {/* Agitación del problema: nombra el dolor real antes de mostrar la solución */}
+      <section className="mx-auto max-w-4xl px-6 pt-24">
+        <Aparece>
+          <p className="mb-3 text-center text-sm font-medium text-accent">¿Te pasa esto?</p>
+          <h2 className="mx-auto max-w-2xl text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            Aprendiste solo, a los golpes — <span className="texto-luz">y sabés que podrías cobrar más.</span>
+          </h2>
+        </Aparece>
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          {PROBLEMAS.map((p, i) => (
+            <Aparece key={p} retraso={i * 80}>
+              <div className="cristal h-full rounded-2xl p-5 text-sm leading-relaxed text-muted">{p}</div>
+            </Aparece>
+          ))}
+        </div>
+        <Aparece retraso={240}>
+          <p className="mx-auto mt-10 max-w-xl text-center leading-relaxed text-muted">
+            Esto no se arregla con más videos sueltos. Se arregla con una ruta clara, de principio a fin, de alguien que ya formó a miles de barberos. Es lo que vas a ver acá abajo.
+          </p>
+        </Aparece>
       </section>
 
       {/* El curso por dentro: capturas reales de la plataforma */}
@@ -330,7 +363,7 @@ export default function VentasPage() {
       {/* Qué incluye */}
       <section className="mx-auto max-w-6xl px-6 py-24">
         <Aparece>
-          <h2 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">Mucho más que videos: una academia completa.</h2>
+          <h2 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">No es un curso más de YouTube: es una academia completa.</h2>
         </Aparece>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {INCLUYE.map((i, n) => (
@@ -397,7 +430,7 @@ export default function VentasPage() {
             <h2 className="mb-3 text-center text-3xl font-semibold tracking-tight sm:text-4xl">
               Entrá hoy. <span className="texto-luz">Empezá ya.</span>
             </h2>
-            <p className="mb-10 text-center text-sm text-muted">Pago único. Sin mensualidades.</p>
+            <p className="mb-10 text-center text-sm text-muted">Pago único. Sin mensualidades. Dentro de un año, vas a desear haber empezado hoy.</p>
           </Aparece>
           <Suspense fallback={<div className="cristal h-96 rounded-3xl" />}>
             <SeccionOferta />
@@ -446,7 +479,9 @@ export default function VentasPage() {
             <h2 className="relative mx-auto max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
               Tu próximo nivel en la barbería <span className="texto-luz">empieza hoy.</span>
             </h2>
-            <p className="relative mx-auto mt-4 max-w-md text-muted">Cortes completos, clases en vivo, comunidad, certificado y bonos incluidos. Acceso inmediato.</p>
+            <p className="relative mx-auto mt-4 max-w-md text-muted">
+              Cortes completos, clases en vivo, comunidad, certificado y bonos incluidos. Acceso inmediato: la única diferencia entre el barbero que sos hoy y el que querés ser es haber empezado.
+            </p>
             <a href="#comprar" className={`${ui.boton} relative mt-8 px-8 py-3.5`}>
               Quiero mi lugar
             </a>

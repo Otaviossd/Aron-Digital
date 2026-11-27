@@ -154,7 +154,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
             </p>
           )}
           <p className="mb-6 text-sm leading-relaxed text-muted">
-            Te mostramos los precios y te mandamos el acceso por email apenas pagás.
+            Te mostramos los precios y te mandamos el acceso por email apenas pagás. Unite a los más de 2.500 barberos que ya se formaron con Aaron.
           </p>
 
           <label htmlFor="of-nombre" className="mb-1.5 block text-xs font-medium text-muted">
