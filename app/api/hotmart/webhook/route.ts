@@ -2,6 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendWelcomeEmail } from "@/lib/email";
 import { entornoHotmart, hottokValido, leerCompra, type MontosCompra } from "@/lib/hotmart";
+import { enviarCompraCapi } from "@/lib/metaCapi";
+
+// El envio a la Meta nunca puede frenar ni hacer fallar el procesamiento de la compra: si la Conversions
+// API está caída, sin token, o devuelve error, solo lo logueamos y seguimos.
+const avisarCompraMeta = (datos: Parameters<typeof enviarCompraCapi>[0]) =>
+  enviarCompraCapi(datos).catch((err) => console.error("meta capi", err));
 
 // 42703 = columna inexistente (Postgres), PGRST204 = columna inexistente en el caché de PostgREST
 const faltaColumna = (e: { code?: string }) => e.code === "42703" || e.code === "PGRST204";
@@ -61,6 +67,7 @@ async function procesar(admin: ReturnType<typeof createAdminClient>, evento: any
         const base = { transaction: c.transaccion, email: c.email };
         const r = await admin.from("extra_compras").upsert({ ...base, ...columnasMontos(c.montos) }, { onConflict: "transaction" });
         if (r.error && faltaColumna(r.error)) await admin.from("extra_compras").upsert(base, { onConflict: "transaction" });
+        await avisarCompraMeta({ email: c.email, valor: c.montos.bruto, moneda: c.montos.moneda, transaccion: c.transaccion });
         return;
       }
       const ahora = new Date();
@@ -93,6 +100,7 @@ async function procesar(admin: ReturnType<typeof createAdminClient>, evento: any
         await sendWelcomeEmail({ to: c.email, plan: c.plan });
         await admin.from("subscriptions").update({ welcome_sent_at: ahora.toISOString() }).eq("id", fila.id);
       }
+      await avisarCompraMeta({ email: c.email, valor: c.montos.bruto, moneda: c.montos.moneda, transaccion: c.transaccion });
       return;
     }
 
