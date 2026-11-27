@@ -150,7 +150,7 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
           <h3 className="mb-2 text-2xl font-semibold tracking-tight">Dejanos tus datos y mirá la oferta</h3>
           {promo && (
             <p className="mb-4 rounded-xl border border-accent/30 bg-accent/[0.07] px-4 py-3 text-sm font-medium text-ink">
-              Precio de lanzamiento activo: 50% OFF en el acceso vitalicio + el módulo <span className="text-accent">«{EXTRA.titulo}»</span> de regalo, solo para los primeros {PRECOS.promo.vagas} alumnos.
+              Precio de lanzamiento activo: 50% OFF en el acceso vitalicio + el módulo <span className="text-accent">«{EXTRA.titulo}»</span> de regalo, por tiempo limitado.
             </p>
           )}
           <p className="mb-6 text-sm leading-relaxed text-muted">
@@ -189,16 +189,11 @@ export default function Oferta({ vagasRestantes, promoFin }: { vagasRestantes: n
               <p className="text-base font-semibold text-ink">
                 50% OFF en el acceso vitalicio + el módulo <span className="text-accent">«{EXTRA.titulo}»</span> de regalo
               </p>
-              <p className="mt-1 text-sm font-semibold text-accent">Solo para los primeros {PRECOS.promo.vagas} alumnos</p>
-              <p className="mt-1 text-xs text-muted">3 días o hasta agotar los cupos, lo que ocurra primero. Después vuelve al precio normal y el módulo extra se cobra aparte.</p>
+              <p className="mt-1 text-sm font-semibold text-accent">Cupos limitados</p>
+              <p className="mt-1 text-xs text-muted">Por tiempo limitado o hasta agotar los cupos, lo que ocurra primero. Después vuelve al precio normal y el módulo extra se cobra aparte.</p>
               <div className="mt-3">
                 <CuentaRegresiva fin={promoFin} />
               </div>
-              {vagasRestantes <= PRECOS.promo.vagas - PRECOS.promo.mostrarCuposDesde && (
-                <p className="mt-3 text-sm text-ink">
-                  Quedan <strong className="text-accent">{vagasRestantes}</strong> de {PRECOS.promo.vagas} cupos
-                </p>
-              )}
             </div>
           )}
           <p className="mb-6 text-sm text-muted">
