@@ -1,58 +1,159 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import OfertaTrial from "@/components/OfertaTrial";
+import Oferta from "@/components/Oferta";
 import Rastreo from "@/components/Rastreo";
 import Aparece from "@/components/Aparece";
 import BarraMovil from "@/components/BarraMovil";
 import VideoHero from "@/components/ventas/VideoHero";
 import Recorrido, { type Escena } from "@/components/ventas/Recorrido";
-import { BRAND, DIAS_UPGRADE_TRIAL, PRECOS } from "@/lib/config";
+import Contador from "@/components/ventas/Contador";
+import CuentaCorta from "@/components/ventas/CuentaCorta";
+import { vagasPromoRestantes } from "@/lib/promo";
+import { BRAND, DIAS_BONO, DIAS_REEMBOLSO, EXTRA, PRECOS, PROMO_FIN } from "@/lib/config";
 import { FOTOS } from "@/lib/fotos";
 import { ui } from "@/lib/ui";
 
 export const metadata: Metadata = {
-  title: "Accedé al curso por US$1 | Aaron Dalla Rosa",
-  description: "Experimentá el curso de barbería de Aaron Dalla Rosa por US$1 y mirá la plataforma por dentro, antes de ir por el acceso completo.",
+  title: "Curso de Barbería | Aaron Dalla Rosa",
+  description:
+    "Aprendé barbería de verdad con Aaron Dalla Rosa, barbero educador internacional. Cortes completos en video, clases en vivo, comunidad y certificado. Pago único y acceso inmediato.",
 };
 
-// Funil de entrada directo: $1 para entrar y ver el Módulo 1 completo + 2 clases del Módulo 2.
-// Página corta a propósito — el objetivo es que la persona entre y vea la plataforma por dentro,
-// no venderle todo el curso acá (eso lo hace el banner de upgrade una vez que ya está adentro).
+// Contenido editable (cambiá los textos acá, sin tocar el diseño).
+const CINTA = ["Pago único", "Acceso inmediato", "Clases en vivo", "Comunidad de barberos", "Certificado", "Bonos incluidos", "Desde el celular", "Reembolso de 7 días"];
 
-const CINTA = ["Acceso inmediato", "Probá el curso por dentro", "Desde el celular", "Sin mensualidades", "Pasá al curso completo cuando quieras"];
+// Los números suben de 0 al valor cuando entran en pantalla.
+const NUMEROS = [
+  { valor: 2500, prefijo: "+", sufijo: "", t: "barberos formados" },
+  { valor: 6, prefijo: "", sufijo: " países", t: "con cursos presenciales" },
+  { valor: 5, prefijo: "", sufijo: " cortes", t: "completos, paso a paso" },
+  { valor: 1, prefijo: "", sufijo: " pago", t: "sin mensualidades" },
+];
 
+// "El curso por dentro": capturas reales de la plataforma, vista del alumno (imágenes en /public/curso).
 const ESCENAS: Escena[] = [
-  { id: "inicio", titulo: "Tu inicio", texto: "Entrás y ves tu progreso, las clases en vivo, la comunidad y tu certificado, a un toque." },
-  { id: "modulos", titulo: "Módulos y bonos", texto: "Así se ve el curso ordenado por módulos — con el Módulo 1 y el arranque del Módulo 2 ya abiertos para vos.", dimsD: [1800, 1265] },
-  { id: "clase", titulo: "La clase", texto: "El video, la lista de clases del módulo y los comentarios para dejar tus dudas." },
+  { id: "inicio", titulo: "Tu inicio", texto: "Entrás y seguís donde te quedaste. Tu progreso, las clases en vivo, la comunidad y tu certificado, a un toque." },
+  { id: "modulos", titulo: "Módulos y bonos", texto: "Todo el curso ordenado por módulos. Los bonos y algunas clases se abren solos con los días de tu compra.", dimsD: [1800, 1265] },
+  { id: "clase", titulo: "La clase", texto: "El video, la lista de clases del módulo y los comentarios para dejar tus dudas. Marcás la clase como completada y avanzás." },
+  { id: "certificado", titulo: "Tu certificado", texto: "Al completar el 100 % descargás tu certificado en PDF, con un código que cualquiera puede verificar." },
+];
+
+const RUTA = [
+  { t: "Bienvenida", d: "Cómo entrar, cómo funciona la plataforma y cómo aprovechar el curso desde el primer día." },
+  { t: "Fundamentos de la barbería", d: "Anatomía del cráneo, planos, grados y elevaciones, tipos de cabello, formas y texturas: la base técnica antes de tomar la tijera." },
+  { t: "Corte completo 1", d: "Cómo es el corte, qué herramientas usar y el paso a paso en partes, hasta el acabado." },
+  { t: "Corte completo 2", d: "Otro corte de principio a fin, en partes cortas para pausar, repetir y practicar." },
+  { t: "Corte completo 3", d: "El tercer corte, con el mismo método y los errores más comunes." },
+  { t: "Corte completo 4", d: "Un corte más, de principio a fin y en partes, para sumar un estilo nuevo a tu repertorio." },
+  { t: "Corte completo 5", d: "El quinto corte de la ruta, con el mismo método paso a paso — y la lista sigue creciendo con cada actualización." },
+];
+
+const BONOS = [
+  { t: "Color", d: "Teoría del color, decoloración, mechas y matizado para barberos." },
+  { t: "Mentalidad y motivación", d: "Hábitos, números y mentalidad para vivir bien de la barbería." },
 ];
 
 const INCLUYE = [
-  { t: "Entrás a la plataforma", d: "Mirás el curso por tu cuenta, desde adentro, antes de decidir si vas por el acceso completo." },
-  { t: "Ves el método de Aaron", d: "Clases reales, paso a paso, tal como las ve cualquier alumno del curso." },
-  { t: "Acceso inmediato", d: "Pagás y te llega el acceso por email al instante. Entrás desde el celular, la tablet o la computadora." },
+  { t: "Clases en video, paso a paso", d: "Clases cortas y en orden. La plataforma guarda tu avance y te lleva a donde te quedaste." },
+  { t: "Clases en vivo con Aaron", d: "Preguntás por el chat y Aaron responde en directo. La grabación queda guardada en el curso." },
+  { t: "Tus dudas, respondidas", d: "Debajo de cada clase dejás tu pregunta. Las respuestas de Aaron aparecen marcadas como Instructor." },
+  { t: "Comunidad de barberos", d: "Compartí tus cortes, mirá los de otros y aprendé con barberos de distintos países." },
+  { t: "Certificado al terminar", d: "Completás el 100 % y descargás tu certificado en PDF, con un código de verificación." },
+  { t: "Desde cualquier lugar", d: "Pagás y te llega el acceso por email. Celular, tablet o computadora: seguís donde te quedaste." },
+];
+
+const PARA_QUIEN = [
+  "Estás empezando y querés una base sólida y ordenada.",
+  "Ya cortás y querés perfeccionar tu técnica y cobrar mejor.",
+  "Querés aprender de alguien que enseña lo que hace todos los días.",
+];
+
+// Sección de agitación del problema, antes de mostrar la plataforma: nombra el dolor real
+// (aprender suelto, sin orden, estancado) para que la persona sienta que esto es justo lo que le falta.
+const PROBLEMAS = [
+  "Mirás tutoriales sueltos en YouTube y cada uno te enseña algo distinto, sin una base real detrás.",
+  "Un corte te sale bien una vez, pero no podés repetirlo con seguridad ni explicar por qué funcionó.",
+  "Sentís que estás estancado: los mismos cortes, los mismos precios, los mismos clientes de siempre.",
 ];
 
 const PREGUNTAS = [
-  { q: "¿Qué veo exactamente por US$1?", r: "El Módulo 1 completo (fundamentos de la barbería) y las primeras 2 clases del Módulo 2. El resto del curso queda bloqueado hasta que decidas pasar al acceso completo." },
-  { q: "¿Cuándo recibo el acceso?", r: "Apenas se confirma el pago te llega un email con un botón para entrar. Entrás con ese mismo email." },
-  { q: "¿Y si quiero el curso completo?", r: `Tenés ${DIAS_UPGRADE_TRIAL} días desde que entrás para pasar al acceso vitalicio completo al precio de lanzamiento, con todos los bonos. Lo ves directo desde adentro de la plataforma.` },
-  { q: "¿Es un pago único?", r: "Sí. No hay mensualidades ni renovaciones automáticas." },
+  { q: "¿Cuándo recibo el acceso?", r: "Apenas se confirma el pago te llega un email con un botón para entrar. Entrás con ese mismo email: tocás el botón del email y entrás directo." },
+  { q: "¿Puedo comprar desde mi país?", r: "Sí. El curso es 100 % online y está en español. El precio está en dólares y en la página de pago ves los medios disponibles en tu país." },
+  { q: "¿Es un pago único?", r: "Sí. No hay mensualidades ni renovaciones automáticas. Pagás una vez." },
+  { q: "¿Qué diferencia hay entre el acceso de 1 año y el vitalicio?", r: "Con el de 1 año tenés el curso por 12 meses desde tu compra. Con el vitalicio es para siempre, e incluye todas las actualizaciones y clases nuevas." },
+  { q: "¿Cómo funcionan las clases en vivo?", r: "Se anuncian dentro de la plataforma. Entrás, participás por el chat y Aaron responde en directo. Si no podés estar, la grabación queda guardada en el curso." },
+  { q: "¿Dan certificado?", r: "Sí. Al completar el 100 % de las clases escribís tu nombre completo y descargás tu certificado en PDF, con un código que cualquiera puede verificar en nuestra página." },
+  { q: "¿Cuándo se abren los bonos?", r: `Los bonos y algunas clases se liberan ${DIAS_BONO} días después de tu compra. Los ves en tu panel con el candado y el tiempo que falta.` },
+  { q: "¿Sirve si recién empiezo?", r: "Sí. El camino va de lo básico a lo avanzado, en orden, para que no te saltees nada." },
+  { q: "¿Desde dónde lo veo?", r: "Desde el celular, la tablet o la computadora, cuando quieras." },
+  { q: "¿Puedo pedir reembolso?", r: `Sí, tenés ${DIAS_REEMBOLSO} días desde tu compra. Escribinos a soporte dentro de ese plazo y lo gestionamos.` },
 ];
+
+const Candado = ({ className = "h-4 w-4" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+  </svg>
+);
+
+const Check = () => (
+  <svg viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 shrink-0 text-accent" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M8 12.5l2.7 2.7L16 9.8" />
+  </svg>
+);
+
+const PILDORA = "hero-in mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1.5 text-xs font-medium text-accent";
+const PUNTO = (
+  <span className="relative flex h-2 w-2">
+    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+    <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+  </span>
+);
+
+async function PildoraHero() {
+  const restantes = await vagasPromoRestantes();
+  if (restantes <= 0) {
+    return (
+      <p className={PILDORA} style={{ ["--d" as string]: "200ms" }}>
+        {PUNTO}
+        Curso online de barbería · Inscripciones abiertas
+      </p>
+    );
+  }
+
+  const ahorroCurso = PRECOS.vitalicio.valor - PRECOS.promo.valor;
+  const ahorroTotal = ahorroCurso + EXTRA.valorAntes;
+
+  return (
+    <div
+      className="hero-in relative mb-6 inline-flex flex-col gap-2 overflow-hidden rounded-2xl border border-accent/70 bg-gradient-to-br from-accent/25 via-accent/10 to-transparent px-5 py-4 shadow-[0_0_90px_-18px_rgba(57,255,126,.85)] sm:px-6 sm:py-5"
+      style={{ ["--d" as string]: "200ms" }}
+    >
+      <span className="flex items-start gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent sm:text-xs">
+        <span className="mt-[3px] shrink-0">{PUNTO}</span>
+        <span>
+          Oferta de lanzamiento · termina en <CuentaCorta fin={PROMO_FIN} />
+        </span>
+      </span>
+      <span className="text-[17px] font-bold leading-snug tracking-tight text-ink sm:text-xl">
+        50% OFF + regalo de US${EXTRA.valorAntes}
+        <span className="mt-0.5 block text-accent">Más de US${ahorroTotal} en beneficios, hoy</span>
+      </span>
+    </div>
+  );
+}
+
+async function SeccionOferta() {
+  const restantes = await vagasPromoRestantes();
+  return <Oferta vagasRestantes={restantes} promoFin={PROMO_FIN} />;
+}
 
 export default function VentasPage() {
   return (
     <main className="touch-pan-y overflow-x-clip">
       <Rastreo path="/ventas" />
-
-      {/* Barra de precio, fija arriba de todo */}
-      <a
-        href="#comprar"
-        className="sticky top-0 z-30 flex items-center justify-center gap-2 bg-accent px-4 py-2.5 text-center text-sm font-bold tracking-tight text-black transition hover:brightness-95"
-      >
-        <span className="hidden sm:inline">⚡ Oferta de entrada:</span> Accedé al curso por solo US${PRECOS.trial.valor} →
-      </a>
 
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
@@ -77,29 +178,32 @@ export default function VentasPage() {
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-16 pt-6 lg:grid-cols-[1.05fr_.95fr] lg:pb-24 lg:pt-10">
           <div className="hero-in cristal relative overflow-hidden rounded-3xl p-7 sm:p-10" style={{ ["--d" as string]: "80ms" }}>
             <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
-            <p className="hero-in mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1.5 text-xs font-medium text-accent" style={{ ["--d" as string]: "200ms" }}>
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-              </span>
-              Probalo vos mismo · solo US${PRECOS.trial.valor}
-            </p>
+            <Suspense
+              fallback={
+                <p className={PILDORA} style={{ ["--d" as string]: "200ms" }}>
+                  {PUNTO}
+                  Curso online de barbería · Inscripciones abiertas
+                </p>
+              }
+            >
+              <PildoraHero />
+            </Suspense>
             <h1 className="hero-in text-[clamp(2.1rem,4.8vw,3.6rem)] font-semibold leading-[1.04] tracking-[-0.03em]" style={{ ["--d" as string]: "280ms" }}>
-              Experimentá el curso <span className="texto-luz">por US${PRECOS.trial.valor}.</span>
+              Aprendé barbería <span className="texto-luz">de verdad,</span> paso a paso.
             </h1>
             <p className="hero-in mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg" style={{ ["--d" as string]: "380ms" }}>
-              Entrá ya a la plataforma del curso de Aaron Dalla Rosa, barbero educador internacional, y mirá por tu cuenta cómo enseña — por dentro, con tu propio acceso.
+              No es un curso más de YouTube. Es la ruta completa que usó Aaron Dalla Rosa, barbero educador internacional, para formar a más de 2.500 barberos en 6 países: cortes completos en video, clases en vivo, comunidad y certificado, directo en tu celular.
             </p>
             <div className="hero-in mt-8 flex flex-wrap items-center gap-4" style={{ ["--d" as string]: "480ms" }}>
               <a href="#comprar" className={`${ui.boton} w-full sm:w-auto sm:px-8 sm:py-3.5`}>
-                Experimentar por US${PRECOS.trial.valor}
+                Quiero mi lugar
               </a>
               <a href="#por-dentro" className="px-2 py-3 text-sm font-medium text-muted transition hover:text-ink">
                 Ver el curso por dentro ↓
               </a>
             </div>
             <ul className="hero-in mt-7 flex flex-wrap gap-x-5 gap-y-2 border-t border-white/10 pt-5 text-sm text-muted" style={{ ["--d" as string]: "580ms" }}>
-              {["Acceso inmediato", "Sin mensualidades", "Pasá al curso completo cuando quieras"].map((x) => (
+              {["Pago único", "Acceso inmediato", `Garantía de ${DIAS_REEMBOLSO} días`].map((x) => (
                 <li key={x} className="flex items-center gap-2">
                   <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-accent" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M5 12.5l4.5 4.5L19 7.5" />
@@ -108,10 +212,14 @@ export default function VentasPage() {
                 </li>
               ))}
             </ul>
+            <p className="hero-in mt-4 max-w-md text-xs italic leading-relaxed text-faint" style={{ ["--d" as string]: "640ms" }}>
+              Cada mes que pasás cortando a prueba y error es un mes en el que un cliente elige a otro barbero mejor formado que vos.
+            </p>
           </div>
 
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
             <div aria-hidden="true" className="respirar absolute left-1/2 top-[42%] h-[34rem] w-[34rem] max-w-[140%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(57,255,126,.5),rgba(57,255,126,.2)_45%,rgba(57,255,126,.06)_72%,transparent)]" />
+            {/* Anillo fino con un arco de luz que lo recorre despacio */}
             <svg aria-hidden="true" viewBox="0 0 100 100" className="absolute left-1/2 top-[40%] hidden h-[32rem] w-[32rem] -translate-x-1/2 -translate-y-1/2 overflow-visible sm:block">
               <circle cx="50" cy="50" r="49.6" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="0.25" />
               <circle cx="50" cy="50" r="49.6" fill="none" stroke="#39ff7e" strokeWidth="0.5" strokeLinecap="round" strokeDasharray="34 278" className="anillo-giro" />
@@ -126,15 +234,6 @@ export default function VentasPage() {
               className="hero-foto foto-fundida relative z-10 mx-auto h-auto max-h-[42rem] w-auto max-w-full object-contain"
             />
             <VideoHero url={process.env.NEXT_PUBLIC_VIDEO_VENTAS} />
-            {/* Etiqueta de precio, bien grande y clavada sobre la foto */}
-            <a
-              href="#comprar"
-              className="hero-in absolute -right-1 top-6 z-20 flex -rotate-6 flex-col items-center rounded-2xl border-2 border-black/20 bg-accent px-5 py-3 text-black shadow-[0_18px_45px_-10px_rgba(57,255,126,.75)] transition hover:rotate-0 sm:right-4"
-              style={{ ["--d" as string]: "160ms" }}
-            >
-              <span className="text-[10px] font-bold uppercase tracking-wider">Entrá por</span>
-              <span className="text-4xl font-black leading-none tracking-tight sm:text-5xl">US${PRECOS.trial.valor}</span>
-            </a>
           </div>
         </div>
       </section>
@@ -151,6 +250,44 @@ export default function VentasPage() {
         </div>
       </div>
 
+      {/* Números */}
+      <section className="mx-auto max-w-6xl px-6 pt-20">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {NUMEROS.map((x, i) => (
+            <Aparece key={x.t} retraso={i * 80}>
+              <div className="cristal h-full rounded-2xl p-5 text-center">
+                <p className="text-2xl font-semibold tracking-tight text-accent sm:text-3xl">
+                  <Contador valor={x.valor} prefijo={x.prefijo} sufijo={x.sufijo} />
+                </p>
+                <p className="mt-1 text-xs text-muted sm:text-sm">{x.t}</p>
+              </div>
+            </Aparece>
+          ))}
+        </div>
+      </section>
+
+      {/* Agitación del problema: nombra el dolor real antes de mostrar la solución */}
+      <section className="mx-auto max-w-4xl px-6 pt-24">
+        <Aparece>
+          <p className="mb-3 text-center text-sm font-medium text-accent">¿Te pasa esto?</p>
+          <h2 className="mx-auto max-w-2xl text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            Aprendiste solo, a los golpes — <span className="texto-luz">y sabés que podrías cobrar más.</span>
+          </h2>
+        </Aparece>
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          {PROBLEMAS.map((p, i) => (
+            <Aparece key={p} retraso={i * 80}>
+              <div className="cristal h-full rounded-2xl p-5 text-sm leading-relaxed text-muted">{p}</div>
+            </Aparece>
+          ))}
+        </div>
+        <Aparece retraso={240}>
+          <p className="mx-auto mt-10 max-w-xl text-center leading-relaxed text-muted">
+            Esto no se arregla con más videos sueltos. Se arregla con una ruta clara, de principio a fin, de alguien que ya formó a miles de barberos. Es lo que vas a ver acá abajo.
+          </p>
+        </Aparece>
+      </section>
+
       {/* El curso por dentro: capturas reales de la plataforma */}
       <section id="por-dentro" className="relative mx-auto max-w-6xl scroll-mt-8 px-6 pt-24">
         <Aparece>
@@ -165,12 +302,70 @@ export default function VentasPage() {
         </Aparece>
       </section>
 
-      {/* Qué incluye el US$1 */}
+      {/* Ruta del curso */}
+      <section id="ruta" className="relative mx-auto max-w-6xl scroll-mt-8 px-6 py-24">
+        <div aria-hidden="true" className="absolute -left-32 top-10 h-80 w-80 rounded-full bg-accent/10 blur-[110px]" />
+        <div className="relative grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
+          <Aparece>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Un camino claro, <span className="texto-luz">de principio a fin.</span>
+            </h2>
+            <p className="mt-5 max-w-md leading-relaxed text-muted">
+              Primero lo fundamental; después tres cortes completos, cada uno en partes cortas, donde ves a Aaron trabajar de principio a fin. Algunas clases se abren con los días de tu compra, para que
+              avances en orden y sin saltearte la base.
+            </p>
+          </Aparece>
+          <ol className="space-y-3">
+            {RUTA.map((m, i) => (
+              <Aparece key={m.t} retraso={i * 70}>
+                <li className="cristal group flex items-start gap-4 rounded-2xl p-5 transition duration-300 hover:border-accent/40 hover:shadow-[0_20px_60px_-20px_rgba(57,255,126,.35)]">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-accent/30 bg-accent/10 text-sm font-semibold text-accent">{i + 1}</span>
+                  <div>
+                    <p className="text-xs font-medium text-faint">Módulo {i + 1}</p>
+                    <h3 className="font-medium tracking-tight">{m.t}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted">{m.d}</p>
+                  </div>
+                </li>
+              </Aparece>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Bonos */}
+      <section className="relative border-y border-white/10 bg-white/[0.015]">
+        <div aria-hidden="true" className="absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-cyan-400/10 blur-[120px]" />
+        <div className="relative mx-auto max-w-6xl px-6 py-24">
+          <Aparece>
+            <p className="mb-3 text-sm font-medium text-accent">Incluidos sin costo</p>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Dos <span className="texto-luz">bonos</span> de regalo
+            </h2>
+            <p className="mt-3 max-w-lg text-muted">Se desbloquean a los {DIAS_BONO} días de tu acceso.</p>
+          </Aparece>
+          <div className="mt-12 grid gap-4 sm:grid-cols-2">
+            {BONOS.map((b, i) => (
+              <Aparece key={b.t} retraso={i * 100}>
+                <div className="cristal relative h-full overflow-hidden rounded-3xl p-7">
+                  <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/20 blur-3xl" />
+                  <span className="relative mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+                    <Candado className="h-3.5 w-3.5" /> Bono · se abre a los {DIAS_BONO} días
+                  </span>
+                  <h3 className="relative text-2xl font-semibold tracking-tight">{b.t}</h3>
+                  <p className="relative mt-2 text-sm leading-relaxed text-muted">{b.d}</p>
+                </div>
+              </Aparece>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Qué incluye */}
       <section className="mx-auto max-w-6xl px-6 py-24">
         <Aparece>
-          <h2 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">Qué te llevás por US${PRECOS.trial.valor}</h2>
+          <h2 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">No es un curso más de YouTube: es una academia completa.</h2>
         </Aparece>
-        <div className="mt-12 grid gap-4 sm:grid-cols-3">
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {INCLUYE.map((i, n) => (
             <Aparece key={i.t} retraso={n * 70}>
               <div className="h-full rounded-2xl border border-accent/20 bg-gradient-to-b from-accent/[0.08] to-transparent p-6">
@@ -180,6 +375,44 @@ export default function VentasPage() {
               </div>
             </Aparece>
           ))}
+        </div>
+      </section>
+
+      {/* Quién es Aaron */}
+      <section className="relative border-t border-white/10">
+        <div aria-hidden="true" className="absolute left-0 top-1/3 h-96 w-96 rounded-full bg-accent/15 blur-[130px]" />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 md:grid-cols-2">
+          <Aparece className="relative mx-auto w-full max-w-md">
+            <div aria-hidden="true" className="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-accent/50 via-transparent to-cyan-400/30 blur-xl" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={FOTOS.clase}
+              alt="Aaron dando una clase"
+              width={912}
+              height={1368}
+              loading="lazy"
+              className="relative aspect-[4/5] w-full rounded-3xl border border-white/15 object-cover object-[center_20%]"
+            />
+          </Aparece>
+          <Aparece retraso={100}>
+            <p className="mb-3 text-sm font-medium text-accent">Quién es Aaron</p>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Un barbero que enseña lo que hace todos los días.</h2>
+            <p className="mt-5 max-w-md leading-relaxed text-muted">
+              Aaron Dalla Rosa es barbero y educador internacional. Más de 2.500 barberos pasaron por sus clases en 6 países y ahora lleva ese método a una plataforma online, con clases en video, clases en vivo y una comunidad de barberos.
+            </p>
+            <h3 className="mb-4 mt-10 text-lg font-medium tracking-tight">Es para vos si...</h3>
+            <ul className="space-y-3">
+              {PARA_QUIEN.map((p) => (
+                <li key={p} className="flex items-start gap-3 text-sm text-muted">
+                  <Check />
+                  {p}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-faint">
+              No es para quien busca fórmulas mágicas o resultados sin esfuerzo.
+            </p>
+          </Aparece>
         </div>
       </section>
 
@@ -195,13 +428,28 @@ export default function VentasPage() {
         <div className="mx-auto max-w-xl px-6 py-24">
           <Aparece>
             <h2 className="mb-3 text-center text-3xl font-semibold tracking-tight sm:text-4xl">
-              Entrá hoy por <span className="texto-luz">US${PRECOS.trial.valor}.</span>
+              Entrá hoy. <span className="texto-luz">Empezá ya.</span>
             </h2>
-            <p className="mb-10 text-center text-sm text-muted">Sin vueltas: pagás US${PRECOS.trial.valor} y entrás ya a probar el curso por tu cuenta.</p>
+            <p className="mb-10 text-center text-sm text-muted">Pago único. Sin mensualidades. Dentro de un año, vas a desear haber empezado hoy.</p>
           </Aparece>
           <Suspense fallback={<div className="cristal h-96 rounded-3xl" />}>
-            <OfertaTrial />
+            <SeccionOferta />
           </Suspense>
+
+          <div className="cristal mt-6 flex items-start gap-4 rounded-2xl p-5">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" />
+                <path d="M8.5 12.5l2.5 2.5 4.5-5" />
+              </svg>
+            </span>
+            <div>
+              <p className="font-medium tracking-tight">Garantía de {DIAS_REEMBOLSO} días</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">
+                Si en los primeros {DIAS_REEMBOLSO} días sentís que no es para vos, escribinos a soporte y te devolvemos tu pago.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -229,11 +477,13 @@ export default function VentasPage() {
           <div className="cristal relative overflow-hidden rounded-3xl px-6 py-14 text-center sm:px-12">
             <div aria-hidden="true" className="respirar absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/30 blur-[100px]" />
             <h2 className="relative mx-auto max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              Mirá el curso por dentro, <span className="texto-luz">hoy mismo.</span>
+              Tu próximo nivel en la barbería <span className="texto-luz">empieza hoy.</span>
             </h2>
-            <p className="relative mx-auto mt-4 max-w-md text-muted">Experimentá el curso por US${PRECOS.trial.valor}. Acceso inmediato por email.</p>
+            <p className="relative mx-auto mt-4 max-w-md text-muted">
+              Cortes completos, clases en vivo, comunidad, certificado y bonos incluidos. Acceso inmediato: la única diferencia entre el barbero que sos hoy y el que querés ser es haber empezado.
+            </p>
             <a href="#comprar" className={`${ui.boton} relative mt-8 px-8 py-3.5`}>
-              Experimentar por US${PRECOS.trial.valor}
+              Quiero mi lugar
             </a>
           </div>
         </Aparece>
@@ -248,7 +498,7 @@ export default function VentasPage() {
         </div>
       </footer>
 
-      <BarraMovil texto={`Experimentar por US$${PRECOS.trial.valor}`} />
+      <BarraMovil texto="Quiero ver la oferta" />
     </main>
   );
 }
