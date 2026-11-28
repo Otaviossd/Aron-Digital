@@ -67,12 +67,12 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
     ...(instagramUrl ? [{ href: instagramUrl, label: "Instagram", icono: "instagram", externo: true }] : []),
     ...(esAdmin ? [{ href: "/admin", label: "Panel del equipo", icono: "admin" }] : []),
     ...(esAdmin
-      ? vistaAlumno || vistaTrialPreview
-        ? [{ href: "/aulas/vista", label: "Salir de vista alumno", icono: "ayuda", externo: false, recarga: true }]
-        : [
-            { href: "/aulas/vista?modo=nuevo", label: "Ver como alumno nuevo", icono: "ayuda", externo: false, recarga: true },
-            { href: "/aulas/vista?modo=trial", label: "Ver como alumno de US$1", icono: "ayuda", externo: false, recarga: true },
-          ]
+      ? [
+          vistaAlumno || vistaTrialPreview
+            ? { href: "/aulas/vista", label: "Salir de vista alumno", icono: "ayuda", externo: false, recarga: true }
+            // El funil oficial es el de US$1: "alumno nuevo" ahora muestra esa experiencia.
+            : { href: "/aulas/vista?modo=trial", label: "Ver como alumno nuevo", icono: "ayuda", externo: false, recarga: true },
+        ]
       : []),
   ];
 
