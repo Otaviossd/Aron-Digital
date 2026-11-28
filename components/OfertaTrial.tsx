@@ -106,7 +106,7 @@ export default function OfertaTrial() {
           </p>
           {error && <p className="mb-4 text-sm text-red-300">{error}</p>}
           <button disabled={enviando} className={`${ui.boton} w-full disabled:opacity-60`}>
-            {enviando ? "Un momento…" : `Continuar · US$${PRECOS.trial.valor}`}
+            {enviando ? "Un momento…" : `Desbloqueá tu acceso por US$${PRECOS.trial.valor}`}
           </button>
         </form>
       ) : (
