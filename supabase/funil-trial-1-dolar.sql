@@ -11,6 +11,10 @@ alter table public.subscriptions add constraint subscriptions_plan_check check (
 alter table public.modules add column if not exists incluido_en_prueba boolean not null default false;
 alter table public.lessons add column if not exists incluido_en_prueba boolean not null default false;
 
+-- 2b) unlock_at_min también puede no existir todavía (la crea supabase/modulo3-4-piso-manana.sql,
+--     pero si ese archivo no se corrió antes, este de acá lo necesita igual más abajo).
+alter table public.modules add column if not exists unlock_at_min timestamptz;
+
 update public.modules set incluido_en_prueba = true where position = 1;
 update public.lessons l set incluido_en_prueba = true
 from public.modules m
