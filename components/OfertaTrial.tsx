@@ -113,8 +113,8 @@ export default function OfertaTrial() {
         <div>
           <h3 className="mb-2 text-2xl font-semibold tracking-tight">{nombre ? `${nombre.split(" ")[0]}, ya casi` : "Ya casi"}</h3>
           <p className="mb-6 text-sm leading-relaxed text-muted">
-            Por US${PRECOS.trial.valor} accedés ya al Módulo 1 completo y a las primeras 2 clases del Módulo 2. Si te gusta lo que ves, tenés {DIAS_UPGRADE_TRIAL} días para pasar al
-            acceso vitalicio completo al precio de lanzamiento, desde adentro de la plataforma.
+            Por US${PRECOS.trial.valor} ya entrás a probar el curso por tu cuenta. Si te gusta lo que ves, tenés {DIAS_UPGRADE_TRIAL} días para pasar al acceso vitalicio completo al precio de
+            lanzamiento, desde adentro de la plataforma.
           </p>
           {href ? (
             <a

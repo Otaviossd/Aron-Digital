@@ -13,14 +13,14 @@ import { ui } from "@/lib/ui";
 
 export const metadata: Metadata = {
   title: "Accedé al curso por US$1 | Aaron Dalla Rosa",
-  description: "Entrá al Módulo 1 completo y a las primeras 2 clases del Módulo 2 por US$1, y mirá la plataforma del curso de barbería de Aaron Dalla Rosa por dentro.",
+  description: "Experimentá el curso de barbería de Aaron Dalla Rosa por US$1 y mirá la plataforma por dentro, antes de ir por el acceso completo.",
 };
 
 // Funil de entrada directo: $1 para entrar y ver el Módulo 1 completo + 2 clases del Módulo 2.
 // Página corta a propósito — el objetivo es que la persona entre y vea la plataforma por dentro,
 // no venderle todo el curso acá (eso lo hace el banner de upgrade una vez que ya está adentro).
 
-const CINTA = ["Acceso inmediato", "Módulo 1 completo", "2 clases del Módulo 2", "Desde el celular", "Sin mensualidades"];
+const CINTA = ["Acceso inmediato", "Probá el curso por dentro", "Desde el celular", "Sin mensualidades", "Pasá al curso completo cuando quieras"];
 
 const ESCENAS: Escena[] = [
   { id: "inicio", titulo: "Tu inicio", texto: "Entrás y ves tu progreso, las clases en vivo, la comunidad y tu certificado, a un toque." },
@@ -29,8 +29,8 @@ const ESCENAS: Escena[] = [
 ];
 
 const INCLUYE = [
-  { t: "Módulo 1 completo", d: "Fundamentos de la barbería: anatomía del cráneo, planos, grados y elevaciones, tipos de cabello, formas y texturas." },
-  { t: "2 clases del Módulo 2", d: "El arranque del primer corte completo, para que veas el método de Aaron en acción." },
+  { t: "Entrás a la plataforma", d: "Mirás el curso por tu cuenta, desde adentro, antes de decidir si vas por el acceso completo." },
+  { t: "Ves el método de Aaron", d: "Clases reales, paso a paso, tal como las ve cualquier alumno del curso." },
   { t: "Acceso inmediato", d: "Pagás y te llega el acceso por email al instante. Entrás desde el celular, la tablet o la computadora." },
 ];
 
@@ -45,6 +45,14 @@ export default function VentasPage() {
   return (
     <main className="touch-pan-y overflow-x-clip">
       <Rastreo path="/ventas" />
+
+      {/* Barra de precio, fija arriba de todo */}
+      <a
+        href="#comprar"
+        className="sticky top-0 z-30 flex items-center justify-center gap-2 bg-accent px-4 py-2.5 text-center text-sm font-bold tracking-tight text-black transition hover:brightness-95"
+      >
+        <span className="hidden sm:inline">⚡ Oferta de entrada:</span> Accedé al curso por solo US${PRECOS.trial.valor} →
+      </a>
 
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
@@ -74,17 +82,17 @@ export default function VentasPage() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
               </span>
-              Entrada al curso · solo US${PRECOS.trial.valor}
+              Probalo vos mismo · solo US${PRECOS.trial.valor}
             </p>
             <h1 className="hero-in text-[clamp(2.1rem,4.8vw,3.6rem)] font-semibold leading-[1.04] tracking-[-0.03em]" style={{ ["--d" as string]: "280ms" }}>
-              Accedé al <span className="texto-luz">Módulo 1 y 2</span> por US${PRECOS.trial.valor}.
+              Experimentá el curso <span className="texto-luz">por US${PRECOS.trial.valor}.</span>
             </h1>
             <p className="hero-in mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg" style={{ ["--d" as string]: "380ms" }}>
-              Entrá ya a la plataforma del curso de Aaron Dalla Rosa, barbero educador internacional. Mirá el Módulo 1 completo y las primeras 2 clases del Módulo 2 — por dentro, con tu propio acceso.
+              Entrá ya a la plataforma del curso de Aaron Dalla Rosa, barbero educador internacional, y mirá por tu cuenta cómo enseña — por dentro, con tu propio acceso.
             </p>
             <div className="hero-in mt-8 flex flex-wrap items-center gap-4" style={{ ["--d" as string]: "480ms" }}>
               <a href="#comprar" className={`${ui.boton} w-full sm:w-auto sm:px-8 sm:py-3.5`}>
-                Entrar por US${PRECOS.trial.valor}
+                Experimentar por US${PRECOS.trial.valor}
               </a>
               <a href="#por-dentro" className="px-2 py-3 text-sm font-medium text-muted transition hover:text-ink">
                 Ver el curso por dentro ↓
@@ -118,6 +126,15 @@ export default function VentasPage() {
               className="hero-foto foto-fundida relative z-10 mx-auto h-auto max-h-[42rem] w-auto max-w-full object-contain"
             />
             <VideoHero url={process.env.NEXT_PUBLIC_VIDEO_VENTAS} />
+            {/* Etiqueta de precio, bien grande y clavada sobre la foto */}
+            <a
+              href="#comprar"
+              className="hero-in absolute -right-1 top-6 z-20 flex -rotate-6 flex-col items-center rounded-2xl border-2 border-black/20 bg-accent px-5 py-3 text-black shadow-[0_18px_45px_-10px_rgba(57,255,126,.75)] transition hover:rotate-0 sm:right-4"
+              style={{ ["--d" as string]: "160ms" }}
+            >
+              <span className="text-[10px] font-bold uppercase tracking-wider">Entrá por</span>
+              <span className="text-4xl font-black leading-none tracking-tight sm:text-5xl">US${PRECOS.trial.valor}</span>
+            </a>
           </div>
         </div>
       </section>
@@ -180,7 +197,7 @@ export default function VentasPage() {
             <h2 className="mb-3 text-center text-3xl font-semibold tracking-tight sm:text-4xl">
               Entrá hoy por <span className="texto-luz">US${PRECOS.trial.valor}.</span>
             </h2>
-            <p className="mb-10 text-center text-sm text-muted">Sin vueltas: pagás US${PRECOS.trial.valor} y accedés ya al Módulo 1 completo y a las primeras 2 clases del Módulo 2.</p>
+            <p className="mb-10 text-center text-sm text-muted">Sin vueltas: pagás US${PRECOS.trial.valor} y entrás ya a probar el curso por tu cuenta.</p>
           </Aparece>
           <Suspense fallback={<div className="cristal h-96 rounded-3xl" />}>
             <OfertaTrial />
@@ -214,9 +231,9 @@ export default function VentasPage() {
             <h2 className="relative mx-auto max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
               Mirá el curso por dentro, <span className="texto-luz">hoy mismo.</span>
             </h2>
-            <p className="relative mx-auto mt-4 max-w-md text-muted">Módulo 1 completo + 2 clases del Módulo 2, por US${PRECOS.trial.valor}. Acceso inmediato por email.</p>
+            <p className="relative mx-auto mt-4 max-w-md text-muted">Experimentá el curso por US${PRECOS.trial.valor}. Acceso inmediato por email.</p>
             <a href="#comprar" className={`${ui.boton} relative mt-8 px-8 py-3.5`}>
-              Entrar por US${PRECOS.trial.valor}
+              Experimentar por US${PRECOS.trial.valor}
             </a>
           </div>
         </Aparece>
@@ -231,7 +248,7 @@ export default function VentasPage() {
         </div>
       </footer>
 
-      <BarraMovil texto={`Entrar por US$${PRECOS.trial.valor}`} />
+      <BarraMovil texto={`Experimentar por US$${PRECOS.trial.valor}`} />
     </main>
   );
 }
