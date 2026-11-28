@@ -68,10 +68,9 @@ export const DIAS_BONO = 7;
 // Cuando la página de ventas esté lista, cambia `lista` a true y aparece el enlace para copiar.
 export const PAGINAS = [
   { nombre: "Página de captura", ruta: "/captura", detalle: "Lista de espera: email y grupo de WhatsApp", lista: true },
-  { nombre: "Página de ventas", ruta: "/ventas", detalle: "La página oficial (la que ya usa Facebook Ads): venta directa del curso completo", lista: true },
-  { nombre: "Página de venta directa", ruta: "/ventas-completa", detalle: "Igual a la de arriba; útil para mandar un link directo por WhatsApp sin tocar el oficial", lista: true },
-  { nombre: "Funil de US$1 (todavía no está activo)", ruta: "/ventas-us1", detalle: "Guardada acá hasta crear la oferta de US$1 en la Hotmart y correr los 2 SQL. Después pasa a /ventas", lista: false },
-  { nombre: "Checkout (las 3 ofertas)", ruta: "/ventas#comprar", detalle: "Lleva directo al formulario y a la elección de plan; ideal para anuncios y mensajes de cierre", lista: true },
+  { nombre: "Página de ventas (funil de US$1)", ruta: "/ventas", detalle: "El funil oficial: entra por US$1 y pasa a la promo desde adentro", lista: true },
+  { nombre: "Página de venta directa", ruta: "/ventas-completa", detalle: "Para quien ya quiere comprar el curso completo de una vez, sin pasar por el US$1 (ideal para mandar por WhatsApp)", lista: true },
+  { nombre: "Checkout (US$1)", ruta: "/ventas#comprar", detalle: "Lleva directo al formulario de entrada por US$1; ideal para anuncios", lista: true },
   { nombre: "Gracias: compra aprobada", ruta: "/gracias", detalle: "Hotmart > URL para Compras Aprobadas", lista: true },
   { nombre: "Gracias: pago pendiente", ruta: "/gracias/pendiente", detalle: "Hotmart > URL para Compras a la espera de pago", lista: true },
   { nombre: "Gracias: pago en análisis", ruta: "/gracias/analisis", detalle: "Hotmart > URL para Compras a la Espera del Análisis de Crédito", lista: true },
