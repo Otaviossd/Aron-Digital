@@ -33,7 +33,9 @@ as $$
   where m.id = p_module_id
 $$;
 
--- 3) El piso de esta vez: Módulo 3 y Módulo 4 abren recién mañana (28/11) a las 12:00, hora de Paraguay.
+-- 3) El piso de esta vez: Módulo 3 y Módulo 4 abren recién mañana (29/11) a las 12:00, hora de Paraguay.
+--    (Pospuesto de nuevo desde el 28/11 — este UPDATE siempre pisa el valor anterior, así que para la
+--    próxima vez que haya que atrasarlo de nuevo alcanza con correr solo este UPDATE con la fecha nueva.)
 update public.modules
-set unlock_at_min = '2026-11-28 12:00:00-03'
+set unlock_at_min = '2026-11-29 12:00:00-03'
 where title in ('Módulo 3: Corte 1', 'Módulo 4: Corte 2', 'Módulo 3: Corte 1 · Pelo largo', 'Módulo 4: Corte 2 · (a definir)');
