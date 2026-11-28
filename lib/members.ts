@@ -75,12 +75,16 @@ export const getMemberData = cache(async function getMemberData() {
   let modulos = ((modulosRaw ?? []) as ModuloEstado[]).sort((a, b) => a.position - b.position);
   let aulas = (aulasRaw ?? []) as Aula[];
 
-  // Vista previa para el equipo: el admin ve todo abierto; con esta cookie ve el curso como un alumno que compró hoy (con candados).
-  const vistaAlumno = admin === true && (await cookies()).get("vista_alumno")?.value === "1";
+  // Vista previa para el equipo: el admin ve todo abierto; con estas cookies ve el curso como lo vería
+  // un alumno real — "nuevo" (candados por día, recién comprado) o "trial" (candados por contenido,
+  // igual al que entró por el funil de US$1).
+  const cookieJar = await cookies();
+  const vistaAlumno = admin === true && cookieJar.get("vista_alumno")?.value === "1";
+  const vistaTrialPreview = admin === true && cookieJar.get("vista_trial")?.value === "1";
 
   // Enmascara los módulos "oculto" (sin grabar todavía) para cualquiera que no sea el admin viendo el panel real.
-  // Así la vista previa "como alumno" también muestra el genérico, en vez del título real.
-  if (admin !== true || vistaAlumno) {
+  // Así las vistas previas "como alumno" también muestran el genérico, en vez del título real.
+  if (admin !== true || vistaAlumno || vistaTrialPreview) {
     modulos = modulos.map(enmascarar);
   }
 
@@ -95,16 +99,29 @@ export const getMemberData = cache(async function getMemberData() {
       .filter((a) => (diasModulo.get(a.module_id) ?? 0) <= 0)
       .map((a) => ({ ...a, ...en(Math.max(diasModulo.get(a.module_id) ?? 0, diasAula.get(a.id) ?? 0)) }));
   }
+
+  if (vistaTrialPreview) {
+    const [{ data: modFlagsRaw }, { data: lesFlagsRaw }] = await Promise.all([
+      supabase.from("modules").select("id, incluido_en_prueba"),
+      supabase.from("lessons").select("id, incluido_en_prueba"),
+    ]);
+    const modIncluido = new Map(((modFlagsRaw ?? []) as { id: string; incluido_en_prueba: boolean }[]).map((x) => [x.id, x.incluido_en_prueba]));
+    const lesIncluido = new Map(((lesFlagsRaw ?? []) as { id: string; incluido_en_prueba: boolean }[]).map((x) => [x.id, x.incluido_en_prueba]));
+    const ahora = new Date(Date.now() - 1000).toISOString();
+    const en = (incluido: boolean) => ({ unlock_at: incluido ? ahora : null, is_unlocked: incluido });
+    modulos = modulos.map((m) => ({ ...m, ...en(modIncluido.get(m.id) === true) }));
+    aulas = aulas.map((a) => ({ ...a, ...en(modIncluido.get(a.module_id) === true || lesIncluido.get(a.id) === true) }));
+  }
   const completadas = new Set(((progresoRaw ?? []) as { lesson_id: string }[]).map((p) => p.lesson_id));
 
   // Avance real del curso principal: todas las clases publicadas, también las que aún no se abrieron.
   const filaCurso = (Array.isArray(cursoRaw) ? cursoRaw[0] : null) as { total: number; hechas: number; minutos: number; elegible: boolean } | null;
   const idsLive = new Set(modulos.filter((m) => m.is_live).map((m) => m.id));
   let porcentaje: number;
-  if (filaCurso && filaCurso.total > 0 && !vistaAlumno) {
+  if (filaCurso && filaCurso.total > 0 && !vistaAlumno && !vistaTrialPreview) {
     porcentaje = Math.round((filaCurso.hechas / filaCurso.total) * 100);
   } else {
-    // Sin la función nueva (o en vista alumno): sobre las clases ya liberadas, sin las grabaciones de lives.
+    // Sin la función nueva (o en una vista previa): sobre las clases ya liberadas, sin las grabaciones de lives.
     const liberadas = aulas.filter((a) => a.is_unlocked !== false && !idsLive.has(a.module_id));
     const hechas = liberadas.filter((a) => completadas.has(a.id)).length;
     porcentaje = liberadas.length === 0 ? 0 : Math.round((hechas / liberadas.length) * 100);
@@ -121,6 +138,7 @@ export const getMemberData = cache(async function getMemberData() {
     email: user.email,
     esAdmin: admin === true,
     vistaAlumno,
+    vistaTrialPreview,
     avatarUrl,
     modulos,
     aulas,
@@ -129,8 +147,8 @@ export const getMemberData = cache(async function getMemberData() {
     progreso,
     nombre,
     tieneNombre: Boolean(nombreMeta),
-    esTrial,
-    trialCompradoEn: esTrial ? (filaSub?.purchased_at ?? null) : null,
+    esTrial: esTrial || vistaTrialPreview,
+    trialCompradoEn: esTrial ? (filaSub?.purchased_at ?? null) : vistaTrialPreview ? new Date().toISOString() : null,
   };
 });
 

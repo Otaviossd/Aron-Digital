@@ -12,6 +12,7 @@ type Props = {
   porcentaje: number;
   esAdmin: boolean;
   vistaAlumno?: boolean;
+  vistaTrialPreview?: boolean;
   avatarUrl?: string | null;
   instagramUrl?: string;
   whatsappUrl?: string;
@@ -39,7 +40,7 @@ function Icono({ d }: { d: string }) {
   );
 }
 
-export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno, avatarUrl, instagramUrl, whatsappUrl }: Props) {
+export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno, vistaTrialPreview, avatarUrl, instagramUrl, whatsappUrl }: Props) {
   const pathname = usePathname();
   const { enVivo } = useEnVivo();
   // Menú móvil sin depender de JavaScript para abrir: un checkbox oculto + CSS (abre al instante, incluso antes de hidratar).
@@ -66,11 +67,12 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
     ...(instagramUrl ? [{ href: instagramUrl, label: "Instagram", icono: "instagram", externo: true }] : []),
     ...(esAdmin ? [{ href: "/admin", label: "Panel del equipo", icono: "admin" }] : []),
     ...(esAdmin
-      ? [
-          vistaAlumno
-            ? { href: "/aulas/vista", label: "Salir de vista alumno", icono: "ayuda", externo: false, recarga: true }
-            : { href: "/aulas/vista?modo=nuevo", label: "Ver como alumno nuevo", icono: "ayuda", externo: false, recarga: true },
-        ]
+      ? vistaAlumno || vistaTrialPreview
+        ? [{ href: "/aulas/vista", label: "Salir de vista alumno", icono: "ayuda", externo: false, recarga: true }]
+        : [
+            { href: "/aulas/vista?modo=nuevo", label: "Ver como alumno nuevo", icono: "ayuda", externo: false, recarga: true },
+            { href: "/aulas/vista?modo=trial", label: "Ver como alumno de US$1", icono: "ayuda", externo: false, recarga: true },
+          ]
       : []),
   ];
 

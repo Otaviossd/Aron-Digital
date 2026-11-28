@@ -16,7 +16,7 @@ export default function AulasLayout({ children }: LayoutProps<"/aulas">) {
 }
 
 async function Shell({ children }: { children: React.ReactNode }) {
-  const { supabase, email, esAdmin, porcentaje, avatarUrl, vistaAlumno } = await getMemberData();
+  const { supabase, email, esAdmin, porcentaje, avatarUrl, vistaAlumno, vistaTrialPreview } = await getMemberData();
   // ¿Hay una clase en vivo ahora? (si todavía no se creó la tabla, simplemente no hay)
   const { data: liveRaw } = await supabase.rpc("live_actual");
   const live = (Array.isArray(liveRaw) ? liveRaw[0] : null) as { estado: string; titulo: string } | null;
@@ -37,6 +37,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
         porcentaje={porcentaje}
         esAdmin={esAdmin}
         vistaAlumno={vistaAlumno}
+        vistaTrialPreview={vistaTrialPreview}
         avatarUrl={avatarUrl}
         instagramUrl={process.env.NEXT_PUBLIC_INSTAGRAM_URL}
         whatsappUrl={WHATSAPP_ALUMNOS_URL}

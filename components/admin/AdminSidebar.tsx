@@ -82,6 +82,9 @@ export default function AdminSidebar({ brand, email }: { brand: string; email: s
         <Link href="/aulas" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted transition hover:bg-white/[0.04] hover:text-ink">
           <Icono d={iconos.aluno} /> Ver como alumno
         </Link>
+        <a href="/aulas/vista?modo=trial" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted transition hover:bg-white/[0.04] hover:text-ink">
+          <Icono d={iconos.aluno} /> Ver como alumno de US$1
+        </a>
       </nav>
 
       <form action="/auth/sair" method="post" className="border-t border-line p-3">
