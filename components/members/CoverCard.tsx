@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ModuloEstado } from "@/lib/members";
 import { diasRestantes } from "@/lib/members";
+import { FOTOS_PORTADA } from "@/lib/fotos";
 
 type Props = {
   modulo: ModuloEstado;
@@ -9,14 +10,17 @@ type Props = {
   totalAulas: number;
 };
 
-// Capa vertical de módulo (estilo catálogo). Usa la imagen propia del módulo; sin imagen, una marca
-// de agua con el logo y el color del módulo (en vez de reciclar una foto del Aaron en varias tarjetas).
+// Capa vertical de módulo (estilo catálogo). Usa la imagen propia del módulo si tiene; si no, para el
+// Módulo 1, el Módulo 2 y los bonos usa la foto de Aaron de siempre (rotando entre unas pocas); para
+// el resto (los cortes 3+, todavía sin portada real) queda la marca de agua con el logo, hasta que
+// Otávio mande la foto del corte de cada uno.
 export default function CoverCard({ modulo, numero, progreso, totalAulas }: Props) {
   const bloqueado = !modulo.is_unlocked;
   // Módulo "oculto" (sin grabar todavía, o que no queremos adelantar): bloqueado, sin ninguna foto,
   // solo el texto genérico ("Corte exclusivo…") y cuándo se libera.
   const sinFoto = bloqueado && modulo.oculto;
   const accent = /^#[0-9a-fA-F]{6}$/.test(modulo.accent) ? modulo.accent : "#39ff7e";
+  const fotoRotada = modulo.is_bonus || numero <= 2 ? FOTOS_PORTADA[(Math.max(numero, 1) - 1) % FOTOS_PORTADA.length] : null;
 
   const tarjeta = (
     <div
@@ -29,6 +33,9 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
       ) : modulo.cover_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={modulo.cover_url} alt="" className={`absolute inset-0 h-full w-full object-cover transition duration-500 ${bloqueado ? "" : "group-hover:scale-[1.04]"}`} />
+      ) : fotoRotada ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={fotoRotada} alt="" className={`absolute inset-0 h-full w-full object-cover transition duration-500 ${bloqueado ? "" : "group-hover:scale-[1.04]"}`} />
       ) : (
         // Sin portada propia: marca de agua con el logo (nunca una foto del Aaron repetida entre tarjetas).
         <div className="absolute inset-0 overflow-hidden" style={{ background: `radial-gradient(130% 100% at 20% 0%, ${accent}3d, transparent 60%), linear-gradient(170deg, #11151a, #05070a)` }}>
