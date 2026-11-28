@@ -25,6 +25,7 @@ export type ResumenAdmin = {
   activos_mensual: number;
   activos_anual: number;
   activos_vitalicio: number;
+  activos_trial: number;
   compras: number;
   compras_7d: number;
   reembolsos: number;
@@ -37,6 +38,15 @@ export type ResumenAdmin = {
   modulos: number;
   top_clases: { title: string; vistas: number; alumnos: number }[];
   actividad: { email: string; clase: string; cuando: string }[];
+};
+
+// Funil de entrada por US$1 (app/admin/page.tsx), separado de los alumnos que ya compraron de verdad.
+export type FunilTrialAdmin = {
+  activos: number;
+  completaron_contenido: number;
+  dentro_del_plazo: number;
+  vencidos_sin_upgrade: number;
+  convertidos: number;
 };
 
 export type AlumnoAdmin = {

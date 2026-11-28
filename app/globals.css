@@ -79,10 +79,25 @@ body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+@keyframes brillo-boton {
+  0%, 55% { transform: translateX(-140%) skewX(-20deg); }
+  100% { transform: translateX(140%) skewX(-20deg); }
+}
 .flotar { animation: flotar 6s ease-in-out infinite; }
 .flotar-lento { animation: flotar 8s ease-in-out infinite reverse; }
 .respirar { animation: respirar 7s ease-in-out infinite; }
 .cinta { animation: cinta 38s linear infinite; }
+/* Brillo que cruza un botón, para que un CTA se sienta "premium" sin depender de una librería. */
+.brillo-boton { position: relative; overflow: hidden; }
+.brillo-boton::after {
+  content: "";
+  position: absolute;
+  inset: -20% -10%;
+  background: linear-gradient(100deg, transparent 40%, rgba(255, 255, 255, 0.55) 50%, transparent 60%);
+  transform: translateX(-140%) skewX(-20deg);
+  animation: brillo-boton 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
 
 /* Cristal: tarjeta translúcida con borde de luz */
 .cristal {
@@ -209,4 +224,5 @@ button, a, summary { -webkit-tap-highlight-color: transparent; }
   .entra, .escalonado > *, .esqueleto, .animate-ping, .animate-pulse { animation: none !important; }
   .flotar, .flotar-lento, .respirar, .cinta, .texto-luz { animation: none; }
   .aparece { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .brillo-boton::after { animation: none !important; display: none; }
 }

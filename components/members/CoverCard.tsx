@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ModuloEstado } from "@/lib/members";
 import { diasRestantes } from "@/lib/members";
-import { FOTOS_PORTADA } from "@/lib/fotos";
 
 type Props = {
   modulo: ModuloEstado;
@@ -10,15 +9,14 @@ type Props = {
   totalAulas: number;
 };
 
-// Capa vertical de módulo (estilo catálogo). Usa la imagen del módulo; sin imagen, una foto del Aaron
-// teñida con el color del módulo.
+// Capa vertical de módulo (estilo catálogo). Usa la imagen propia del módulo; sin imagen, una marca
+// de agua con el logo y el color del módulo (en vez de reciclar una foto del Aaron en varias tarjetas).
 export default function CoverCard({ modulo, numero, progreso, totalAulas }: Props) {
   const bloqueado = !modulo.is_unlocked;
   // Módulo "oculto" (sin grabar todavía, o que no queremos adelantar): bloqueado, sin ninguna foto,
   // solo el texto genérico ("Corte exclusivo…") y cuándo se libera.
   const sinFoto = bloqueado && modulo.oculto;
   const accent = /^#[0-9a-fA-F]{6}$/.test(modulo.accent) ? modulo.accent : "#39ff7e";
-  const foto = FOTOS_PORTADA[(numero - 1) % FOTOS_PORTADA.length];
 
   const tarjeta = (
     <div
@@ -32,14 +30,18 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
         // eslint-disable-next-line @next/next/no-img-element
         <img src={modulo.cover_url} alt="" className={`absolute inset-0 h-full w-full object-cover transition duration-500 ${bloqueado ? "" : "group-hover:scale-[1.04]"}`} />
       ) : (
-        <div
-          className={`absolute inset-0 bg-cover bg-center transition duration-500 ${bloqueado ? "" : "group-hover:scale-[1.05]"}`}
-          style={{ backgroundImage: `url(${foto})` }}
-        />
+        // Sin portada propia: marca de agua con el logo (nunca una foto del Aaron repetida entre tarjetas).
+        <div className="absolute inset-0 overflow-hidden" style={{ background: `radial-gradient(130% 100% at 20% 0%, ${accent}3d, transparent 60%), linear-gradient(170deg, #11151a, #05070a)` }}>
+          <div aria-hidden="true" className="rejilla absolute inset-0 opacity-70" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-lno.png"
+            alt=""
+            className={`absolute left-1/2 top-[42%] h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-2xl opacity-25 transition duration-500 ${bloqueado ? "" : "group-hover:scale-110 group-hover:opacity-35"}`}
+          />
+        </div>
       )}
 
-      {/* Tinte del color del módulo + degradado para legibilidad */}
-      {!modulo.cover_url && !sinFoto && <div className="absolute inset-0 mix-blend-soft-light" style={{ background: `linear-gradient(160deg, ${accent}aa, transparent 70%)` }} />}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10" />
 
       <span className="absolute left-2.5 top-2.5 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-medium text-ink/90 backdrop-blur">

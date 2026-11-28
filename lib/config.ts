@@ -57,6 +57,10 @@ export const WHATSAPP_ALUMNOS_URL =
 // Soporte al alumno. Para cambiar el email sin tocar el código: NEXT_PUBLIC_SUPPORT_EMAIL en Vercel.
 export const SOPORTE_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "soportelnoacademy@gmail.com";
 
+// WhatsApp de soporte (distinto del grupo de alumnos). Define NEXT_PUBLIC_WHATSAPP_SOPORTE_URL en la
+// Vercel con el link de wa.me/+595... apenas Otávio lo tenga; mientras tanto no se muestra el botón.
+export const WHATSAPP_SOPORTE_URL = process.env.NEXT_PUBLIC_WHATSAPP_SOPORTE_URL || null;
+
 // Días que los bonos (y algunas clases) quedan bloqueados después de la compra.
 export const DIAS_BONO = 7;
 
@@ -64,7 +68,8 @@ export const DIAS_BONO = 7;
 // Cuando la página de ventas esté lista, cambia `lista` a true y aparece el enlace para copiar.
 export const PAGINAS = [
   { nombre: "Página de captura", ruta: "/captura", detalle: "Lista de espera: email y grupo de WhatsApp", lista: true },
-  { nombre: "Página de ventas", ruta: "/ventas", detalle: "Venta del curso: formulario de contacto y checkout de la Hotmart", lista: true },
+  { nombre: "Página de ventas (funil de US$1)", ruta: "/ventas", detalle: "El funil oficial: entra por US$1 y pasa a la promo desde adentro", lista: true },
+  { nombre: "Página de venta directa", ruta: "/ventas-completa", detalle: "Para quien ya quiere comprar el curso completo de una vez, sin pasar por el US$1 (ideal para mandar por WhatsApp)", lista: true },
   { nombre: "Checkout (las 3 ofertas)", ruta: "/ventas#comprar", detalle: "Lleva directo al formulario y a la elección de plan; ideal para anuncios y mensajes de cierre", lista: true },
   { nombre: "Gracias: compra aprobada", ruta: "/gracias", detalle: "Hotmart > URL para Compras Aprobadas", lista: true },
   { nombre: "Gracias: pago pendiente", ruta: "/gracias/pendiente", detalle: "Hotmart > URL para Compras a la espera de pago", lista: true },

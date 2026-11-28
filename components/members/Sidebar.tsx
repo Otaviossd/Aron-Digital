@@ -11,6 +11,7 @@ type Props = {
   email: string;
   porcentaje: number;
   esAdmin: boolean;
+  esTrial?: boolean;
   vistaAlumno?: boolean;
   vistaTrialPreview?: boolean;
   avatarUrl?: string | null;
@@ -40,7 +41,7 @@ function Icono({ d }: { d: string }) {
   );
 }
 
-export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno, vistaTrialPreview, avatarUrl, instagramUrl, whatsappUrl }: Props) {
+export default function Sidebar({ brand, email, porcentaje, esAdmin, esTrial, vistaAlumno, vistaTrialPreview, avatarUrl, instagramUrl, whatsappUrl }: Props) {
   const pathname = usePathname();
   const { enVivo } = useEnVivo();
   // Menú móvil sin depender de JavaScript para abrir: un checkbox oculto + CSS (abre al instante, incluso antes de hidratar).
@@ -55,7 +56,7 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
     return () => window.removeEventListener("keydown", tecla);
   }, []);
 
-  const items: { href: string; label: string; icono: string; externo?: boolean; recarga?: boolean }[] = [
+  const items: { href: string; label: string; icono: string; externo?: boolean; recarga?: boolean; bloqueado?: boolean }[] = [
     { href: "/aulas", label: "Inicio", icono: "inicio" },
     { href: "/aulas/live", label: "Clases en vivo", icono: "live" },
     { href: "/aulas/comunidad", label: "Comunidad", icono: "comunidad" },
@@ -63,7 +64,10 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
     { href: "/aulas/cuenta", label: "Mi cuenta", icono: "cuenta" },
     { href: "/aulas/ayuda", label: "Preguntas frecuentes", icono: "ayuda" },
     { href: "/aulas/soporte", label: "Soporte", icono: "soporte" },
-    ...(whatsappUrl ? [{ href: whatsappUrl, label: "Grupo de WhatsApp", icono: "whatsapp", externo: true }] : []),
+    // El grupo de WhatsApp de alumnos es solo para quien compró el curso completo, no para el funil de US$1.
+    ...(whatsappUrl
+      ? [esTrial ? { href: "#", label: "Grupo de WhatsApp", icono: "whatsapp", bloqueado: true } : { href: whatsappUrl, label: "Grupo de WhatsApp", icono: "whatsapp", externo: true }]
+      : []),
     ...(instagramUrl ? [{ href: instagramUrl, label: "Instagram", icono: "instagram", externo: true }] : []),
     ...(esAdmin ? [{ href: "/admin", label: "Panel del equipo", icono: "admin" }] : []),
     ...(esAdmin
@@ -106,7 +110,15 @@ export default function Sidebar({ brand, email, porcentaje, esAdmin, vistaAlumno
           const clase = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
             activo(it.href) && !it.externo ? "bg-accent/10 font-medium text-ink shadow-[inset_2px_0_0_#39ff7e]" : "text-muted hover:bg-white/[0.04] hover:text-ink"
           }`;
-          return it.recarga ? (
+          return it.bloqueado ? (
+            <span key={it.label} className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-faint/70">
+              <Icono d={iconos[it.icono]} /> {it.label}
+              <svg viewBox="0 0 24 24" className="ml-auto h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+              </svg>
+            </span>
+          ) : it.recarga ? (
             <a key={it.label} href={it.href} className={clase}>
               <Icono d={iconos[it.icono]} /> {it.label}
             </a>

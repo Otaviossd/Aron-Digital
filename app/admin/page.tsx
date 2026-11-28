@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { cargarExcluidos, enLista } from "@/lib/excluidos";
 import { cargarFinanzas } from "@/lib/finanzas-server";
-import { estadoConfig, fmtFecha, fmtUsd, hace, nombrePlan, type ResumenAdmin } from "@/lib/admin";
+import { estadoConfig, fmtFecha, fmtUsd, hace, nombrePlan, type FunilTrialAdmin, type ResumenAdmin } from "@/lib/admin";
 import { Dato, Seccion, Tabla, Titulo, Vacio } from "@/components/admin/ui";
 
 export default function AdminResumenPage() {
@@ -17,12 +17,15 @@ export default function AdminResumenPage() {
 async function Resumen() {
   const supabase = await createClient();
   const L = enLista(await cargarExcluidos(supabase));
-  const [{ data: r }, { data: ultimas }, fin] = await Promise.all([
+  const [{ data: r }, { data: ultimas }, fin, { data: ft }] = await Promise.all([
     supabase.rpc("admin_resumen"),
     supabase.from("subscriptions").select("email, plan, status, purchased_at, refunded_at").not("email", "in", L).order("purchased_at", { ascending: false }).limit(6),
     cargarFinanzas(supabase, null),
+    // Funil de entrada por US$1 (requiere haber corrido supabase/funil-us1-metricas.sql; si no, queda null y no se muestra la sección).
+    supabase.rpc("admin_funil_trial"),
   ]);
   const res = (r ?? null) as ResumenAdmin | null;
+  const funilTrial = (ft ?? null) as FunilTrialAdmin | null;
   if (!res) return <Vacio>No pudimos leer los números. Ejecutá de nuevo supabase/schema.sql en el SQL Editor y recargá.</Vacio>;
 
   const config = estadoConfig();
@@ -46,7 +49,7 @@ async function Resumen() {
       )}
 
       <div className="mb-12 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Dato valor={res.activos} etiqueta="Alumnos con acceso" nota={`${res.activos_anual} de 1 año · ${res.activos_vitalicio} vitalicio`} />
+        <Dato valor={res.activos} etiqueta="Alumnos con acceso" nota={`${res.activos_anual} de 1 año · ${res.activos_vitalicio} vitalicio · sin contar los de US$1`} />
         <Dato valor={res.viendo_7d} etiqueta="Viendo esta semana" nota={`${res.viendo_24h} en las últimas 24 h · ${res.viendo_30d} en 30 días`} />
         <Dato valor={res.compras_7d} etiqueta="Compras en 7 días" nota={`${res.compras} en total`} />
         <Dato
@@ -62,6 +65,25 @@ async function Resumen() {
         <Dato valor={`${res.modulos} / ${res.aulas}`} etiqueta="Módulos / clases publicadas" />
         <Dato valor={res.reembolsos} etiqueta="Reembolsos" />
       </div>
+
+      {funilTrial && (
+        <Seccion
+          titulo="Funil de entrada (US$1)"
+          sub="Separado de los alumnos que ya compraron: quién entró por US$1, quién vio todo lo disponible y quién dejó vencer el plazo sin pasar a la promo."
+        >
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <Dato valor={funilTrial.activos} etiqueta="Activos de US$1" nota="Entraron por el funil de entrada" />
+            <Dato valor={funilTrial.completaron_contenido} etiqueta="Vieron todo lo disponible" nota="Ya terminaron el Módulo 1 y las clases abiertas del 2" />
+            <Dato valor={funilTrial.dentro_del_plazo} etiqueta="Dentro del plazo" nota="Todavía pueden pasar a la promo de US$25" />
+            <Dato valor={funilTrial.vencidos_sin_upgrade} etiqueta="Vencieron sin pasarse" nota="Candidatos a una promo de reenganche (20%, 10%...)" />
+          </div>
+          {funilTrial.convertidos > 0 && (
+            <p className="mt-3 text-xs text-faint">
+              <strong className="text-ink/80">{funilTrial.convertidos}</strong> de los que entraron por US$1 ya se convirtieron en alumnos de verdad.
+            </p>
+          )}
+        </Seccion>
+      )}
 
       <div className="grid gap-12 lg:grid-cols-2">
         <Seccion titulo="Actividad reciente" sub="Últimas clases abiertas por los alumnos">

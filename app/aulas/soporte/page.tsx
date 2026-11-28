@@ -1,4 +1,4 @@
-import { SOPORTE_EMAIL } from "@/lib/config";
+import { SOPORTE_EMAIL, WHATSAPP_SOPORTE_URL } from "@/lib/config";
 import { ui } from "@/lib/ui";
 import Link from "next/link";
 
@@ -12,14 +12,25 @@ export default function SoportePage() {
         ¿Algo no funciona o tenés una duda sobre tu acceso, tu pago o una clase? Escribinos y te ayudamos.
       </p>
 
-      <div className="rounded-2xl border border-line bg-surface p-6">
-        <p className="text-xs text-faint">Escribinos a</p>
-        <a href={`mailto:${SOPORTE_EMAIL}`} className="mt-1 block break-all text-lg font-medium tracking-tight text-ink transition hover:text-accent">
-          {SOPORTE_EMAIL}
-        </a>
-        <a href={`mailto:${SOPORTE_EMAIL}`} className={`${ui.boton} mt-6`}>
-          Enviar un email
-        </a>
+      <div className={`grid gap-4 ${WHATSAPP_SOPORTE_URL ? "sm:grid-cols-2" : ""}`}>
+        {WHATSAPP_SOPORTE_URL && (
+          <div className="rounded-2xl border border-accent/30 bg-accent/[0.05] p-6">
+            <p className="text-xs text-faint">Escribinos por</p>
+            <p className="mt-1 text-lg font-medium tracking-tight text-ink">WhatsApp</p>
+            <a href={WHATSAPP_SOPORTE_URL} target="_blank" rel="noreferrer" className={`${ui.boton} mt-6`}>
+              Abrir WhatsApp
+            </a>
+          </div>
+        )}
+        <div className="rounded-2xl border border-line bg-surface p-6">
+          <p className="text-xs text-faint">Escribinos a</p>
+          <a href={`mailto:${SOPORTE_EMAIL}`} className="mt-1 block break-all text-lg font-medium tracking-tight text-ink transition hover:text-accent">
+            {SOPORTE_EMAIL}
+          </a>
+          <a href={`mailto:${SOPORTE_EMAIL}`} className={`${WHATSAPP_SOPORTE_URL ? ui.botonSuave : ui.boton} mt-6`}>
+            Enviar un email
+          </a>
+        </div>
       </div>
 
       <div className="mt-6 rounded-2xl border border-line bg-surface/60 p-6 text-sm leading-relaxed text-muted">

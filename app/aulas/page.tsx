@@ -6,6 +6,7 @@ import Portada from "@/components/members/Portada";
 import { aulasDelModulo, diasRestantes, getMemberData, siguienteAula } from "@/lib/members";
 import { ui } from "@/lib/ui";
 import { EXTRA } from "@/lib/config";
+import { precioExtra } from "@/lib/extra";
 import Atajos from "@/components/members/Atajos";
 import UpgradeTrial from "@/components/members/UpgradeTrial";
 
@@ -19,8 +20,13 @@ export default function AulasPage() {
 
 async function Inicio() {
   const { modulos, aulas, completadas, email, porcentaje, supabase, esTrial, trialCompradoEn } = await getMemberData();
-  const { data: estadoExtra } = await supabase.rpc("estado_extra");
+  const [{ data: estadoExtra }, { data: comprasExtra }] = await Promise.all([
+    supabase.rpc("estado_extra"),
+    supabase.from("subscriptions").select("purchased_at").is("refunded_at", null).order("purchased_at", { ascending: true }).limit(1),
+  ]);
   const extraLiberaEn = typeof estadoExtra?.libera_en === "string" && estadoExtra?.liberado !== true ? estadoExtra.libera_en : null;
+  const extraCompraEn = comprasExtra?.[0]?.purchased_at ? new Date(comprasExtra[0].purchased_at) : null;
+  const precioModuloExtra = precioExtra(extraCompraEn, new Date());
 
   // Sem compra vigente para este e-mail
   if (modulos.length === 0) {
@@ -100,21 +106,46 @@ async function Inicio() {
         </Row>
       )}
 
-      {!esTrial && (
-        <Link
-          href="/aulas/extra"
-          className="group mt-10 flex items-center gap-4 rounded-2xl border border-accent/30 bg-accent/[0.06] p-5 transition hover:border-accent/60"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={EXTRA.portadaChica} alt="" width={64} height={64} loading="lazy" className="h-16 w-16 shrink-0 rounded-xl border border-accent/40 object-cover" />
-          <span className="min-w-0 flex-1">
-            <span className="block text-xs font-medium text-accent">Módulo extra</span>
-            <span className="block truncate font-medium tracking-tight">{EXTRA.titulo}</span>
-            {extraLiberaEn && <span className="mt-0.5 block text-xs font-medium text-ink/70">Se libera {diasRestantes(extraLiberaEn)}</span>}
-          </span>
-          <span className="text-sm text-muted transition group-hover:text-ink">Ver →</span>
-        </Link>
-      )}
+      <Link
+        href="/aulas/extra"
+        className="group relative mt-10 block overflow-hidden rounded-3xl border border-accent/25 bg-gradient-to-br from-accent/[0.09] via-surface to-surface p-6 transition hover:border-accent/50 sm:p-7"
+      >
+        <div aria-hidden="true" className="respirar absolute -right-20 -top-24 h-64 w-64 rounded-full bg-accent/25 blur-[90px]" />
+        <div aria-hidden="true" className="respirar absolute -left-16 -bottom-20 h-56 w-56 rounded-full bg-cyan-400/15 blur-[90px] [animation-delay:-4s]" />
+
+        <div className="relative flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+          <div className="relative shrink-0">
+            <div aria-hidden="true" className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-accent/60 to-cyan-400/40 opacity-60 blur-md transition group-hover:opacity-90" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={EXTRA.portadaChica}
+              alt=""
+              width={96}
+              height={96}
+              loading="lazy"
+              className="relative h-20 w-20 rounded-2xl border border-accent/40 object-cover shadow-[0_10px_30px_-8px_rgba(57,255,126,.6)] transition duration-500 group-hover:scale-105 sm:h-24 sm:w-24"
+            />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-accent">
+              Bono extra
+            </span>
+            <h3 className="mt-2 text-lg font-semibold tracking-tight sm:text-xl">{EXTRA.titulo}</h3>
+            <p className="mt-1 max-w-md truncate text-sm text-muted sm:whitespace-normal">{EXTRA.descripcion}</p>
+            {extraLiberaEn ? (
+              <p className="mt-2 text-xs font-medium text-ink/70">Se libera {diasRestantes(extraLiberaEn)}</p>
+            ) : (
+              <p className="mt-3 flex items-baseline gap-2">
+                {precioModuloExtra.enOferta && <span className="text-sm text-faint line-through">US${precioModuloExtra.valorAntes}</span>}
+                <span className="text-xl font-bold tracking-tight text-accent">US${precioModuloExtra.valor}</span>
+              </p>
+            )}
+          </div>
+
+          <span className={`${ui.boton} shrink-0 self-stretch px-6 sm:self-center`}>Ver el bono →</span>
+        </div>
+      </Link>
     </>
   );
 }
