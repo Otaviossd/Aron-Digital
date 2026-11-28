@@ -71,17 +71,13 @@ async function Resumen() {
           titulo="Funil de entrada (US$1)"
           sub="Separado de los alumnos que ya compraron: quién entró por US$1, quién vio todo lo disponible y quién dejó vencer el plazo sin pasar a la promo."
         >
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
             <Dato valor={funilTrial.activos} etiqueta="Activos de US$1" nota="Entraron por el funil de entrada" />
             <Dato valor={funilTrial.completaron_contenido} etiqueta="Vieron todo lo disponible" nota="Ya terminaron el Módulo 1 y las clases abiertas del 2" />
             <Dato valor={funilTrial.dentro_del_plazo} etiqueta="Dentro del plazo" nota="Todavía pueden pasar a la promo de US$25" />
             <Dato valor={funilTrial.vencidos_sin_upgrade} etiqueta="Vencieron sin pasarse" nota="Candidatos a una promo de reenganche (20%, 10%...)" />
+            <Dato valor={funilTrial.convertidos} etiqueta="Compraron el curso" nota="Pasaron de US$1 al acceso completo" />
           </div>
-          {funilTrial.convertidos > 0 && (
-            <p className="mt-3 text-xs text-faint">
-              <strong className="text-ink/80">{funilTrial.convertidos}</strong> de los que entraron por US$1 ya se convirtieron en alumnos de verdad.
-            </p>
-          )}
         </Seccion>
       )}
 
