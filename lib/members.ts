@@ -57,7 +57,7 @@ export const getMemberData = cache(async function getMemberData() {
   } = await supabase.auth.getUser();
   if (!user?.email) redirect("/entrar");
 
-  const [{ data: modulosRaw }, { data: aulasRaw }, { data: progresoRaw }, { data: admin }, { data: cursoRaw }] =
+  const [{ data: modulosRaw }, { data: aulasRaw }, { data: progresoRaw }, { data: admin }, { data: cursoRaw }, { data: subRaw }] =
     await Promise.all([
       supabase.rpc("my_modules"),
       supabase.rpc("my_lessons"),
@@ -65,7 +65,12 @@ export const getMemberData = cache(async function getMemberData() {
       supabase.rpc("is_admin"),
       // Avance del curso principal (sin bonos ni lives). Si todavía no se corrió plataforma-v2.sql, viene vacío.
       supabase.rpc("progreso_curso"),
+      // Plan actual (para el banner de upgrade del trial de US$1).
+      supabase.rpc("current_subscription"),
     ]);
+
+  const filaSub = (Array.isArray(subRaw) ? subRaw[0] : subRaw) as { plan?: string; purchased_at?: string } | null;
+  const esTrial = filaSub?.plan === "trial";
 
   let modulos = ((modulosRaw ?? []) as ModuloEstado[]).sort((a, b) => a.position - b.position);
   let aulas = (aulasRaw ?? []) as Aula[];
@@ -124,6 +129,8 @@ export const getMemberData = cache(async function getMemberData() {
     progreso,
     nombre,
     tieneNombre: Boolean(nombreMeta),
+    esTrial,
+    trialCompradoEn: esTrial ? (filaSub?.purchased_at ?? null) : null,
   };
 });
 

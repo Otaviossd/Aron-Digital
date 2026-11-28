@@ -6,13 +6,22 @@ export const PRECOS = {
   vitalicio: { valor: 70, rotulo: "Acceso vitalicio", detalle: "pago único, para siempre y con todas las actualizaciones" },
   // Precio de lanzamiento: vitalicio al precio del anual con 50% de descuento, solo para las primeras personas
   promo: { valor: 25, vagas: 50, mostrarCuposDesde: 30, /* ventas a partir de las cuales se muestra "Quedan X cupos" */ rotulo: "Precio de lanzamiento", detalle: "acceso vitalicio al precio promocional" },
+  // Funil de entrada: Módulo 1 completo + 2 clases del Módulo 2, por US$1. Tiene DIAS_UPGRADE_TRIAL
+  // días para pasar al precio de lanzamiento (promo) antes de que vuelva al precio normal.
+  trial: { valor: 1, rotulo: "Accedé por US$1", detalle: "Módulo 1 completo + 2 clases del Módulo 2, para que veas la plataforma por dentro" },
 } as const;
+
+// Días que tiene quien entró por US$1 para pasar a la promo de US$25 (después vuelve al precio normal).
+export const DIAS_UPGRADE_TRIAL = 3;
 
 // Links de checkout de la Hotmart (uno por oferta). Se definen en la Vercel; sin ellos el botón queda como "próximamente".
 // Links fijos de las 3 ofertas. No dependen de variables de la Vercel, para que un valor viejo allá no mande al checkout antiguo.
 export const CHECKOUT_URLS = {
   anual: "https://pay.hotmart.com/L108130682Q?off=snaqp8m9&checkoutMode=10",
   vitalicio: "https://pay.hotmart.com/L108130682Q?off=xz9l3slm&checkoutMode=10",
+  // Oferta nueva del funil de US$1: todavía no existe en la Hotmart. Apenas Otávio la cree, pone acá
+  // el código (u el link entero) en NEXT_PUBLIC_HOTMART_URL_TRIAL en la Vercel y queda activo solo.
+  trial: process.env.NEXT_PUBLIC_HOTMART_URL_TRIAL || null,
   promo: "https://pay.hotmart.com/L108130682Q?off=zpu4tvlu&checkoutMode=10",
 } as const;
 

@@ -79,8 +79,8 @@ async function procesar(admin: ReturnType<typeof createAdminClient>, evento: any
         promo: c.promo,
         status: "active",
         purchased_at: ahora.toISOString(),
-        // vitalicio = sin vencimiento; 1 año = 365 días desde la compra
-        access_until: c.plan === "lifetime" ? null : new Date(ahora.getTime() + 365 * 86400000).toISOString(),
+        // vitalicio y trial = sin vencimiento (el trial se limita por contenido, no por tiempo); 1 año = 365 días desde la compra
+        access_until: c.plan === "lifetime" || c.plan === "trial" ? null : new Date(ahora.getTime() + 365 * 86400000).toISOString(),
       };
       const guardar = (fila: Record<string, unknown>) =>
         admin.from("subscriptions").upsert(fila, { onConflict: "hotmart_transaction", ignoreDuplicates: false }).select("id, welcome_sent_at").single();

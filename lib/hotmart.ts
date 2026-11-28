@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { OFERTAS_HOTMART } from "./config.ts";
 
-export type PlanCompra = "annual" | "lifetime";
+export type PlanCompra = "annual" | "lifetime" | "trial";
 
 export type CompraHotmart = {
   email: string;
@@ -76,6 +76,7 @@ export function entornoHotmart(env: Env = process.env): Env {
 // por el precio: hasta US$ 35 = promo vitalicia, desde US$ 60 = vitalicio, el resto = 1 año.
 export function planDeCompra(codigoOferta: string | undefined, precio: number | undefined, env: Env = process.env) {
   if (codigoOferta) {
+    if (codigoOferta === env.HOTMART_OFFER_TRIAL) return { plan: "trial" as const, promo: false };
     if (codigoOferta === env.HOTMART_OFFER_PROMO) return { plan: "lifetime" as const, promo: true };
     if (codigoOferta === env.HOTMART_OFFER_VITALICIO) return { plan: "lifetime" as const, promo: false };
     if (codigoOferta === env.HOTMART_OFFER_ANUAL) return { plan: "annual" as const, promo: false };
@@ -95,7 +96,7 @@ export function leerCompra(payload: any, env: Env = process.env): CompraHotmart 
   if (!email || !transaccion) return null;
   const precio = Number(d?.purchase?.price?.value ?? d?.purchase?.price);
   const codigo = d?.purchase?.offer?.code;
-  const esPlan = [env.HOTMART_OFFER_PROMO, env.HOTMART_OFFER_VITALICIO, env.HOTMART_OFFER_ANUAL].includes(codigo);
+  const esPlan = [env.HOTMART_OFFER_PROMO, env.HOTMART_OFFER_VITALICIO, env.HOTMART_OFFER_ANUAL, env.HOTMART_OFFER_TRIAL].includes(codigo);
   const esPrueba = (env.HOTMART_TEST_EMAILS ?? "").toLowerCase().split(",").map((x) => x.trim()).includes(email);
   // La clase extra se reconoce por su producto u oferta (HOTMART_PRODUCT_EXTRA / HOTMART_OFFER_EXTRA, separados por coma);
   // si no están definidos, por precio: cualquier compra de menos de US$ 25 que no sea uno de los 3 planes (el extra cuesta US$ 10 o 20).

@@ -1,18 +1,39 @@
 // Texto del e-mail de confirmación de compra (español). Fica separado para o painel poder mostrar a prévia.
-import { SOPORTE_EMAIL, DIAS_BONO, DIAS_REEMBOLSO, WHATSAPP_ALUMNOS_URL } from "@/lib/config";
+import { SOPORTE_EMAIL, DIAS_BONO, DIAS_REEMBOLSO, DIAS_UPGRADE_TRIAL, PRECOS, WHATSAPP_ALUMNOS_URL } from "@/lib/config";
 import { bloque, boton, COLORES, layoutEmail, paso, parrafo, subtitulo, titulo } from "./layout";
 
-type Datos = { accessLink: string; loginLink: string; to: string; plan?: "monthly" | "annual" | "lifetime" };
+type Datos = { accessLink: string; loginLink: string; to: string; plan?: "monthly" | "annual" | "lifetime" | "trial" };
 
 export const ASUNTO_COMPRA = "Compra confirmada: ¡bienvenido a La Nueva Ola Academy!";
 
-const NOMBRE_PLAN = { lifetime: "Acceso vitalicio", annual: "Acceso por 1 año", monthly: "Acceso mensual" } as const;
+const NOMBRE_PLAN = { lifetime: "Acceso vitalicio", annual: "Acceso por 1 año", monthly: "Acceso mensual", trial: "Acceso de entrada (Módulo 1 + 2 clases)" } as const;
 
 export function htmlCompra({ accessLink, loginLink, to, plan }: Datos) {
   const enlace = (u: string, t: string) => `<a href="${u}" style="color:${COLORES.acento};text-decoration:underline">${t}</a>`;
   const detallePlan = plan
     ? `<strong style="color:#ffffff">Tu plan:</strong> ${NOMBRE_PLAN[plan]}<br/>`
     : "";
+
+  if (plan === "trial") {
+    return layoutEmail({
+      preheader: "Tu acceso ya está activo. Entrá con un solo clic.",
+      cuerpo: `
+        ${titulo("¡Ya estás adentro!")}
+        ${parrafo("Tu pago fue confirmado. Ya podés ver el Módulo 1 completo y las primeras 2 clases del Módulo 2, para que conozcas la plataforma por dentro.")}
+        ${boton(accessLink, "Entrar automáticamente")}
+        ${bloque(`${detallePlan}<strong style="color:#ffffff">Tu cuenta:</strong> ${to}`)}
+
+        ${subtitulo("Dos formas de entrar")}
+        ${paso(1, "<strong>Automático:</strong> tocá el botón <strong>Entrar automáticamente</strong> de arriba. Entrás directo, sin contraseña. El botón es de un solo uso y vence en poco tiempo.")}
+        ${paso(2, `<strong>Con tu email:</strong> entrá a ${enlace(loginLink, loginLink)}, escribí este mismo email (${to}) y te enviamos un acceso nuevo cuando quieras.`)}
+
+        ${subtitulo("Si te gustó lo que viste")}
+        ${parrafo(`Tenés <strong>${DIAS_UPGRADE_TRIAL} días</strong> para pasar al acceso vitalicio completo (todos los módulos, clases en vivo, comunidad, certificado y bonos) al precio de lanzamiento de <strong>US$${PRECOS.promo.valor}</strong>. Después de eso vuelve al precio normal. Vas a ver el botón para hacerlo directo desde adentro de la plataforma.`)}
+
+        ${subtitulo("Soporte")}
+        ${parrafo(`¿Alguna duda? Escribinos a ${enlace(`mailto:${SOPORTE_EMAIL}`, SOPORTE_EMAIL)} y te respondemos.`)}`,
+    });
+  }
 
   return layoutEmail({
     preheader: "Tu acceso ya está activo. Entrá con un solo clic.",

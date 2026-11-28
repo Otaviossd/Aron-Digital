@@ -7,6 +7,7 @@ import { aulasDelModulo, diasRestantes, getMemberData, siguienteAula } from "@/l
 import { ui } from "@/lib/ui";
 import { EXTRA } from "@/lib/config";
 import Atajos from "@/components/members/Atajos";
+import UpgradeTrial from "@/components/members/UpgradeTrial";
 
 export default function AulasPage() {
   return (
@@ -17,7 +18,7 @@ export default function AulasPage() {
 }
 
 async function Inicio() {
-  const { modulos, aulas, completadas, email, porcentaje, supabase } = await getMemberData();
+  const { modulos, aulas, completadas, email, porcentaje, supabase, esTrial, trialCompradoEn } = await getMemberData();
   const { data: estadoExtra } = await supabase.rpc("estado_extra");
   const extraLiberaEn = typeof estadoExtra?.libera_en === "string" && estadoExtra?.liberado !== true ? estadoExtra.libera_en : null;
 
@@ -65,6 +66,8 @@ async function Inicio() {
         aviso={proximoBono?.m.unlock_at ? `${proximoBono.m.title} se libera ${diasRestantes(proximoBono.m.unlock_at)}` : undefined}
       />
 
+      {esTrial && email && <UpgradeTrial email={email} compradoEn={trialCompradoEn} />}
+
       <Atajos porcentaje={porcentaje} />
 
       {enProgreso.length > 0 && (
@@ -97,19 +100,21 @@ async function Inicio() {
         </Row>
       )}
 
-      <Link
-        href="/aulas/extra"
-        className="group mt-10 flex items-center gap-4 rounded-2xl border border-accent/30 bg-accent/[0.06] p-5 transition hover:border-accent/60"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={EXTRA.portadaChica} alt="" width={64} height={64} loading="lazy" className="h-16 w-16 shrink-0 rounded-xl border border-accent/40 object-cover" />
-        <span className="min-w-0 flex-1">
-          <span className="block text-xs font-medium text-accent">Módulo extra</span>
-          <span className="block truncate font-medium tracking-tight">{EXTRA.titulo}</span>
-          {extraLiberaEn && <span className="mt-0.5 block text-xs font-medium text-ink/70">Se libera {diasRestantes(extraLiberaEn)}</span>}
-        </span>
-        <span className="text-sm text-muted transition group-hover:text-ink">Ver →</span>
-      </Link>
+      {!esTrial && (
+        <Link
+          href="/aulas/extra"
+          className="group mt-10 flex items-center gap-4 rounded-2xl border border-accent/30 bg-accent/[0.06] p-5 transition hover:border-accent/60"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={EXTRA.portadaChica} alt="" width={64} height={64} loading="lazy" className="h-16 w-16 shrink-0 rounded-xl border border-accent/40 object-cover" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs font-medium text-accent">Módulo extra</span>
+            <span className="block truncate font-medium tracking-tight">{EXTRA.titulo}</span>
+            {extraLiberaEn && <span className="mt-0.5 block text-xs font-medium text-ink/70">Se libera {diasRestantes(extraLiberaEn)}</span>}
+          </span>
+          <span className="text-sm text-muted transition group-hover:text-ink">Ver →</span>
+        </Link>
+      )}
     </>
   );
 }

@@ -58,7 +58,11 @@ export default function CoverCard({ modulo, numero, progreso, totalAulas }: Prop
       <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
         <h3 className="text-[15px] font-semibold leading-tight tracking-tight sm:text-lg">{modulo.title}</h3>
         {bloqueado ? (
-          modulo.unlock_at && <p className="mt-1 text-xs font-medium text-ink/70">Se libera {diasRestantes(modulo.unlock_at)}</p>
+          modulo.unlock_at ? (
+            <p className="mt-1 text-xs font-medium text-ink/70">Se libera {diasRestantes(modulo.unlock_at)}</p>
+          ) : (
+            <p className="mt-1 text-xs font-medium text-accent">Desbloqueá tu acceso completo ↑</p>
+          )
         ) : (
           <>
             <p className="mt-1 text-xs text-muted">
